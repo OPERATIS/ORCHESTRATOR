@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConnectsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +17,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/connect/shopify/login', [ConnectsController::class, 'shopifyLogin'])->name('shopifyLogin');
+Route::get('/connect/shopify/callback', [ConnectsController::class, 'shopifyCallback'])->name('shopifyCallback');
