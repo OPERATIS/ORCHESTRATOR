@@ -20,3 +20,5 @@ Route::get('/', function () {
 
 Route::get('/connect/shopify/login', [ConnectsController::class, 'shopifyLogin'])->name('shopifyLogin');
 Route::get('/connect/shopify/callback', [ConnectsController::class, 'shopifyCallback'])->name('shopifyCallback');
+Route::get('/connect/google/login', [ConnectsController::class, 'googleLogin'])->name('googleLogin');
+Route::get('/connect/google/callback', [ConnectsController::class, 'googleCallback'])->name('googleCallback');

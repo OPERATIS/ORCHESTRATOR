@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Google\Client;
+use Google\Exception;
+use Google\Service\Analytics;
+use Google\Service\Localservices;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -104,5 +108,61 @@ class ConnectsController extends BaseController
             true,
             false,
         );
+    }
+
+    /**
+     * @param Request $request
+     * @return RedirectResponse
+     * @throws Exception
+     */
+    public function googleLogin(Request $request): RedirectResponse
+    {
+        $service = $request->get('service');
+        if (empty($service)) {
+            abort(404);
+        }
+
+        $client = new Client();
+        $client->setIncludeGrantedScopes(true);
+        $client->setAuthConfig(config_path() . '/googleCredentials.json');
+        if ($service === 'analytics') {
+            $client->addScope(Analytics::ANALYTICS);
+        }
+
+        if ($service === 'adwords') {
+            $client->addScope(Localservices::ADWORDS);
+        }
+
+        $client->setAccessType('offline');
+        $client->setPrompt('consent');
+
+        $redirectUri = route('googleCallback');
+        $client->setRedirectUri($redirectUri);
+        $url = $client->createAuthUrl();
+        return redirect()->to($url);
+    }
+
+    /**
+     * @param Request $request
+     * @throws Exception
+     */
+    public function googleCallback(Request $request)
+    {
+        $code = $request->get('code');
+        if (empty($code)) {
+            abort(404);
+        }
+
+        $client = new Client();
+        $client->setAuthConfig(config_path() . '/googleCredentials.json');
+
+        $token = $client->fetchAccessTokenWithAuthCode($code);
+        // TODO save in database
+        //  "access_token"
+        //  "expires_in" => 3599
+        //  "refresh_token"
+        //  "scope" => "https://www.googleapis.com/auth/analytics https://www.googleapis.com/auth/adwords"
+        //  "token_type" => "Bearer"
+        //  "created" => 1693130377
     }
 }
