@@ -14,6 +14,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Session;
+use Laravel\Socialite\Facades\Socialite;
 use Shopify\Auth\FileSessionStorage;
 use Shopify\Auth\OAuth;
 use Shopify\Auth\OAuthCookie;
@@ -164,5 +165,28 @@ class ConnectsController extends BaseController
         //  "scope" => "https://www.googleapis.com/auth/analytics https://www.googleapis.com/auth/adwords"
         //  "token_type" => "Bearer"
         //  "created" => 1693130377
+    }
+
+    /**
+     * @return mixed
+     */
+    public function facebookLogin()
+    {
+        return Socialite::driver('facebook')
+            ->with(['redirect_uri' => route('facebookCallback')])
+            ->scopes(['email', 'user_birthday', 'ads_read'])
+            ->redirect();
+    }
+
+    public function facebookCallback()
+    {
+        $user = Socialite::driver('facebook')
+            ->user();
+
+        // TODO save in database
+        // token
+        // refreshToken
+        // expiresIn
+        // approvedScopes
     }
 }

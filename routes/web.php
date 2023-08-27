@@ -22,3 +22,6 @@ Route::get('/connect/shopify/login', [ConnectsController::class, 'shopifyLogin']
 Route::get('/connect/shopify/callback', [ConnectsController::class, 'shopifyCallback'])->name('shopifyCallback');
 Route::get('/connect/google/login', [ConnectsController::class, 'googleLogin'])->name('googleLogin');
 Route::get('/connect/google/callback', [ConnectsController::class, 'googleCallback'])->name('googleCallback');
+
+Route::get('/connect/facebook/login', [ConnectsController::class, 'facebookLogin'])->name('facebookLogin');
+Route::get('/connect/facebook/callback', [ConnectsController::class, 'facebookCallback'])->name('facebookCallback');
