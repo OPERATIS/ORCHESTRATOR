@@ -173,7 +173,6 @@ class ConnectsController extends BaseController
     public function facebookLogin()
     {
         return Socialite::driver('facebook')
-            ->with(['redirect_uri' => route('facebookCallback')])
             ->scopes(['email', 'user_birthday', 'ads_read'])
             ->redirect();
     }
