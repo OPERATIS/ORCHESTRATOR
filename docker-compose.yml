@@ -30,6 +30,7 @@ services:
         volumes:
             - .:/var/www
             - ./dockerfiles/nginx/conf.d:/etc/nginx/conf.d
+            - ./dockerfiles/nginx/certs:/etc/nginx/certs
         networks:
             - app-network
 
@@ -37,6 +38,7 @@ services:
         image: postgres:15
         volumes:
             - ./dockerfiles/postgresql:/etc/postgresql
+            - ./postgres-data:/var/lib/postgresql/data
         container_name: db
         restart: unless-stopped
         tty: true
