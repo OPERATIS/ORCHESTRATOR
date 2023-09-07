@@ -41,6 +41,7 @@ class GetOrders implements ShouldQueue
         $attempt = 0;
         $pageInfo = null;
         $orders = [];
+        $now = Carbon::now();
         do {
             try {
                 $client = new Rest($shopify->app_user_slug, $shopify->access_token);
@@ -73,11 +74,13 @@ class GetOrders implements ShouldQueue
                     $orders[] = [
                         "connect_id" => $shopify->id,
                         "order_id" => $order->id,
-                        "order_created_at" => $order->created_at,
+                        "order_created_at" => Carbon::parse($order->created_at)->setTimezone(0),
                         "financial_status" => $order->financial_status,
                         "order_number" => $order->order_number,
                         "total_price" => $order->total_price,
-                        "customer_id" => $order->customer->id ?? null
+                        "customer_id" => $order->customer->id ?? null,
+                        'created_at' => $now,
+                        'updated_at' => $now
                     ];
                 }
 
