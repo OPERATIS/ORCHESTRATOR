@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('shopify:get-orders')->everyFiveMinutes();
+        $schedule->command('facebook:get-ads-stats')->everyFiveMinutes();
     }
 
     /**

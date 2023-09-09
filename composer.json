@@ -14,7 +14,8 @@
         "laravel/sanctum": "^2.11",
         "laravel/socialite": "^5.8",
         "laravel/tinker": "^2.5",
-        "shopify/shopify-api": "^4.3"
+        "shopify/shopify-api": "^4.3",
+      "ext-curl": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

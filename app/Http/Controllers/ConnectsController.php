@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Connect;
+use App\Models\User;
+use App\Services\Shopify;
 use Google\Client;
 use Google\Exception;
 use Google\Service\Analytics;
 use Google\Service\Localservices;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -15,16 +19,10 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Session;
 use Laravel\Socialite\Facades\Socialite;
-use Shopify\Auth\FileSessionStorage;
 use Shopify\Auth\OAuth;
 use Shopify\Auth\OAuthCookie;
 use Shopify\Context;
 use Shopify\Exception\CookieSetException;
-use Shopify\Exception\HttpRequestException;
-use Shopify\Exception\InvalidOAuthException;
-use Shopify\Exception\MissingArgumentException;
-use Shopify\Exception\OAuthCookieNotFoundException;
-use Shopify\Exception\OAuthSessionNotFoundException;
 use Shopify\Exception\PrivateAppException;
 use Shopify\Exception\SessionStorageException;
 use Shopify\Exception\UninitializedContextException;
@@ -39,76 +37,66 @@ class ConnectsController extends BaseController
      * @throws CookieSetException
      * @throws PrivateAppException
      * @throws SessionStorageException
-     * @throws UninitializedContextException|MissingArgumentException
+     * @throws UninitializedContextException
      */
     public function shopifyLogin(Request $request): RedirectResponse
     {
-        $shop = $request->get('shop');
-        // TODO remove after testing
-        $shop = 'quickstart-2bd07cf2.myshopify.com';
+        $shop = $request->post('shop');
         if (empty($shop)) {
             abort(404);
         }
 
-        $this->shopifySetContext($shop);
-
+        Shopify::setContext($shop);
         $url = OAuth::begin($shop, route('shopifyCallback'), false,
             function (OAuthCookie $cookie) use ($shop) {
                 Session::put($cookie->getValue(), $shop);
                 Cookie::queue(Cookie::make($cookie->getName(), $cookie->getValue(), $cookie->getExpire()));
                 return true;
             });
+
         // Fix redirect url (library problem)
         $url = urldecode($url);
         $url = str_replace('redirect_uri=' . Context::$HOST_SCHEME . '://' . Context::$HOST_NAME . '/', 'redirect_uri=', $url);
         return redirect()->to($url);
     }
 
-    /**
-     * @param Request $request
-     * @throws PrivateAppException
-     * @throws SessionStorageException
-     * @throws UninitializedContextException
-     * @throws HttpRequestException
-     * @throws InvalidOAuthException
-     * @throws OAuthCookieNotFoundException
-     * @throws OAuthSessionNotFoundException|MissingArgumentException
-     */
     public function shopifyCallback(Request $request)
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         $shopifySessionId = $request->cookies->get('shopify_session_id');
         if (!empty($shopifySessionId)) {
             $shop = Session::get($shopifySessionId);
         }
 
         if (empty($shop)) {
-            abort(404);
+            return abort(404);
         }
 
-        $this->shopifySetContext($shop);
-        $session = OAuth::callback($request->cookies->all(), $request->request->all());
-        // TODO save in database
-        // $session->getScope()
-        // $session->getExpires()
-        // $session->getAccessToken()
-    }
+        Shopify::setContext($shop);
+        try {
+            $session = OAuth::callback($request->cookies->all(), $request->request->all());
+        } catch (\Exception $exception) {
+            // TODO add text
+            Session::flash('success-message', 'Some error please contact us');
+            return redirect('dashboard');
+        }
 
-    /**
-     * @param $shop
-     * @throws MissingArgumentException
-     */
-    protected function shopifySetContext($shop)
-    {
-        Context::initialize(
-            config('connects.shopify.apiKey'),
-            config('connects.shopify.apiSecret'),
-            config('connects.shopify.appScopes'),
-            $shop,
-            new FileSessionStorage(),
-            '2023-04',
-            true,
-            false,
-        );
+        Connect::updateOrCreate([
+            'user_id' => $user->id,
+            'app_user_slug' => $session->getShop(),
+            'app_user_id' => $session->getId(),
+            'platform' => 'shopify'
+        ], [
+            'access_token' => $session->getAccessToken(),
+            'expires_in' => $session->getExpires(),
+            'scope' => $session->getScope()
+        ]);
+
+        // TODO add text
+        Session::flash('success-message', 'Connect shopify added/updated');
+        return redirect('dashboard');
     }
 
     /**
@@ -144,11 +132,13 @@ class ConnectsController extends BaseController
     }
 
     /**
-     * @param Request $request
      * @throws Exception
      */
     public function googleCallback(Request $request)
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         $code = $request->get('code');
         if (empty($code)) {
             abort(404);
@@ -157,14 +147,33 @@ class ConnectsController extends BaseController
         $client = new Client();
         $client->setAuthConfig(config_path() . '/googleCredentials.json');
 
-        $token = $client->fetchAccessTokenWithAuthCode($code);
-        // TODO save in database
-        //  "access_token"
-        //  "expires_in" => 3599
-        //  "refresh_token"
-        //  "scope" => "https://www.googleapis.com/auth/analytics https://www.googleapis.com/auth/adwords"
-        //  "token_type" => "Bearer"
-        //  "created" => 1693130377
+        try {
+            $token = $client->fetchAccessTokenWithAuthCode($code);
+        } catch (\Exception $exception) {
+            Session::flash('success-message', 'Some error please contact us');
+            return redirect('dashboard');
+        }
+
+        if (isset($token['error'])) {
+            // TODO add text
+            Session::flash('success-message', 'Some error please contact us');
+            return redirect('dashboard');
+        } else {
+            Connect::updateOrCreate([
+                'user_id' => $user->id,
+                'app_user_id' => $client->getClientId(),
+                'platform' => 'google'
+            ], [
+                'access_token' => $token['access_token'],
+                'expires_in' => $token['expires_in'],
+                'refresh_token' => $token['refresh_token'],
+                'scope' => implode(',', explode(' ', $token['scope']))
+            ]);
+        }
+
+        // TODO add text
+        Session::flash('success-message', 'Connect shopify added/updated');
+        return redirect('dashboard');
     }
 
     /**
@@ -173,19 +182,37 @@ class ConnectsController extends BaseController
     public function facebookLogin()
     {
         return Socialite::driver('facebook')
-            ->scopes(['email', 'user_birthday', 'ads_read'])
+            ->scopes(['ads_read'])
             ->redirect();
     }
 
     public function facebookCallback()
     {
-        $user = Socialite::driver('facebook')
-            ->user();
+        /** @var User $user */
+        $user = Auth::user();
 
-        // TODO save in database
-        // token
-        // refreshToken
-        // expiresIn
-        // approvedScopes
+        try {
+            $socialiteUser = Socialite::driver('facebook')
+                ->user();
+        } catch (\Exception $exception) {
+            // TODO add text
+            Session::flash('success-message', 'Some error please contact us');
+            return redirect('dashboard');
+        }
+
+        Connect::updateOrCreate([
+            'user_id' => $user->id,
+            'app_user_slug' => $socialiteUser->getNickname() ?? null,
+            'app_user_id' => $socialiteUser->getId(),
+            'platform' => 'facebook'
+        ], [
+            'access_token' => $socialiteUser->token,
+            'expires_in' => $socialiteUser->expiresIn,
+            'scope' => implode(',', $socialiteUser->approvedScopes)
+        ]);
+
+        // TODO add text
+        Session::flash('success-message', 'Connect shopify added/updated');
+        return redirect('dashboard');
     }
 }
