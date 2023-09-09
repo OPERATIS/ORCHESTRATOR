@@ -56,7 +56,6 @@ class GetAdsStats implements ShouldQueue
 
         $after = null;
         $stats = [];
-        $now = $this->endPeriod;
         foreach ($adIds as $adId) {
             do {
                 try {
@@ -77,8 +76,8 @@ class GetAdsStats implements ShouldQueue
                             'ad_id' => $record->ad_id,
                             'start_period' => $this->startPeriod,
                             'end_period' => $this->endPeriod,
-                            'created_at' => $now,
-                            'updated_at' => $now
+                            'created_at' => $this->endPeriod,
+                            'updated_at' => $this->endPeriod
                         ];
                     }
 

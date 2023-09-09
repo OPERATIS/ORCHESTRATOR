@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands\Facebook;
 
-use App\Models\AdsStat;
 use App\Models\Connect;
 use Carbon\Carbon;
 use Illuminate\Console\Command;

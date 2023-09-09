@@ -10,4 +10,8 @@ class AdsStat extends Model
     use HasFactory;
 
     protected $guarded = [];
+    public $dates = [
+        'start_period',
+        'end_period'
+    ];
 }

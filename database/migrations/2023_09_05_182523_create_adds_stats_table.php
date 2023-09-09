@@ -16,10 +16,10 @@ class CreateAddsStatsTable extends Migration
         Schema::create('adds_stats', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('connect_id')->index();
-            $table->unsignedBigInteger('clicks')->index();
-            $table->unsignedBigInteger('impressions')->index();
-            $table->float('spend')->index();
-            $table->unsignedBigInteger('unique_clicks')->index();
+            $table->unsignedBigInteger('clicks');
+            $table->unsignedBigInteger('impressions');
+            $table->float('spend');
+            $table->unsignedBigInteger('unique_clicks');
             $table->unsignedBigInteger('ad_id')->index();
             $table->timestamp('start_period')->index();
             $table->timestamp('end_period')->index();
