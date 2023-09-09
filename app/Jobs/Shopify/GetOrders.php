@@ -36,12 +36,11 @@ class GetOrders implements ShouldQueue
     public function handle(): void
     {
         $shopify = $this->connect;
-        Shopify::shopifySetContext($shopify->app_user_slug);
+        Shopify::setContext($shopify->app_user_slug);
 
         $attempt = 0;
         $pageInfo = null;
         $orders = [];
-        $now = Carbon::now();
         do {
             try {
                 $client = new Rest($shopify->app_user_slug, $shopify->access_token);
@@ -79,8 +78,8 @@ class GetOrders implements ShouldQueue
                         "order_number" => $order->order_number,
                         "total_price" => $order->total_price,
                         "customer_id" => $order->customer->id ?? null,
-                        'created_at' => $now,
-                        'updated_at' => $now
+                        'created_at' => $this->endPeriod,
+                        'updated_at' => $this->endPeriod
                     ];
                 }
 
