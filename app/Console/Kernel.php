@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('shopify:get-orders')->everyFiveMinutes();
         $schedule->command('facebook:get-ads-stats')->everyFiveMinutes();
+        $schedule->command('google:get-ga-stats')->everyFiveMinutes();
     }
 
     /**
