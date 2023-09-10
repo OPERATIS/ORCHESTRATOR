@@ -48,8 +48,8 @@ class GetOrders implements ShouldQueue
                 if (empty($pageInfo)) {
                     $response = $client->get('orders', [], [
                         'limit' => 100,
-                        'created_at_max' => Carbon::parse($this->endPeriod)->toIso8601String(),
-                        'created_at_min' => Carbon::parse($this->startPeriod)->toIso8601String(),
+                        'updated_at_max' => Carbon::parse($this->endPeriod)->toIso8601String(),
+                        'updated_at_min' => Carbon::parse($this->startPeriod)->toIso8601String(),
                         'fields' => implode(',', [
                             'financial_status',
                             'order_number',
@@ -70,17 +70,16 @@ class GetOrders implements ShouldQueue
 
                 $responseOrders = json_decode($response->getBody()->getContents());
                 foreach ($responseOrders->orders as $order) {
-                    $orders[] = [
+                    Order::updateOrCreate([
                         "connect_id" => $shopify->id,
                         "order_id" => $order->id,
+                        "order_number" => $order->order_number,
+                    ], [
                         "order_created_at" => Carbon::parse($order->created_at)->setTimezone(0),
                         "financial_status" => $order->financial_status,
-                        "order_number" => $order->order_number,
                         "total_price" => $order->total_price,
-                        "customer_id" => $order->customer->id ?? null,
-                        'created_at' => $this->endPeriod,
-                        'updated_at' => $this->endPeriod
-                    ];
+                        "customer_id" => $order->customer->id ?? null
+                    ]);
                 }
 
                 $attempt = 0;
@@ -88,7 +87,5 @@ class GetOrders implements ShouldQueue
                 $attempt++;
             }
         } while ($pageInfo && $pageInfo->hasNextPage() && $attempt < 3);
-
-        Order::insert($orders);
     }
 }

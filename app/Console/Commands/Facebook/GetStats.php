@@ -5,11 +5,11 @@ namespace App\Console\Commands\Facebook;
 use App\Models\Connect;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use App\Jobs\Facebook\GetAdsStats as GetAdsStatsJobs;
+use App\Jobs\Facebook\GetStats as GetStatsJobs;
 
-class GetAdsStats extends Command
+class GetStats extends Command
 {
-    protected $signature = 'facebook:get-ads-stats';
+    protected $signature = 'facebook:get-stats';
 
     public function handle(): bool
     {
@@ -18,9 +18,9 @@ class GetAdsStats extends Command
 
         // Every five minutes
         $startPeriod = Carbon::now()->setSeconds(0)->subMinutes(5)->toDateTimeString();
-        $endPeriod = Carbon::now()->setSeconds(0)->toDateString();
+        $endPeriod = Carbon::now()->setSeconds(0)->toDateTimeString();
         foreach ($connects as $connect) {
-            GetAdsStatsJobs::dispatch($connect, $startPeriod, $endPeriod);
+            GetStatsJobs::dispatch($connect, $startPeriod, $endPeriod);
         }
 
         return true;
