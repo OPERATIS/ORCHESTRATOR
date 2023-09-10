@@ -2,7 +2,7 @@
 
 namespace App\Jobs\Facebook;
 
-use App\Models\AdsStat;
+use App\Models\FbStat;
 use App\Models\Connect;
 use App\Services\Facebook;
 use Carbon\Carbon;
@@ -12,7 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class GetAdsStats implements ShouldQueue
+class GetStats implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -88,6 +88,6 @@ class GetAdsStats implements ShouldQueue
             } while (!empty($after) && $attempt < 3);
         }
 
-        AdsStat::insert($stats);
+        FbStat::insert($stats);
     }
 }

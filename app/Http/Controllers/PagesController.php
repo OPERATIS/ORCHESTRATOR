@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Connect;
+use App\Models\GaStat;
 use App\Models\User;
 use Google\Service\Analytics;
 use Google\Service\Localservices;

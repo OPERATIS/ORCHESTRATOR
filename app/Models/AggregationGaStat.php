@@ -5,13 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AdsStat extends Model
+class AggregationGaStat extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
     public $dates = [
-        'start_period',
-        'end_period'
+        'period'
     ];
 }
