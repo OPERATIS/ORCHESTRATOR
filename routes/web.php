@@ -37,10 +37,3 @@ Route::post('custom-login', [CustomAuthController::class, 'customLogin'])->name(
 Route::get('registration', [CustomAuthController::class, 'registration'])->name('registration');
 Route::post('custom-registration', [CustomAuthController::class, 'customRegistration'])->name('customRegistration');
 Route::get('logout', [CustomAuthController::class, 'logout'])->name('logout');
-
-
-//https://www.google.com/search?q=laravel+custom+reset+password&oq=laravel+custom+reser&aqs=chrome.1.69i57j0i13i512j0i22i30l3j0i8i13i30l3j0i13i15i30.5230j0j7&sourceid=chrome&ie=UTF-8
-Route::get('forget-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('forget.password.get');
-Route::post('forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post');
-Route::get('reset-password/{token}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('reset.password.get');
-Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('reset.password.post');
