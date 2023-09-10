@@ -6,11 +6,13 @@ use App\Models\FbStat;
 use App\Models\Connect;
 use App\Services\Facebook;
 use Carbon\Carbon;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use App\Services\Log as LogService;
 
 class GetStats implements ShouldQueue
 {
@@ -30,6 +32,7 @@ class GetStats implements ShouldQueue
     public function handle(): void
     {
         $facebook = $this->connect;
+        $logService = new LogService('facebook', $this->connect->id);
 
         /** @var Facebook $facebookService */
         $facebookService = app()->make(Facebook::class);
@@ -42,24 +45,29 @@ class GetStats implements ShouldQueue
                 $info = $facebookService->getPage($facebook->app_user_id, $facebook->access_token);
                 $status = true;
                 $attempt = 0;
+                $logService->addSuccess('getPage');
             } catch (\Exception $exception) {
                 $attempt++;
+                $logService->addError('getPage', $exception->getMessage());
+            } catch (GuzzleException $exception) {
+                $attempt++;
+                $logService->addError('getPage', $exception->getMessage());
             }
         } while (!$status && $attempt < 3);
 
-        $adIds = [];
+        $adAccountIds = [];
         if (isset($info) && isset($info->adaccounts)) {
             foreach ($info->adaccounts->data as $account) {
-                $adIds[] = $account->id;
+                $adAccountIds[] = $account->account_id;
             }
         }
 
         $after = null;
         $stats = [];
-        foreach ($adIds as $adId) {
+        foreach ($adAccountIds as $adAccountId) {
             do {
                 try {
-                    $info = $facebookService->getInsights($adId, $facebook->access_token, Carbon::now()->toDateString(), Carbon::now()->toDateString(), $after);
+                    $info = $facebookService->getInsights('act_' . $adAccountId, $facebook->access_token, Carbon::now()->toDateString(), Carbon::now()->toDateString(), $after);
                     if ($info->paging->next ?? null) {
                         $after = $info->paging->cursors->after;
                     } else {
@@ -82,8 +90,13 @@ class GetStats implements ShouldQueue
                     }
 
                     $attempt = 0;
+                    $logService->addSuccess('getInsights', $adAccountId);
                 } catch (\Exception $exception) {
                     $attempt++;
+                    $logService->addError('getInsights', $exception->getMessage(), $adAccountId);
+                } catch (GuzzleException $exception) {
+                    $attempt++;
+                    $logService->addError('getInsights', $exception->getMessage(), $adAccountId);
                 }
             } while (!empty($after) && $attempt < 3);
         }

@@ -14,6 +14,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use App\Services\Log as LogService;
 
 class GetStats implements ShouldQueue
 {
@@ -36,12 +37,13 @@ class GetStats implements ShouldQueue
     public function handle(): void
     {
         $google = $this->connect;
+        $logService = new LogService('google', $this->connect->id);
 
         $client = new Client();
         $client->setAuthConfig(config_path() . '/googleCredentials.json');
 
         // Refresh token
-        $actualToken = Carbon::parse($google->updated_at)->timestamp + $google->expires_in - 300 < Carbon::now()->timestamp;
+        $actualToken = Carbon::parse($google->updated_at)->timestamp + $google->expires_in - 300 > Carbon::now()->timestamp;
         if (!$actualToken) {
             $attempt = 0;
             do {
@@ -49,8 +51,10 @@ class GetStats implements ShouldQueue
                     $info = $client->refreshToken($google->refresh_token);
                     $attempt = 0;
                     $actualToken = true;
+                    $logService->addSuccess('refreshToken');
                 } catch (\Exception $exception) {
                     $attempt++;
+                    $logService->addError('refreshToken', $exception->getMessage());
                 }
             } while (!$actualToken && $attempt < 3);
 
@@ -69,11 +73,13 @@ class GetStats implements ShouldQueue
             $attempt = 0;
             do {
                 try {
-                    $profileId = Google::getFirstProfileId($analytics, 'ESM.one');
+                    $profileId = Google::getProfileId($analytics, 'ESM.one');
                     $status = true;
                     $attempt = 0;
+                    $logService->addSuccess('getProfileId');
                 } catch (\Exception $exception) {
                     $attempt++;
+                    $logService->addError('getProfileId', $exception->getMessage());
                 }
             } while (!$status && $attempt < 3);
 
@@ -101,8 +107,10 @@ class GetStats implements ShouldQueue
                         );
                         $attempt = 0;
                         $status = true;
+                        $logService->addSuccess('get', $profileId);
                     } catch (\Exception $exception) {
                         $attempt++;
+                        $logService->addError('get', $exception->getMessage(), $profileId);
                     }
                 } while (!$status && $attempt < 3);
 

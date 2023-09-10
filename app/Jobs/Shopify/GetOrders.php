@@ -4,6 +4,7 @@ namespace App\Jobs\Shopify;
 
 use App\Models\Connect;
 use App\Models\Order;
+use App\Services\Log as LogService;
 use App\Services\Shopify;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -36,6 +37,7 @@ class GetOrders implements ShouldQueue
     public function handle(): void
     {
         $shopify = $this->connect;
+        $logService = new LogService('shopify', $this->connect->id);
         Shopify::setContext($shopify->app_user_slug);
 
         $attempt = 0;
@@ -83,8 +85,10 @@ class GetOrders implements ShouldQueue
                 }
 
                 $attempt = 0;
+                $logService->addSuccess('get');
             } catch (\Exception $exception) {
                 $attempt++;
+                $logService->addError('get', $exception->getMessage());
             }
         } while ($pageInfo && $pageInfo->hasNextPage() && $attempt < 3);
     }

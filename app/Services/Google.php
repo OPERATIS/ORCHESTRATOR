@@ -9,7 +9,7 @@ class Google
      * @param $accountName
      * @return mixed|null
      */
-    public static function getFirstProfileId($analytics, $accountName)
+    public static function getProfileId($analytics, $accountName)
     {
         // Get the list of accounts for the authorized user.
         $accounts = $analytics->management_accounts->listManagementAccounts();
