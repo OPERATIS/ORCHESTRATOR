@@ -28,6 +28,7 @@
                                             <input type="checkbox" name="remember"> Remember Me
                                         </label>
                                     </div>
+                                    <a href="{{route('forgotPassword')}}">Forget password</a>
                                 </div>
                                 <div class="d-grid mx-auto">
                                     <button type="submit" class="btn btn-dark btn-block">Signin</button>
