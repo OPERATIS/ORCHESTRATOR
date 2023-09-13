@@ -96,7 +96,7 @@ class SaveMetrics extends Command
             sum(count_line_items) as sumD,
             count(*) as countOrders,
             count(DISTINCT(customer_id)) + count(DISTINCT CASE WHEN customer_id IS NULL THEN 1 END) as countCustomers,
-            count(CASE WHEN ads THEN 1 END) as AdsCLs,
+            count(DISTINCT CASE WHEN ads THEN customer_id END) as AdsCLs,
             connect_id
         ")
             ->where('order_created_at', '>=', $startPeriod)
