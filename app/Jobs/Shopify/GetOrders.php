@@ -58,7 +58,12 @@ class GetOrders implements ShouldQueue
                             'total_price',
                             'customer',
                             'id',
-                            'created_at'
+                            'created_at',
+                            'total_line_items_price',
+                            'line_items',
+                            'refunds',
+                            'reference',
+                            'referring_site',
                         ])
                     ]);
                 } else {
@@ -72,6 +77,18 @@ class GetOrders implements ShouldQueue
 
                 $responseOrders = json_decode($response->getBody()->getContents());
                 foreach ($responseOrders->orders as $order) {
+                    $totalRefundLineItemsPrice = 0;
+                    foreach ($order->refunds->refund_line_items ?? [] as $one) {
+                        $totalRefundLineItemsPrice += $one->subtotal;
+                    }
+
+                    $ads = false;
+                    if (str_contains($order->reference, 'gclid') || str_contains($order->reference, 'fbclid')) {
+                        $ads = true;
+                    } elseif (str_contains($order->referring_site, 'gclid') || str_contains($order->referring_site, 'fbclid')) {
+                        $ads = true;
+                    }
+
                     Order::updateOrCreate([
                         "connect_id" => $shopify->id,
                         "order_id" => $order->id,
@@ -80,7 +97,14 @@ class GetOrders implements ShouldQueue
                         "order_created_at" => Carbon::parse($order->created_at)->setTimezone(0),
                         "financial_status" => $order->financial_status,
                         "total_price" => $order->total_price,
-                        "customer_id" => $order->customer->id ?? null
+                        "customer_id" => $order->customer->id ?? null,
+                        "total_line_items_price" => $order->total_line_items_price,
+                        "count_line_items" => count($order->line_items ?? []),
+                        "total_refund_line_items_price" => $totalRefundLineItemsPrice,
+                        "count_refund_line_items" => count($order->refunds->refund_line_items ?? []),
+                        "reference" => $order->reference,
+                        "referring_site" => $order->referring_site,
+                        "ads" => $ads
                     ]);
                 }
 

@@ -21,6 +21,9 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('google:aggregation-stats')->everyFiveMinutes();
         $schedule->command('facebook:aggregation-stats')->everyFiveMinutes();
+
+        // after delay aggregation
+        $schedule->command('save-metrics')->hourlyAt('25');
     }
 
     /**
