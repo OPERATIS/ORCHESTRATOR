@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ConnectsController;
 use App\Http\Controllers\CustomAuthController;
+use App\Http\Controllers\ApiController;
 use App\Http\Controllers\PagesController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,8 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('/connect/facebook/callback', [ConnectsController::class, 'facebookCallback'])->name('facebookCallback');
 
     Route::get('dashboard', [PagesController::class, 'dashboard'])->name('dashboard');
+
+    Route::get('metrics', [ApiController::class, 'metrics'])->name('metrics');
 });
 
 Route::get('login', [CustomAuthController::class, 'index'])->name('login');

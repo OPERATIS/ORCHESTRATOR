@@ -10,4 +10,7 @@ class Metric extends Model
     use HasFactory;
 
     protected $guarded = [];
+    public $dates = [
+        'period'
+    ];
 }
