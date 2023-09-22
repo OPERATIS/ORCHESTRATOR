@@ -11,6 +11,7 @@ class Metric extends Model
 
     protected $guarded = [];
     public $dates = [
-        'period'
+        'start_period',
+        'end_period'
     ];
 }
