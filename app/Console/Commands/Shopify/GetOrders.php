@@ -17,7 +17,7 @@ class GetOrders extends Command
             ->get();
 
         // Every five minutes
-        $startPeriod = Carbon::now()->seconds(0)->subMinutes(5)->toDateTimeString();
+        $startPeriod = Carbon::now()->subMinutes(5)->seconds(0)->toDateTimeString();
         $endPeriod = Carbon::now()->seconds(0)->toDateTimeString();
         foreach ($connects as $connect) {
             GetOrdersJobs::dispatch($connect, $startPeriod, $endPeriod);
