@@ -14,9 +14,11 @@ class AggregationStats extends Command
     public function handle(): bool
     {
         // Every five minutes
-        $startPeriod = Carbon::now()->setSeconds(0)->subMinutes(15)->toDateTimeString();
-        $endPeriod = Carbon::now()->setSeconds(0)->subMinutes(10)->toDateTimeString();
+        $startPeriod = Carbon::now()->subMinutes(10)->setSeconds(0)->toDateTimeString();
+        $endPeriod = Carbon::now()->subMinutes(5)->setSeconds(0)->toDateTimeString();
 
+        // 10:00:00 10:01:01 10:03:03 10:04:00 10:05:00 10:05:01
+        // 10:01:01 10:03:03 10:04:00 10:05:00
         $rows = DB::select("
             SELECT
                 MAX(clicks) - MIN(clicks) as clicks,
@@ -25,8 +27,7 @@ class AggregationStats extends Command
                 MAX(unique_clicks) - MIN(unique_clicks) as unique_clicks,
                 count(*) as count,
                 connect_id,
-                ad_id,
-                MAX(end_period) as period
+                ad_id
             FROM fb_stats
             WHERE start_period >= '{$startPeriod}' and end_period <= '{$endPeriod}'
             GROUP BY connect_id, ad_id
@@ -42,7 +43,9 @@ class AggregationStats extends Command
                     'unique_clicks' => $row->unique_clicks,
                     'connect_id' => $row->connect_id,
                     'add_id' => $row->add_id,
-                    'period' => $row->period
+                    'period' => '5_minutes',
+                    'start_period' => $startPeriod,
+                    'end_period' => $endPeriod,
                 ];
             }
         }
