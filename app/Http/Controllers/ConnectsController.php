@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Connect;
 use App\Models\User;
+use App\Services\Google;
 use App\Services\Shopify;
 use Google\Client;
 use Google\Exception;
@@ -159,7 +160,7 @@ class ConnectsController extends BaseController
             Session::flash('success-message', 'Some error please contact us');
             return redirect('dashboard');
         } else {
-            Connect::updateOrCreate([
+            $connect = Connect::updateOrCreate([
                 'user_id' => $user->id,
                 'app_user_id' => $client->getClientId(),
                 'platform' => 'google'
@@ -169,6 +170,11 @@ class ConnectsController extends BaseController
                 'refresh_token' => $token['refresh_token'],
                 'scope' => implode(',', explode(' ', $token['scope']))
             ]);
+
+            // Save profiles
+            $client->setAccessToken($connect->access_token);
+            $analytics = new Analytics($client);
+            Google::getProfileId($analytics, $connect->id);
         }
 
         // TODO add text
