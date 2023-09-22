@@ -3,8 +3,8 @@
 namespace App\Jobs\Google;
 
 use App\Models\Connect;
+use App\Models\GaProfile;
 use App\Models\GaStat;
-use App\Services\Google;
 use Carbon\Carbon;
 use Google\Client;
 use Google\Exception;
@@ -44,6 +44,7 @@ class GetStats implements ShouldQueue
 
         // Refresh token
         $actualToken = Carbon::parse($google->updated_at)->timestamp + $google->expires_in - 300 > Carbon::now()->timestamp;
+        $info = $client->refreshToken($google->refresh_token);
         if (!$actualToken) {
             $attempt = 0;
             do {
@@ -58,81 +59,77 @@ class GetStats implements ShouldQueue
                 }
             } while (!$actualToken && $attempt < 3);
 
-            if (!empty($info)) {
+            $actualToken = false;
+            if (!empty($info) && !isset($info['error'])) {
                 $google->access_token = $info['access_token'];
                 $google->expires_in = $info['expires_in'];
                 $google->refresh_token = $info['refresh_token'];
                 $google->save();
+                $actualToken = true;
             }
         }
 
         if ($actualToken) {
             $client->setAccessToken($google->access_token);
             $analytics = new Analytics($client);
-            $status = false;
-            $attempt = 0;
-            do {
-                try {
-                    $profileId = Google::getProfileId($analytics, 'ESM.one');
-                    $status = true;
-                    $attempt = 0;
-                    $logService->addSuccess('getProfileId');
-                } catch (\Exception $exception) {
-                    $attempt++;
-                    $logService->addError('getProfileId', $exception->getMessage());
-                }
-            } while (!$status && $attempt < 3);
 
-            if (!empty($profileId)) {
-                $all = [
-                    'ga:impressions',
-                    'ga:pageviews',
-                    'ga:uniquePageviews',
-                    'ga:adClicks',
-                    'ga:adCost',
-                ];
+            $profiles = GaProfile::where('connect_id', $google->id)
+                ->where('actual', 1)
+                ->get();
 
-                $status = false;
-                $attempt = 0;
-                do {
-                    try {
-                        $results = $analytics->data_ga->get(
-                            'ga:' . $profileId,
-                            Carbon::parse($this->startPeriod)->toDateString(),
-                            Carbon::parse($this->endPeriod)->toDateString(),
-                            implode(',', $all),
-                            [
-                                'include-empty-rows' => true
-                            ]
-                        );
-                        $attempt = 0;
-                        $status = true;
-                        $logService->addSuccess('get', $profileId);
-                    } catch (\Exception $exception) {
-                        $attempt++;
-                        $logService->addError('get', $exception->getMessage(), $profileId);
-                    }
-                } while (!$status && $attempt < 3);
-
-                $stats = [];
-                if (!empty($results) && count($results->getRows()) > 0) {
-                    $rows = $results->getRows();
-                    $stats = [
-                        'connect_id' => $google->id,
-                        'impressions' => $rows[0][0],
-                        'pageviews' => $rows[0][1],
-                        'unique_pageviews' => $rows[0][2],
-                        'ad_clicks' => $rows[0][3],
-                        'ad_cost' => $rows[0][4],
-                        'start_period' => $this->startPeriod,
-                        'end_period' => $this->endPeriod,
-                        'created_at' => $this->endPeriod,
-                        'updated_at' => $this->endPeriod,
-                        'unique_table_id' => $profileId
+            foreach ($profiles as $profile) {
+                $profileId = $profile->profile_id;
+                if (!empty($profileId)) {
+                    $all = [
+                        'ga:impressions',
+                        'ga:pageviews',
+                        'ga:uniquePageviews',
+                        'ga:adClicks',
+                        'ga:adCost',
                     ];
-                }
 
-                GaStat::insert($stats);
+                    $status = false;
+                    $attempt = 0;
+                    do {
+                        try {
+                            $results = $analytics->data_ga->get(
+                                'ga:' . $profileId,
+                                Carbon::parse($this->startPeriod)->setTimezone($profile->timezone)->toDateString(),
+                                Carbon::parse($this->endPeriod)->setTimezone($profile->timezone)->toDateString(),
+                                implode(',', $all),
+                                [
+                                    'include-empty-rows' => true
+                                ]
+                            );
+                            $attempt = 0;
+                            $status = true;
+                            $logService->addSuccess('get', $profileId);
+                        } catch (\Exception $exception) {
+                            $attempt++;
+                            $logService->addError('get', $exception->getMessage(), $profileId);
+                        }
+                    } while (!$status && $attempt < 3);
+
+                    $stats = [];
+                    if (!empty($results) && count($results->getRows()) > 0) {
+                        $rows = $results->getRows();
+                        $stats = [
+                            'connect_id' => $google->id,
+                            'impressions' => $rows[0][0],
+                            'pageviews' => $rows[0][1],
+                            'unique_pageviews' => $rows[0][2],
+                            'ad_clicks' => $rows[0][3],
+                            'ad_cost' => $rows[0][4],
+                            'start_period' => $this->startPeriod,
+                            'end_period' => $this->endPeriod,
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                            'unique_table_id' => $profileId
+                        ];
+                    }
+
+                    GaStat::insert($stats);
+                }
             }
         }
     }
