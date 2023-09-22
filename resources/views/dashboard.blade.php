@@ -29,5 +29,17 @@
         @if ($googleAdwords ?? null)
             {{$googleAdwords->created_at}}
         @endif
+        <br>
+        <br>
+        @if ($gaProfiles ?? null)
+            @foreach ($gaProfiles as $googleProfile)
+                {{$googleProfile->name}}
+                <br>
+                {{$googleProfile->timezone}}
+                <br>
+                {{$googleProfile->actual}}
+                <br>
+            @endforeach
+        @endif
     </div>
 @endsection
