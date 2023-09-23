@@ -36,13 +36,13 @@ class SaveAnalyzes extends Command
                 $cls = $sixSigma->getCLs(array_column($userMetrics, 'c'));
                 $analyzes[$metric . '_' . 'ucl'] = $cls['ucl'];
                 $analyzes[$metric . '_' . 'lcl'] = $cls['lcl'];
-                $analyzes['start_period'] = $startPeriod;
-                $analyzes['end_period'] = $endPeriod;
-                $analyzes['period'] = '60_hours';
-                $analyzes['period'] = '60_hours';
-                $analyzes['created_at'] = Carbon::now();
-                $analyzes['updated_at'] = Carbon::now();
             }
+            $analyzes['start_period'] = $startPeriod;
+            $analyzes['end_period'] = $endPeriod;
+            $analyzes['period'] = '60_hours';
+            $analyzes['period'] = '60_hours';
+            $analyzes['created_at'] = Carbon::now();
+            $analyzes['updated_at'] = Carbon::now();
 
             Analysis::insert($analyzes);
         }
