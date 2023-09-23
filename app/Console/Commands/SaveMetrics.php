@@ -9,6 +9,7 @@ use App\Models\Metric;
 use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 
 class SaveMetrics extends Command
 {
@@ -16,10 +17,8 @@ class SaveMetrics extends Command
 
     public function handle(): bool
     {
-        // Every five minutes
         $startPeriod = Carbon::now()->setMinutes(0)->setSeconds(0)->subHour()->toDateTimeString();
         $endPeriod = Carbon::now()->setMinutes(0)->setSeconds(0)->toDateTimeString();
-        $now = Carbon::now()->setMinutes(0)->setSeconds(0);
 
         $connects = Connect::get();
         $connectIds = [];
@@ -29,7 +28,9 @@ class SaveMetrics extends Command
             if (!isset($preparedMetrics[$connect->user_id])) {
                 $preparedMetrics[$connect->user_id] = [
                     'user_id' => $connect->user_id,
-                    'period' => $endPeriod,
+                    'period' => '1_hour',
+                    'start_period' => $startPeriod,
+                    'end_period' => $endPeriod,
                     'reach' => 0,
                     'l' => 0,
                     'p' => 0,
@@ -45,8 +46,8 @@ class SaveMetrics extends Command
                     'r' => 0,
                     'c1' => 0,
                     'c' => 0,
-                    'created_at' => $now,
-                    'updated_at' => $now
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
                 ];
             }
         }
@@ -57,8 +58,8 @@ class SaveMetrics extends Command
             sum(clicks) as L,
             connect_id
         ")
-            ->where('start_period', '>=', $startPeriod)
-            ->where('end_period', '<', $endPeriod)
+            ->where('end_period', '>', $startPeriod)
+            ->where('end_period', '<=', $endPeriod)
             ->groupBy(['connect_id'])
             ->get();
 
@@ -77,8 +78,8 @@ class SaveMetrics extends Command
             sum(ad_clicks) as L,
             connect_id
         ")
-            ->where('start_period', '>=', $startPeriod)
-            ->where('end_period', '<', $endPeriod)
+            ->where('end_period', '>', $startPeriod)
+            ->where('end_period', '<=', $endPeriod)
             ->groupBy(['connect_id'])
             ->get();
 
@@ -99,8 +100,8 @@ class SaveMetrics extends Command
             count(DISTINCT CASE WHEN ads THEN customer_id END) as AdsCLs,
             connect_id
         ")
-            ->where('order_created_at', '>=', $startPeriod)
-            ->where('order_created_at', '<', $endPeriod)
+            ->where('order_created_at', '>', $startPeriod)
+            ->where('order_created_at', '<=', $endPeriod)
             ->groupBy(['connect_id'])
             ->get();
 
@@ -134,12 +135,16 @@ class SaveMetrics extends Command
                 $preparedMetrics[$userId]['q'] = $preparedMetrics[$userId]['q1'] - $preparedMetrics[$userId]['returns'];
                 $preparedMetrics[$userId]['ltv'] = $preparedMetrics[$userId]['p'] * $preparedMetrics[$userId]['q'];
                 $preparedMetrics[$userId]['r'] = $preparedMetrics[$userId]['cls'] * $preparedMetrics[$userId]['ltv'];
-                $preparedMetrics[$userId]['c1'] = $preparedMetrics[$userId]['reach'] ? $preparedMetrics[$userId]['l']/$preparedMetrics[$userId]['reach'] : 0;
-                $preparedMetrics[$userId]['c'] = $preparedMetrics[$userId]['l'] ? $preparedMetrics[$userId]['cls']/$preparedMetrics[$userId]['l'] : 0;
+                $preparedMetrics[$userId]['c1'] = $preparedMetrics[$userId]['reach'] ? $preparedMetrics[$userId]['l'] / $preparedMetrics[$userId]['reach'] : 0;
+                $preparedMetrics[$userId]['c'] = $preparedMetrics[$userId]['l'] ? $preparedMetrics[$userId]['cls'] / $preparedMetrics[$userId]['l'] : 0;
             }
         }
 
         Metric::insert($preparedMetrics);
+
+        // Search alerts
+        Artisan::call('search-alerts');
+        Artisan::call('save-analyzes');
 
         return true;
     }
