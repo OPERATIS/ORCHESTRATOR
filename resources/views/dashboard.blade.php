@@ -42,4 +42,7 @@
             @endforeach
         @endif
     </div>
+    <div>
+        <a href="https://t.me/{{config('connects.telegram.botName')}}?start={{base64_encode($user->id)}}">Telegram</a>>
+    </div>
 @endsection

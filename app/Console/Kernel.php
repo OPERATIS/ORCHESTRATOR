@@ -33,6 +33,9 @@ class Kernel extends ConsoleKernel
         // Save metrics by period 12:00-13:00
         // Init search alerts and then init save analyzes
         $schedule->command('save-metrics')->cron('15 * * * *');
+
+        // Integrations for notifications
+        $schedule->command('telegram:get-updates')->everyFiveMinutes();
     }
 
     /**
