@@ -4,6 +4,7 @@ use App\Http\Controllers\ConnectsController;
 use App\Http\Controllers\CustomAuthController;
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\PagesController;
+use App\Http\Controllers\WebhooksController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
@@ -45,3 +46,6 @@ Route::get('forgot-password', [CustomAuthController::class, 'forgotPassword'])->
 Route::post('custom-forgot-password', [CustomAuthController::class, 'customForgotPassword'])->name('customForgotPassword');
 Route::get('reset-password/{token}', [CustomAuthController::class, 'resetPassword'])->name('resetPassword');
 Route::post('custom-reset-password', [CustomAuthController::class, 'customResetPassword'])->name('customResetPassword');
+
+Route::get('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);
+Route::post('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);

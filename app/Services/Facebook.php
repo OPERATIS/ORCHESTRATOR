@@ -76,4 +76,33 @@ class Facebook
 
         return json_decode($response->getBody());
     }
+
+    /**
+     * @param string $template
+     * @param $phone
+     * @return mixed
+     * @throws GuzzleException
+     */
+    public function sendMessage(string $template, $phone)
+    {
+        $response = $this->client->post('https://graph.facebook.com/v17.0/' . config('connects.whatsapp.phoneNumberId') . '/messages', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . config('connects.whatsapp.accessToken'),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                'messaging_product' => 'whatsapp',
+                'to' => $phone,
+                'type' => 'template',
+                'template' => [
+                    'name' => $template,
+                    'language' => [
+                        'code' => 'en_US'
+                    ]
+                ]
+            ]
+        ]);
+
+        return json_decode($response->getBody());
+    }
 }
