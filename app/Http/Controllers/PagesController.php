@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Connect;
-use App\Models\GaStat;
+use App\Models\GaProfile;
 use App\Models\User;
 use Google\Service\Analytics;
 use Google\Service\Localservices;
@@ -36,19 +36,23 @@ class PagesController extends Controller
                 if (in_array(Localservices::ADWORDS, $scope)) {
                     $googleAdwords = $google;
                 }
+
+                $gaProfiles = GaProfile::where('connect_id', $google->id)->get();
             }
 
             return view('dashboard')
                 ->with('shopify', $shopify ?? null)
                 ->with('facebook', $facebook ?? null)
                 ->with('googleAnalytics', $googleAnalytics ?? null)
-                ->with('googleAdwords', $googleAdwords ?? null);
+                ->with('googleAdwords', $googleAdwords ?? null)
+                ->with('gaProfiles', $gaProfiles ?? null);
         }
 
         return view('dashboard')
             ->with('shopify', $shopify ?? null)
             ->with('facebook', $facebook ?? null)
             ->with('googleAnalytics', $googleAnalytics ?? null)
-            ->with('googleAdwords', $googleAdwords ?? null);
+            ->with('googleAdwords', $googleAdwords ?? null)
+            ->with('gaProfiles', $gaProfiles ?? null);
     }
 }

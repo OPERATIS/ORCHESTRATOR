@@ -6,7 +6,9 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
+        "ext-curl": "*",
         "ext-json": "*",
+        "doctrine/dbal": "^3.6",
         "fruitcake/laravel-cors": "^2.0",
         "google/apiclient": "^2.15.0",
         "guzzlehttp/guzzle": "^7.0.1",
@@ -14,8 +16,7 @@
         "laravel/sanctum": "^2.11",
         "laravel/socialite": "^5.8",
         "laravel/tinker": "^2.5",
-        "shopify/shopify-api": "^4.3",
-      "ext-curl": "*"
+        "shopify/shopify-api": "^4.3"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

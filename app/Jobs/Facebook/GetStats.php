@@ -84,8 +84,8 @@ class GetStats implements ShouldQueue
                             'ad_id' => $record->ad_id,
                             'start_period' => $this->startPeriod,
                             'end_period' => $this->endPeriod,
-                            'created_at' => $this->endPeriod,
-                            'updated_at' => $this->endPeriod
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now()
                         ];
                     }
 

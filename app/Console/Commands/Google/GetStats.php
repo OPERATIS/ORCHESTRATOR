@@ -17,7 +17,7 @@ class GetStats extends Command
             ->get();
 
         // Every five minutes
-        $startPeriod = Carbon::now()->setSeconds(0)->subMinutes(5)->toDateTimeString();
+        $startPeriod = Carbon::now()->subMinutes(5)->setSeconds(0)->toDateTimeString();
         $endPeriod = Carbon::now()->setSeconds(0)->toDateTimeString();
         foreach ($connects as $connect) {
             GetStatsJobs::dispatch($connect, $startPeriod, $endPeriod);

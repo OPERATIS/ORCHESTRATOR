@@ -33,16 +33,18 @@ class ApiController extends Controller
 
             $metrics = Metric::select(['l', 'c', 'p', 'q', 'ltv', 'period'])
                 ->where('user_id', $user->id)
-                ->where('period', '>=', $start->toDateTimeString())
-                ->where('period', '<=', $end->toDateTimeString())
+                ->where('end_period', '>', $start->toDateTimeString())
+                ->where('end_period', '<=', $end->toDateTimeString())
+                ->where('period', '1_hour')
                 ->orderBy('period')
                 ->get()
                 ->toArray();
 
             $previousMetrics = Metric::select(['l', 'c', 'p', 'q', 'ltv', 'period'])
                 ->where('user_id', $user->id)
-                ->where('period', '>=', $previousStart->toDateTimeString())
-                ->where('period', '<=', $previousEnd->toDateTimeString())
+                ->where('end_period', '>', $previousStart->toDateTimeString())
+                ->where('end_period', '<=', $previousEnd->toDateTimeString())
+                ->where('period', '1_hour')
                 ->orderBy('period')
                 ->get()
                 ->toArray();
