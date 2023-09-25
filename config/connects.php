@@ -16,4 +16,9 @@ return [
         'phoneNumberId' => env('WHATSAPP_PHONE_NUMBER_ID'),
         'businessAccountId' => env('WHATSAPP_BUSINESS_ACCOUNT_ID')
     ],
+    'messenger' => [
+        'pageAccessToken' => env('MESSENGER_PAGE_ACCESS_TOKEN'),
+        'pageName' => env('MESSENGER_PAGE_NAME'),
+        'pageId' => env('MESSENGER_PAGE_ID'),
+    ]
 ];

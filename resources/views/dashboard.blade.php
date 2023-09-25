@@ -46,5 +46,7 @@
         <a href="https://t.me/{{config('connects.telegram.botName')}}?start={{base64_encode($user->id)}}">Telegram</a>
         <br>
         <a href="https://wa.me/{{config('connects.whatsapp.displayPhoneNumber')}}?text={{urlencode('Start to notifications #' . $user->id)}}">WhatsApp</a>
+        <br>
+        <a href="https://m.me/{{config('connects.messenger.pageName')}}?text={{urlencode('Start to notifications #' . $user->id)}}">Messenger</a>
     </div>
 @endsection

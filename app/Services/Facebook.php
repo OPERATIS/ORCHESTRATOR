@@ -83,7 +83,7 @@ class Facebook
      * @return mixed
      * @throws GuzzleException
      */
-    public function sendMessage(string $template, $phone)
+    public function sendWaMessage(string $template, $phone)
     {
         $response = $this->client->post('https://graph.facebook.com/v17.0/' . config('connects.whatsapp.phoneNumberId') . '/messages', [
             'headers' => [
@@ -102,6 +102,17 @@ class Facebook
                 ]
             ]
         ]);
+
+        return json_decode($response->getBody());
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function sendMeMessage(string $text, $psid)
+    {
+        $response = $this->client
+            ->post("https://graph.facebook.com/v17.0/" . config('connects.messenger.pageId') . "/messages?recipient={'id':'$psid'}&messaging_type=RESPONSE&message={'text':'$text'}&access_token=" . config('connects.messenger.pageAccessToken'));
 
         return json_decode($response->getBody());
     }

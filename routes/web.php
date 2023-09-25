@@ -49,3 +49,6 @@ Route::post('custom-reset-password', [CustomAuthController::class, 'customResetP
 
 Route::get('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);
 Route::post('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);
+
+Route::get('webhooks/messenger', [WebhooksController::class, 'messenger']);
+Route::post('webhooks/messenger', [WebhooksController::class, 'messenger']);
