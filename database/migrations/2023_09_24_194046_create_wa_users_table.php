@@ -16,8 +16,7 @@ class CreateWaUsersTable extends Migration
         Schema::create('wa_users', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->index()->nullable();
-            $table->string('display_phone_number')->nullable()->index();
-            $table->string('phone_number_id')->nullable()->index();
+            $table->string('wa_id')->nullable()->index();
             $table->string('username')->nullable();
             $table->timestamps();
         });

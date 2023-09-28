@@ -77,30 +77,34 @@ class Facebook
         return json_decode($response->getBody());
     }
 
-    /**
-     * @param string $template
-     * @param $phone
-     * @return mixed
-     * @throws GuzzleException
-     */
-    public function sendWaMessage(string $template, $phone)
+    public function sendWaMessage($phone, string $template = null, string $text = null)
     {
+        $json = [
+            'messaging_product' => 'whatsapp',
+            'to' => $phone,
+        ];
+
+        if ($template) {
+            $json['type'] = 'template';
+            $json['template'] = [
+                'name' => $template,
+                'language' => [
+                    'code' => 'en_US'
+                ]
+            ];
+        } else {
+            $json['type'] = 'text';
+            $json['text'] = [
+                'body' => $text
+            ];
+        }
+
         $response = $this->client->post('https://graph.facebook.com/v17.0/' . config('connects.whatsapp.phoneNumberId') . '/messages', [
             'headers' => [
                 'Authorization' => 'Bearer ' . config('connects.whatsapp.accessToken'),
                 'Content-Type' => 'application/json'
             ],
-            'json' => [
-                'messaging_product' => 'whatsapp',
-                'to' => $phone,
-                'type' => 'template',
-                'template' => [
-                    'name' => $template,
-                    'language' => [
-                        'code' => 'en_US'
-                    ]
-                ]
-            ]
+            'json' => $json
         ]);
 
         return json_decode($response->getBody());

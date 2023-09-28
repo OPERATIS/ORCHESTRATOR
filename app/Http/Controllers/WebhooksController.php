@@ -11,35 +11,35 @@ use Illuminate\Http\Request;
 
 class WebhooksController extends Controller
 {
-    /**
-     * @throws GuzzleException
-     */
     public function whatsapp(Request $request)
     {
         if ($request->isJson()) {
-            $response = json_decode($request->json());
-            $message = $response->entry[0]->changes[0]->value->messages[0]->text->body;
-            $userId = str_replace('Start to notifications #', '', $message);
-            $displayPhoneNumber = $response->entry[0]->changes[0]->value->metadata->display_phone_number;
-            $phoneNumberId = $response->entry[0]->changes[0]->value->metadata->phone_number_id;
-            $username = $response->entry[0]->changes[0]->value[0]->contacts[0]->profile->name;
-            if (is_numeric($userId)) {
-                $waUser = WaUser::updateOrCreate([
-                    'user_id' => $userId,
-                    'display_phone_number' => $displayPhoneNumber,
-                    'phone_number_id' => $phoneNumberId,
-                ], [
-                    'username' => $username
-                ]);
+            $response = $request->all();
 
-                if (Carbon::parse($waUser->created_at)->seconds(0)->toDateTimeString() === Carbon::now()->seconds(0)->toDateTimeString()) {
-                    $facebook = new Facebook();
-                    // TODO add text
-                    $facebook->sendWaMessage('hello_world', $displayPhoneNumber);
+            // Check first message
+            if (isset($response['entry'][0]['changes'][0]['value']['messages'][0]['text']['body'])) {
+                $message = $response['entry'][0]['changes'][0]['value']['messages'][0]['text']['body'];
+                $userId = str_replace('Start to notifications #', '', $message);
+                $username = $response['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name'];
+                $waId = $response['entry'][0]['changes'][0]['value']['contacts'][0]['wa_id'];
+
+                if (is_numeric($userId)) {
+                    $waUser = WaUser::updateOrCreate([
+                        'user_id' => $userId,
+                        'wa_id' => $waId
+                    ], [
+                        'username' => $username
+                    ]);
+
+                    if (Carbon::parse($waUser->created_at)->seconds(0)->toDateTimeString() === Carbon::now()->seconds(0)->toDateTimeString()) {
+                        $facebook = new Facebook();
+                        // TODO add text
+                        $facebook->sendWaMessage($waId, null, 'add text');
+                    }
                 }
             }
 
-            return response();
+            return response('');
         } else {
             // Step validation
             $hubChallenge = $request->get('hub_challenge');
