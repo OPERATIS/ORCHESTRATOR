@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\Google;
 use App\Services\Shopify;
 use App\Services\Slack;
+use Carbon\Carbon;
 use Google\Client;
 use Google\Exception;
 use Google\Service\Analytics;
@@ -249,25 +250,20 @@ class ConnectsController extends BaseController
                 /** @var User $user */
                 $user = Auth::user();
 
-                if ($user) {
-                    $slUser = SlUser::updateOrCreate([
-                        'user_id' => $user->id,
-                        'authed_user_id' => $response->authed_user->id
-                    ], [
-                        'access_token' => $response->access_token
-                    ]);
+                $slUser = SlUser::updateOrCreate([
+                    'user_id' => $user->id,
+                    'authed_user_id' => $response->authed_user->id
+                ], [
+                    'access_token' => $response->access_token
+                ]);
 
-                    if ($slUser->created_at == $slUser->updated_at) {
-                        $slack = new Slack();
-                        // TODO add text
-                        $slack->chatPostMessage($slUser->access_token, $slUser->authed_user_id, 'add text');
-
-                        // TODO add text
-                        Session::flash('success-message', 'Connect slack added/updated');
-                    }
-                } else {
+                if (Carbon::parse($slUser->created_at)->seconds(0)->toDateTimeString() === Carbon::now()->seconds(0)->toDateTimeString()) {
+                    $slack = new Slack();
                     // TODO add text
-                    Session::flash('error-message', 'User not login');
+                    $slack->chatPostMessage($slUser->access_token, $slUser->authed_user_id, 'add text');
+
+                    // TODO add text
+                    Session::flash('success-message', 'Connect slack added/updated');
                 }
             } else {
                 // TODO add text

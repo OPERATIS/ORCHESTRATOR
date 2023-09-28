@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MeUser;
 use App\Models\WaUser;
 use App\Services\Facebook;
+use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 
@@ -31,7 +32,7 @@ class WebhooksController extends Controller
                     'username' => $username
                 ]);
 
-                if ($waUser->updated_at == $waUser->created_at) {
+                if (Carbon::parse($waUser->created_at)->seconds(0)->toDateTimeString() === Carbon::now()->seconds(0)->toDateTimeString()) {
                     $facebook = new Facebook();
                     // TODO add text
                     $facebook->sendWaMessage('hello_world', $displayPhoneNumber);
@@ -63,7 +64,7 @@ class WebhooksController extends Controller
                     'psid' => $psid,
                 ]);
 
-                if ($meUser->updated_at == $meUser->created_at) {
+                if (Carbon::parse($meUser->created_at)->seconds(0)->toDateTimeString() === Carbon::now()->seconds(0)->toDateTimeString()) {
                     $facebook = new Facebook();
                     // TODO add text
                     $facebook->sendMeMessage('Add text', $meUser->psid);
