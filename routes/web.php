@@ -31,6 +31,9 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('/connect/facebook/login', [ConnectsController::class, 'facebookLogin'])->name('facebookLogin');
     Route::get('/connect/facebook/callback', [ConnectsController::class, 'facebookCallback'])->name('facebookCallback');
 
+    Route::get('/connect/slack/login', [ConnectsController::class, 'slackLogin'])->name('slackLogin');
+    Route::get('/connect/slack/callback', [ConnectsController::class, 'slackCallback'])->name('slackCallback');
+
     Route::get('dashboard', [PagesController::class, 'dashboard'])->name('dashboard');
 
     Route::get('metrics', [ApiController::class, 'metrics'])->name('metrics');

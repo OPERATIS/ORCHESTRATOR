@@ -31,7 +31,7 @@ class WebhooksController extends Controller
                     'username' => $username
                 ]);
 
-                if ($waUser->updated_at === $waUser->created_at) {
+                if ($waUser->updated_at == $waUser->created_at) {
                     $facebook = new Facebook();
                     // TODO add text
                     $facebook->sendWaMessage('hello_world', $displayPhoneNumber);
@@ -63,7 +63,7 @@ class WebhooksController extends Controller
                     'psid' => $psid,
                 ]);
 
-                if ($meUser->updated_at === $meUser->created_at) {
+                if ($meUser->updated_at == $meUser->created_at) {
                     $facebook = new Facebook();
                     // TODO add text
                     $facebook->sendMeMessage('Add text', $meUser->psid);
