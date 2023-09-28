@@ -55,3 +55,4 @@ Route::post('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);
 
 Route::get('webhooks/messenger', [WebhooksController::class, 'messenger']);
 Route::post('webhooks/messenger', [WebhooksController::class, 'messenger']);
+Route::post('webhooks/telegram', [WebhooksController::class, 'telegram']);

@@ -24,13 +24,6 @@ class Telegram
         $this->token = $token;
     }
 
-    public function getUpdates()
-    {
-        $response = $this->client
-            ->post('https://api.telegram.org/bot' . $this->token . '/getUpdates');
-        return json_decode($response->getBody());
-    }
-
     /**
      * @param int $chatId
      * @param string $message

@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\MeUser;
+use App\Models\TgUser;
 use App\Models\WaUser;
 use App\Services\Facebook;
+use App\Services\Telegram;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class WebhooksController extends Controller
 {
@@ -80,5 +83,39 @@ class WebhooksController extends Controller
 
             return response($hubChallenge, 200, ['Content-Type' => 'text/plain']);
         }
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     * @throws GuzzleException
+     */
+    public function telegram(Request $request): Response
+    {
+        $response = $request->all();
+        if (isset($response['message']['from']['id'])) {
+            $fromId = $response['message']['from']['id'];
+            $userId = base64_decode(str_replace('/start ', '', $response['message']['text']));
+            $firstName = $response['message']['from']['first_name'];
+            $username = $response['message']['from']['username'];
+
+            if (is_numeric($userId)) {
+                $tgUser = TgUser::updateOrCreate([
+                    'user_id' => $userId,
+                    'chat_id' => $fromId
+                ], [
+                    'first_name' => $firstName,
+                    'username' => $username
+                ]);
+
+                if (Carbon::parse($tgUser->created_at)->seconds(0)->toDateTimeString() === Carbon::now()->seconds(0)->toDateTimeString()) {
+                    $telegram = new Telegram(config('connects.telegram.botToken'));
+                    // TODO add text
+                    $telegram->sendMessage($fromId, 'Your account has successful connected');
+                }
+            }
+        }
+
+        return response('');
     }
 }
