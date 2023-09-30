@@ -15,6 +15,7 @@ class CreateAnalyzesTable extends Migration
     {
         Schema::create('analyzes', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->index();
             $table->float('c_ucl');
             $table->float('c_lcl');
             $table->float('l_ucl');
