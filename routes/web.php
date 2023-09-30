@@ -4,6 +4,7 @@ use App\Http\Controllers\ConnectsController;
 use App\Http\Controllers\CustomAuthController;
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\PagesController;
+use App\Http\Controllers\WebhooksController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,9 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('/connect/facebook/login', [ConnectsController::class, 'facebookLogin'])->name('facebookLogin');
     Route::get('/connect/facebook/callback', [ConnectsController::class, 'facebookCallback'])->name('facebookCallback');
 
+    Route::get('/connect/slack/login', [ConnectsController::class, 'slackLogin'])->name('slackLogin');
+    Route::get('/connect/slack/callback', [ConnectsController::class, 'slackCallback'])->name('slackCallback');
+
     Route::get('dashboard', [PagesController::class, 'dashboard'])->name('dashboard');
 
     Route::get('metrics', [ApiController::class, 'metrics'])->name('metrics');
@@ -45,3 +49,10 @@ Route::get('forgot-password', [CustomAuthController::class, 'forgotPassword'])->
 Route::post('custom-forgot-password', [CustomAuthController::class, 'customForgotPassword'])->name('customForgotPassword');
 Route::get('reset-password/{token}', [CustomAuthController::class, 'resetPassword'])->name('resetPassword');
 Route::post('custom-reset-password', [CustomAuthController::class, 'customResetPassword'])->name('customResetPassword');
+
+Route::get('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);
+Route::post('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);
+
+Route::get('webhooks/messenger', [WebhooksController::class, 'messenger']);
+Route::post('webhooks/messenger', [WebhooksController::class, 'messenger']);
+Route::post('webhooks/telegram', [WebhooksController::class, 'telegram']);

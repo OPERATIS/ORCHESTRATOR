@@ -41,6 +41,7 @@ class PagesController extends Controller
             }
 
             return view('dashboard')
+                ->with('user', $user)
                 ->with('shopify', $shopify ?? null)
                 ->with('facebook', $facebook ?? null)
                 ->with('googleAnalytics', $googleAnalytics ?? null)

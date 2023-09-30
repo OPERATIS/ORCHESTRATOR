@@ -76,4 +76,48 @@ class Facebook
 
         return json_decode($response->getBody());
     }
+
+    public function sendWaMessage($phone, string $template = null, string $text = null)
+    {
+        $json = [
+            'messaging_product' => 'whatsapp',
+            'to' => $phone,
+        ];
+
+        if ($template) {
+            $json['type'] = 'template';
+            $json['template'] = [
+                'name' => $template,
+                'language' => [
+                    'code' => 'en_US'
+                ]
+            ];
+        } else {
+            $json['type'] = 'text';
+            $json['text'] = [
+                'body' => $text
+            ];
+        }
+
+        $response = $this->client->post('https://graph.facebook.com/v17.0/' . config('connects.whatsapp.phoneNumberId') . '/messages', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . config('connects.whatsapp.accessToken'),
+                'Content-Type' => 'application/json'
+            ],
+            'json' => $json
+        ]);
+
+        return json_decode($response->getBody());
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function sendMeMessage(string $text, $psid)
+    {
+        $response = $this->client
+            ->post("https://graph.facebook.com/v17.0/" . config('connects.messenger.pageId') . "/messages?recipient={'id':'$psid'}&messaging_type=RESPONSE&message={'text':'$text'}&access_token=" . config('connects.messenger.pageAccessToken'));
+
+        return json_decode($response->getBody());
+    }
 }
