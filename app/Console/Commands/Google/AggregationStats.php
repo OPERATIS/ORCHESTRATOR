@@ -84,6 +84,8 @@ class AggregationStats extends CommandsAggregationStats
                     'period' => '5_minutes',
                     'start_period' => $this->startPeriod,
                     'end_period' => $this->endPeriod,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
                 ];
             }
         }
