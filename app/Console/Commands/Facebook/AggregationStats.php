@@ -4,21 +4,40 @@ namespace App\Console\Commands\Facebook;
 
 use App\Models\AggregationFbStat;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use App\Console\Commands\AggregationStats as CommandsAggregationStats;
 
-class AggregationStats extends Command
+class AggregationStats extends CommandsAggregationStats
 {
-    protected $signature = 'facebook:aggregation-stats';
+    protected $signature = 'facebook:aggregation-stats {endPeriod?} {connectId?}';
 
     public function handle(): bool
     {
-        // Every five minutes
-        $startPeriod = Carbon::now()->subMinutes(10)->setSeconds(0)->toDateTimeString();
-        $endPeriod = Carbon::now()->subMinutes(5)->setSeconds(0)->toDateTimeString();
+        // Search period
+        $this->beforeHandle();
 
-        if (Carbon::parse($endPeriod)->minute === 0 and Carbon::parse($endPeriod)->hour === 0) {
+        $andWhere = '';
+        if ($this->connectId) {
+            $andWhere = ' AND connect_id = ' . $this->connectId;
+        }
+
+        if (Carbon::parse($this->endPeriod)->minute === 0 and Carbon::parse($this->endPeriod)->hour === 0) {
             // 23:35 [00:00] 00:05
+            $rows = DB::select("
+                SELECT
+                    MAX(clicks) - MIN(clicks) as clicks,
+                    MAX(impressions) - MIN(impressions) as impressions,
+                    MAX(spend) - MIN(spend) as spend,
+                    MAX(unique_clicks) - MIN(unique_clicks) as unique_clicks,
+                    count(*) as count,
+                    connect_id,
+                    ad_id
+                FROM fb_stats
+                WHERE end_period >= '{$this->startPeriod}' and end_period < '{$this->endPeriod}' {$andWhere}
+                GROUP BY connect_id, ad_id
+            ");
+        } elseif (Carbon::parse($this->endPeriod)->minute === 5 and Carbon::parse($this->endPeriod)->hour === 0) {
+            // 23:35 00:00 [00:05]
             $rows = DB::select("
                 SELECT
                     MAX(clicks) as clicks,
@@ -29,7 +48,7 @@ class AggregationStats extends Command
                     connect_id,
                     ad_id
                 FROM fb_stats
-                WHERE end_period = '{$endPeriod}'
+                WHERE end_period = '{$this->endPeriod}' {$andWhere}
                 GROUP BY connect_id, ad_id
             ");
         } else {
@@ -44,7 +63,7 @@ class AggregationStats extends Command
                     connect_id,
                     ad_id
                 FROM fb_stats
-                WHERE start_period >= '{$startPeriod}' and end_period <= '{$endPeriod}'
+                WHERE end_period >= '{$this->startPeriod}' and end_period <= '{$this->endPeriod}' {$andWhere}
                 GROUP BY connect_id, ad_id
             ");
         }
@@ -58,10 +77,12 @@ class AggregationStats extends Command
                     'spend' => $row->spend,
                     'unique_clicks' => $row->unique_clicks,
                     'connect_id' => $row->connect_id,
-                    'add_id' => $row->add_id,
+                    'ad_id' => $row->ad_id,
                     'period' => '5_minutes',
-                    'start_period' => $startPeriod,
-                    'end_period' => $endPeriod,
+                    'start_period' => $this->startPeriod,
+                    'end_period' => $this->endPeriod,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
                 ];
             }
         }
