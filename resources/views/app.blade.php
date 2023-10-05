@@ -5,6 +5,31 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+<script type="text/javascript" src="/js/app.js"></script>
+<script>
+    window.Echo.connector.pusher.connection.bind('connected', () => {
+        console.log('connected');
+    });
+
+    window.Echo.channel('public')
+        .listen('PublicEvent', (e) => {
+            console.log(e);
+        });
+
+    @if (auth())
+        window.Echo.private('alert.{{auth()->id()}}')
+            .listen('AlertEvent', (e) => {
+                    console.log(e);
+                }
+            );
+
+        window.Echo.private('metrics.{{auth()->id()}}')
+            .listen('MetricsEvent', (e) => {
+                    console.log(e);
+                }
+            );
+    @endif
+</script>
 <nav class="navbar navbar-light navbar-expand-lg mb-5" style="background-color: #e3f2fd;">
     <div class="container">
         <a class="navbar-brand mr-auto" href="#">ConnectLoc</a>

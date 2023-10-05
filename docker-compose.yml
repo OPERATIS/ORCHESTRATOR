@@ -53,6 +53,24 @@ services:
         networks:
             - app-network
 
+    soketi:
+        container_name: soketi
+        restart: unless-stopped
+        image: 'quay.io/soketi/soketi:0.17-16-alpine'
+        ports:
+            - '${SOKETI_PORT:-6001}:6001'
+            - '${SOKETI_METRICS_SERVER_PORT:-9601}:9601'
+        environment:
+            SOKETI_DEBUG: '${DEBUG:-1}'
+            SOKETI_DEFAULT_APP_ID: '${PUSHER_APP_ID:-app-id}'
+            SOKETI_DEFAULT_APP_KEY: '${PUSHER_APP_KEY:-app-key}'
+            SOKETI_DEFAULT_APP_SECRET: '${PUSHER_APP_SECRET:-app-secret}'
+            SOKETI_DEFAULT_APP_ENABLE_CLIENT_MESSAGES: ${DEFAULT_APP_ENABLE_CLIENT_MESSAGES:-false}
+        networks:
+            app-network:
+                aliases:
+                    - socket.connect-loc.com
+
 # Docker Networks
 networks:
     app-network:
