@@ -27,7 +27,11 @@ class SixSigma
             $deviationFromTheMean[] = pow($item - $mean, 2);
         }
 
-        $findTheVariance = array_sum($deviationFromTheMean) / (count($deviationFromTheMean) - 1);
+        $countDeviationFromTheMean = count($deviationFromTheMean) - 1;
+        $findTheVariance = 0;
+        if ($countDeviationFromTheMean) {
+            $findTheVariance = array_sum($deviationFromTheMean) / $countDeviationFromTheMean;
+        }
         return sqrt($findTheVariance);
     }
 

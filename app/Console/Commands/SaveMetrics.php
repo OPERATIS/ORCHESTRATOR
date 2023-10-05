@@ -13,14 +13,34 @@ use Illuminate\Support\Facades\Artisan;
 
 class SaveMetrics extends Command
 {
-    protected $signature = 'save-metrics';
+    protected $signature = 'save-metrics {endPeriod?} {type?}';
 
     public function handle(): bool
     {
-        $startPeriod = Carbon::now()->setMinutes(0)->setSeconds(0)->subHour()->toDateTimeString();
-        $endPeriod = Carbon::now()->setMinutes(0)->setSeconds(0)->toDateTimeString();
+        // Logic for old data
+        $endPeriod = $this->argument('endPeriod');
 
-        $connects = Connect::get();
+        // Search only demo
+        $type = $this->argument('type');
+
+        if (!$endPeriod) {
+            $startPeriod = Carbon::now()->setMinutes(0)->setSeconds(0)->subHour()->toDateTimeString();
+        } else {
+            $startPeriod = Carbon::parse($endPeriod)->subHour()->setMinutes(0)->setSeconds(0)->toDateTimeString();
+        }
+
+        $endPeriod = Carbon::parse($startPeriod)->addHours()->toDateTimeString();
+
+        if (!$type) {
+            $connects = Connect::get();
+        } else {
+            $connects = Connect::whereIn('id', [
+                FbStat::DEMO_CONNECT_ID,
+                GaStat::DEMO_CONNECT_ID,
+                Order::DEMO_CONNECT_ID
+            ])->get();
+        }
+
         $connectIds = [];
         $preparedMetrics = [];
         foreach ($connects as $connect) {
@@ -60,9 +80,11 @@ class SaveMetrics extends Command
         ")
             ->where('end_period', '>', $startPeriod)
             ->where('end_period', '<=', $endPeriod)
+            ->when($type === 'demo', function ($query) {
+                return $query->where('connect_id', FbStat::DEMO_CONNECT_ID);
+            })
             ->groupBy(['connect_id'])
             ->get();
-
 
         foreach ($fbMetrics as $fbMetric) {
             $userId = $connectIds[$fbMetric->connect_id] ?? null;
@@ -80,6 +102,9 @@ class SaveMetrics extends Command
         ")
             ->where('end_period', '>', $startPeriod)
             ->where('end_period', '<=', $endPeriod)
+            ->when($type === 'demo', function ($query) {
+                return $query->where('connect_id', GAStat::DEMO_CONNECT_ID);
+            })
             ->groupBy(['connect_id'])
             ->get();
 
@@ -102,6 +127,9 @@ class SaveMetrics extends Command
         ")
             ->where('order_created_at', '>', $startPeriod)
             ->where('order_created_at', '<=', $endPeriod)
+            ->when($type === 'demo', function ($query) {
+                return $query->where('connect_id', Order::DEMO_CONNECT_ID);
+            })
             ->groupBy(['connect_id'])
             ->get();
 
@@ -116,7 +144,12 @@ class SaveMetrics extends Command
                 $preparedMetrics[$userId]['cls'] = $orderMetric->countcustomers;
                 $preparedMetrics[$userId]['ads_cls'] = $orderMetric->adscls;
                 $preparedMetrics[$userId]['returns'] = 0;
+                $preparedMetrics[$userId]['c1'] = $preparedMetrics[$userId]['reach'] ? $preparedMetrics[$userId]['l'] / $preparedMetrics[$userId]['reach'] : 0;
+                $preparedMetrics[$userId]['c'] = $preparedMetrics[$userId]['l'] ? $preparedMetrics[$userId]['cls'] / $preparedMetrics[$userId]['l'] : 0;
+                // Recalculate
                 $preparedMetrics[$userId]['q'] = $orderMetric->countcustomers ? ($orderMetric->countorders / $orderMetric->countcustomers) : 0;
+                $preparedMetrics[$userId]['ltv'] = $preparedMetrics[$userId]['p'] * $preparedMetrics[$userId]['q'];
+                $preparedMetrics[$userId]['r'] = $preparedMetrics[$userId]['cls'] * $preparedMetrics[$userId]['ltv'];
             }
         }
 
@@ -125,6 +158,9 @@ class SaveMetrics extends Command
             connect_id
         ")
             ->where('financial_status', 'refunded')
+            ->when($type === 'demo', function ($query) {
+                return $query->where('connect_id', Order::DEMO_CONNECT_ID);
+            })
             ->groupBy(['connect_id'])
             ->get();
 
@@ -132,19 +168,18 @@ class SaveMetrics extends Command
             $userId = $connectIds[$orderMetric->connect_id] ?? null;
             if ($userId) {
                 $preparedMetrics[$userId]['returns'] = $preparedMetrics[$userId]['count_customers'] ? ($orderMetric->countorders / $preparedMetrics[$userId]['count_customers']) : 0;
+                // Recalculate if found returns
                 $preparedMetrics[$userId]['q'] = $preparedMetrics[$userId]['q1'] - $preparedMetrics[$userId]['returns'];
                 $preparedMetrics[$userId]['ltv'] = $preparedMetrics[$userId]['p'] * $preparedMetrics[$userId]['q'];
                 $preparedMetrics[$userId]['r'] = $preparedMetrics[$userId]['cls'] * $preparedMetrics[$userId]['ltv'];
-                $preparedMetrics[$userId]['c1'] = $preparedMetrics[$userId]['reach'] ? $preparedMetrics[$userId]['l'] / $preparedMetrics[$userId]['reach'] : 0;
-                $preparedMetrics[$userId]['c'] = $preparedMetrics[$userId]['l'] ? $preparedMetrics[$userId]['cls'] / $preparedMetrics[$userId]['l'] : 0;
             }
         }
 
         Metric::insert($preparedMetrics);
 
         // Search alerts
-        Artisan::call('search-alerts');
-        Artisan::call('save-analyzes');
+        Artisan::call("search-alerts '{$endPeriod}' {$type}");
+        Artisan::call("save-analyzes '{$endPeriod}' {$type}");
 
         return true;
     }

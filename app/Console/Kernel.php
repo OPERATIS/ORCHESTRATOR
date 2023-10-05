@@ -18,10 +18,16 @@ class Kernel extends ConsoleKernel
         // For example 13:15
         // All orders by period 13:10-13:15
         $schedule->command('shopify:get-orders')->everyFiveMinutes();
+        $schedule->command('shopify:get-orders')->dailyAt('23:59');
+        $schedule->command('shopify:get-orders demo')->everyFiveMinutes();
+
         // All stats by full day
         $schedule->command('facebook:get-stats')->everyFiveMinutes();
+        $schedule->command('facebook:get-stats')->dailyAt('23:59');
+        $schedule->command('facebook:get-stats demo')->everyFiveMinutes();
         // All stats by full day
         $schedule->command('google:get-stats')->everyFiveMinutes();
+        $schedule->command('google:get-stats demo')->everyFiveMinutes();
 
         // For example 13:15
         // Convert stats to 5 minutes 13:05-13:10

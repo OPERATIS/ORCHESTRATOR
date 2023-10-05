@@ -9,6 +9,9 @@ class GaStat extends Model
 {
     use HasFactory;
 
+    public const DEMO_UNIQUE_TABLE_ID = 401;
+    public const DEMO_CONNECT_ID = 4;
+
     protected $guarded = [];
     public $dates = [
         'start_period',
