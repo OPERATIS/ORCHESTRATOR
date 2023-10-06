@@ -3,13 +3,16 @@
 3. Go to docker\
    ```docker-compose exec app bash```
 4. Run inside docker\
-   ```composer install```
-5. Exit from docker\
+   ```composer install```\
+   Sometimes you can receive problem from google-api\
+   ```rm -rf ~/.composer/cache```
+5. ```php artisan migrate```
+6. Exit from docker\
    ```exit```
-6. Run from local environment\
+7. Run from local environment\
    ```npm i```\
    ```npm run dev```
-7. Configuration local environment\
+8. Configuration local environment\
    ```sudo nano /etc/hosts```\
-   127.0.0.1 connect-loc.com\
-   127.0.0.1 socket.connect-loc.com
+   ```127.0.0.1 connect-loc.com```\
+   ```127.0.0.1 socket.connect-loc.com```
