@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AlertEvent;
+use App\Events\MetricsEvent;
+use App\Events\OrderStatusUpdated;
+use App\Events\PrivateEvent;
+use App\Events\PublicEvent;
 use App\Models\Connect;
 use App\Models\GaProfile;
 use App\Models\User;
@@ -20,6 +25,16 @@ class PagesController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
+
+        // Example soketi
+//        PublicEvent::dispatch('PublicEvent');
+//        MetricsEvent::dispatch([
+//            'l' => [
+//                'previous' => 10,
+//                'current' => 1
+//            ]
+//        ], $user->id);
+//        AlertEvent::dispatch('AlertEvent', $user->id);
 
         if ($user) {
             $connects = Connect::where('user_id', $user->id)->get();
