@@ -36,16 +36,11 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('dashboard', [PagesController::class, 'dashboard'])->name('dashboard');
 });
 
-Route::get('login', [AuthController::class, 'index'])->name('login');
-Route::post('custom-login', [AuthController::class, 'customLogin'])->name('customLogin');
-Route::get('registration', [AuthController::class, 'registration'])->name('registration');
-Route::post('custom-registration', [AuthController::class, 'customRegistration'])->name('customRegistration');
+Route::any('login', [AuthController::class, 'login'])->name('login');
+Route::any('registration', [AuthController::class, 'registration'])->name('registration');
 Route::get('logout', [AuthController::class, 'logout'])->name('logout');
-
-Route::get('forgot-password', [AuthController::class, 'forgotPassword'])->name('forgotPassword');
-Route::post('custom-forgot-password', [AuthController::class, 'customForgotPassword'])->name('customForgotPassword');
-Route::get('reset-password/{token}', [AuthController::class, 'resetPassword'])->name('resetPassword');
-Route::post('custom-reset-password', [AuthController::class, 'customResetPassword'])->name('customResetPassword');
+Route::any('forgot-password', [AuthController::class, 'forgotPassword'])->name('forgotPassword');
+Route::any('reset-password/{token}', [AuthController::class, 'resetPassword'])->name('resetPassword');
 
 Route::get('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);
 Route::post('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);

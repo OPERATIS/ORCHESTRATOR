@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Mail\RecoverPassword;
 use App\Mail\Registration;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -19,59 +17,56 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function index()
+    public function login(Request $request)
     {
-        return view('auth.login');
-    }
+        if ($request->isMethod('post')) {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email',
+                'password' => 'required'
+            ]);
 
-    public function customLogin(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required',
-            'password' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            $jsonMessage = $validator->errors()->first();
-            $jsonStatus = false;
-        } else {
-            $credentials = $request->only('email', 'password');
-            if (Auth::attempt($credentials)) {
-                $jsonMessage = $validator->errors()->first();
-                $jsonStatus = true;
-                $jsonRedirect = route('dashboard');
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'errors' => $validator->errors()
+                ]);
             } else {
-                $jsonStatus = false;
-                $jsonMessage = '';
+                if (Auth::attempt($request->only(['email', 'password']))) {
+                    return response()->json([
+                        'status' => true,
+                        'redirect' => url('dashboard')
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'errors' => ['Invalid credentials']
+                    ]);
+                }
             }
-        }
-
-        return response()->json([
-            'status' => $jsonStatus ?? false,
-            'message' => $jsonMessage ?? null,
-            'redirect' => $jsonRedirect ?? null
-        ]);
-    }
-
-    public function registration()
-    {
-        return view('auth.registration');
-    }
-
-    public function customRegistration(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
-        ]);
-
-        if ($validator->fails()) {
-            $jsonMessage = $validator->errors()->first();
-            $jsonStatus = false;
         } else {
+            return view('auth.login');
+        }
+    }
+
+    public function registration(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'email' => 'required|email|unique:users',
+                'password' => 'required|min:6',
+                'confirm_password' => 'required|min:6|same:password',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'errors' => $validator->errors()
+                ]);
+            }
+
             $data = $request->all();
-            User::create([
+            $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password'])
@@ -80,15 +75,15 @@ class AuthController extends Controller
             Mail::to($data['email'])
                 ->send(new Registration($data['name'], $data['password']));
 
-            $jsonStatus = true;
-            $jsonRedirect = redirect('dashboard');
-        }
+            Auth::login($user);
 
-        return response()->json([
-            'status' => $jsonStatus ?? false,
-            'message' => $jsonMessage ?? null,
-            'redirect' => $jsonRedirect ?? null
-        ]);
+            return response()->json([
+                'status' => true,
+                'redirect' => url('dashboard')
+            ]);
+        } else {
+            return view('auth.registration');
+        }
     }
 
     public function logout()
@@ -96,92 +91,90 @@ class AuthController extends Controller
         Session::flush();
         Auth::logout();
 
-        return Redirect('login');
+        return redirect('login');
     }
 
-    public function forgotPassword()
+    public function forgotPassword(Request $request)
     {
-        return view('auth.forgot-password');
-    }
+        if ($request->isMethod('post')) {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email',
+            ]);
 
-    public function customForgotPassword(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-        ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'errors' => $validator->errors()
+                ]);
+            } else {
+                $status = Password::sendResetLink($request->only('email'),
+                    function ($user, $token) {
+                        Mail::to($user->email)
+                            ->send(new RecoverPassword($token));
 
-        if ($validator->fails()) {
-            $jsonMessage = $validator->errors()->first();
-            $jsonStatus = false;
-        } else {
-            $status = Password::sendResetLink($request->only('email'),
-                function ($user, $token) {
-                    Mail::to($user->email)
-                        ->send(new RecoverPassword($token));
+                        return Password::RESET_LINK_SENT;
+                    }
+                );
 
-                    return Password::RESET_LINK_SENT;
+                if ($status === Password::RESET_LINK_SENT) {
+                    return response()->json([
+                        'status' => true
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => true,
+                        'errors' => ['Invalid credentials']
+                    ]);
                 }
-            );
-
-            $jsonStatus = $status === Password::RESET_LINK_SENT;
-            $jsonMessage = '';
-        }
-
-        return response()->json([
-            'status' => $jsonStatus,
-            'message' => $jsonMessage ?? null
-        ]);
-    }
-
-    public function resetPassword($token)
-    {
-        return view('auth.reset-password')
-            ->with('token', $token);
-    }
-
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function customResetPassword(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
-        ]);
-
-        if ($validator->fails()) {
-            $jsonMessage = $validator->errors()->first();
-            $jsonStatus = false;
-        } else {
-            $status = Password::reset(
-                $request->only('email', 'password', 'password_confirmation', 'token'),
-                function (User $user, string $password) {
-                    $user->forceFill([
-                        'password' => Hash::make($password)
-                    ])->setRememberToken(Str::random(60));
-
-                    $user->save();
-                    event(new PasswordReset($user));
-                }
-            );
-
-            $jsonStatus = ($status === Password::PASSWORD_RESET);
-            if ($status === Password::PASSWORD_RESET) {
-                $jsonMessage = '';
-            } elseif ($status === Password::INVALID_USER) {
-                $jsonMessage = '';
-            } elseif ($status === Password::INVALID_TOKEN) {
-                $jsonMessage = '';
-            } elseif ($status === Password::RESET_THROTTLED) {
-                $jsonMessage = '';
             }
+        } else {
+            return view('auth.forgot-password');
         }
+    }
 
-        return response()->json([
-            'status' => $jsonStatus,
-            'message' => $jsonMessage ?? null
-        ]);
+    public function resetPassword($token, Request $request)
+    {
+        if ($request->isMethod('post')) {
+            $validator = Validator::make($request->all(), [
+                'token' => 'required',
+                'email' => 'required|email',
+                'password' => 'required|min:8|confirmed',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'errors' => $validator->errors()
+                ]);
+            } else {
+                $status = Password::reset(
+                    $request->only('email', 'password', 'password_confirmation', 'token'),
+                    function (User $user, string $password) {
+                        $user->forceFill([
+                            'password' => Hash::make($password)
+                        ])->setRememberToken(Str::random(60));
+
+                        $user->save();
+                        event(new PasswordReset($user));
+                    }
+                );
+
+                if ($status === Password::PASSWORD_RESET) {
+                    return response()->json([
+                        'status' => true
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => true,
+                        'errors' => ['Invalid credentials']
+                    ]);
+                }
+            }
+        } elseif (!empty($token)) {
+            return view('auth.reset-password')
+                ->with('token', $token);
+        } else {
+            return abort(404);
+        }
     }
 }
