@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-class PagesController extends Controller
+class ChatController extends Controller
 {
     public function index()
     {
-        return view('landing');
+        return view('chat.index');
     }
 }

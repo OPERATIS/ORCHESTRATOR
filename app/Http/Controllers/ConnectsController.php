@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Connect;
+use App\Models\Integration;
 use App\Models\SlUser;
 use App\Models\User;
 use App\Services\Google;
@@ -87,7 +87,7 @@ class ConnectsController extends BaseController
             return redirect('dashboard');
         }
 
-        Connect::updateOrCreate([
+        Integration::updateOrCreate([
             'user_id' => $user->id,
             'app_user_slug' => $session->getShop(),
             'app_user_id' => $session->getId(),
@@ -163,7 +163,7 @@ class ConnectsController extends BaseController
             Session::flash('success-message', 'Some error please contact us');
             return redirect('dashboard');
         } else {
-            $connect = Connect::updateOrCreate([
+            $integration = Integration::updateOrCreate([
                 'user_id' => $user->id,
                 'app_user_id' => $client->getClientId(),
                 'platform' => 'google'
@@ -175,9 +175,9 @@ class ConnectsController extends BaseController
             ]);
 
             // Save profiles
-            $client->setAccessToken($connect->access_token);
+            $client->setAccessToken($integration->access_token);
             $analytics = new Analytics($client);
-            Google::getProfileId($analytics, $connect->id);
+            Google::getProfileId($analytics, $integration->id);
         }
 
         // TODO add text
@@ -209,7 +209,7 @@ class ConnectsController extends BaseController
             return redirect('dashboard');
         }
 
-        Connect::updateOrCreate([
+        Integration::updateOrCreate([
             'user_id' => $user->id,
             'app_user_slug' => $socialiteUser->getNickname() ?? null,
             'app_user_id' => $socialiteUser->getId(),
