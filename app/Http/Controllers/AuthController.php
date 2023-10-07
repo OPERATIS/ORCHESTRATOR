@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class CustomAuthController extends Controller
+class AuthController extends Controller
 {
     public function index()
     {
