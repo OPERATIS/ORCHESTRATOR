@@ -8,10 +8,10 @@ class Google
 {
     /**
      * @param $analytics
-     * @param $connectId
+     * @param $integrationId
      * @return void
      */
-    public static function getProfileId($analytics, $connectId)
+    public static function getProfileId($analytics, $integrationId)
     {
         // Get the list of accounts for the authorized user.
         $accounts = $analytics->management_accounts->listManagementAccounts();
@@ -36,7 +36,7 @@ class Google
                         $items = $profiles->getItems();
 
                         GaProfile::updateOrCreate([
-                            'connect_id' => $connectId,
+                            'integration_id' => $integrationId,
                             'profile_id' => $items[0]->getId()
                         ], [
                             'name' => $item->getName(),

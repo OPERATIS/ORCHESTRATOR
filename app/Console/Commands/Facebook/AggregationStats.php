@@ -4,21 +4,40 @@ namespace App\Console\Commands\Facebook;
 
 use App\Models\AggregationFbStat;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use App\Console\Commands\AggregationStats as CommandsAggregationStats;
 
-class AggregationStats extends Command
+class AggregationStats extends CommandsAggregationStats
 {
-    protected $signature = 'facebook:aggregation-stats';
+    protected $signature = 'facebook:aggregation-stats {endPeriod?} {integrationId?}';
 
     public function handle(): bool
     {
-        // Every five minutes
-        $startPeriod = Carbon::now()->subMinutes(10)->setSeconds(0)->toDateTimeString();
-        $endPeriod = Carbon::now()->subMinutes(5)->setSeconds(0)->toDateTimeString();
+        // Search period
+        $this->beforeHandle();
 
-        if (Carbon::parse($endPeriod)->minute === 0 and Carbon::parse($endPeriod)->hour === 0) {
+        $andWhere = '';
+        if ($this->integrationId) {
+            $andWhere = ' AND integration_id = ' . $this->integrationId;
+        }
+
+        if (Carbon::parse($this->endPeriod)->minute === 0 and Carbon::parse($this->endPeriod)->hour === 0) {
             // 23:35 [00:00] 00:05
+            $rows = DB::select("
+                SELECT
+                    MAX(clicks) - MIN(clicks) as clicks,
+                    MAX(impressions) - MIN(impressions) as impressions,
+                    MAX(spend) - MIN(spend) as spend,
+                    MAX(unique_clicks) - MIN(unique_clicks) as unique_clicks,
+                    count(*) as count,
+                    integration_id,
+                    ad_id
+                FROM fb_stats
+                WHERE end_period >= '{$this->startPeriod}' and end_period < '{$this->endPeriod}' {$andWhere}
+                GROUP BY integration_id, ad_id
+            ");
+        } elseif (Carbon::parse($this->endPeriod)->minute === 5 and Carbon::parse($this->endPeriod)->hour === 0) {
+            // 23:35 00:00 [00:05]
             $rows = DB::select("
                 SELECT
                     MAX(clicks) as clicks,
@@ -26,11 +45,11 @@ class AggregationStats extends Command
                     MAX(spend) as spend,
                     MAX(unique_clicks) as unique_clicks,
                     2 as count,
-                    connect_id,
+                    integration_id,
                     ad_id
                 FROM fb_stats
-                WHERE end_period = '{$endPeriod}'
-                GROUP BY connect_id, ad_id
+                WHERE end_period = '{$this->endPeriod}' {$andWhere}
+                GROUP BY integration_id, ad_id
             ");
         } else {
             // 10:00:00 [10:01:01 10:03:03 10:04:00 10:05:00] 10:05:01
@@ -41,11 +60,11 @@ class AggregationStats extends Command
                     MAX(spend) - MIN(spend) as spend,
                     MAX(unique_clicks) - MIN(unique_clicks) as unique_clicks,
                     count(*) as count,
-                    connect_id,
+                    integration_id,
                     ad_id
                 FROM fb_stats
-                WHERE start_period >= '{$startPeriod}' and end_period <= '{$endPeriod}'
-                GROUP BY connect_id, ad_id
+                WHERE end_period >= '{$this->startPeriod}' and end_period <= '{$this->endPeriod}' {$andWhere}
+                GROUP BY integration_id, ad_id
             ");
         }
 
@@ -57,11 +76,13 @@ class AggregationStats extends Command
                     'impressions' => $row->impressions,
                     'spend' => $row->spend,
                     'unique_clicks' => $row->unique_clicks,
-                    'connect_id' => $row->connect_id,
-                    'add_id' => $row->add_id,
+                    'integration_id' => $row->integration_id,
+                    'ad_id' => $row->ad_id,
                     'period' => '5_minutes',
-                    'start_period' => $startPeriod,
-                    'end_period' => $endPeriod,
+                    'start_period' => $this->startPeriod,
+                    'end_period' => $this->endPeriod,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
                 ];
             }
         }

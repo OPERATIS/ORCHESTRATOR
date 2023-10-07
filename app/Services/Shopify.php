@@ -10,9 +10,9 @@ class Shopify
     public static function setContext($shop)
     {
         Context::initialize(
-            config('connects.shopify.apiKey'),
-            config('connects.shopify.apiSecret'),
-            config('connects.shopify.appScopes'),
+            config('integrations.shopify.apiKey'),
+            config('integrations.shopify.apiSecret'),
+            config('integrations.shopify.appScopes'),
             $shop,
             new FileSessionStorage(),
             '2023-04',

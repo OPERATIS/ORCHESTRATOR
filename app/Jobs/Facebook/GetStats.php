@@ -3,7 +3,7 @@
 namespace App\Jobs\Facebook;
 
 use App\Models\FbStat;
-use App\Models\Connect;
+use App\Models\Integration;
 use App\Services\Facebook;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
@@ -18,21 +18,21 @@ class GetStats implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $connect = null;
+    protected $integration = null;
     protected $startPeriod = null;
     protected $endPeriod = null;
 
-    public function __construct(Connect $connect, $startPeriod, $endPeriod)
+    public function __construct(Integration $integration, $startPeriod, $endPeriod)
     {
-        $this->connect = $connect;
+        $this->integration = $integration;
         $this->startPeriod = $startPeriod;
         $this->endPeriod = $endPeriod;
     }
 
     public function handle(): void
     {
-        $facebook = $this->connect;
-        $logService = new LogService('facebook', $this->connect->id);
+        $facebook = $this->integration;
+        $logService = new LogService('facebook', $this->integration->id);
 
         /** @var Facebook $facebookService */
         $facebookService = app()->make(Facebook::class);
@@ -76,7 +76,7 @@ class GetStats implements ShouldQueue
 
                     foreach ($info->data as $record) {
                         $stats[] = [
-                            'connect_id' => $this->connect->id,
+                            'integration_id' => $this->integration->id,
                             'clicks' => $record->clicks,
                             'impressions' => $record->impressions,
                             'spend' => $record->spend,

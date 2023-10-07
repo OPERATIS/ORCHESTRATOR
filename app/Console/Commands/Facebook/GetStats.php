@@ -2,25 +2,33 @@
 
 namespace App\Console\Commands\Facebook;
 
-use App\Models\Connect;
+use App\Models\Integration;
+use App\Services\Demo;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use App\Jobs\Facebook\GetStats as GetStatsJobs;
 
 class GetStats extends Command
 {
-    protected $signature = 'facebook:get-stats';
+    protected $signature = 'facebook:get-stats {type?}';
 
     public function handle(): bool
     {
-        $connects = Connect::where('platform', 'facebook')
-            ->get();
+        $type = $this->argument('type');
 
         // Every five minutes
         $startPeriod = Carbon::now()->subMinutes(5)->setSeconds(0)->toDateTimeString();
         $endPeriod = Carbon::now()->setSeconds(0)->toDateTimeString();
-        foreach ($connects as $connect) {
-            GetStatsJobs::dispatch($connect, $startPeriod, $endPeriod);
+
+        if (empty($type)) {
+            $integrations = Integration::where('platform', 'facebook')
+                ->get();
+
+            foreach ($integrations as $integration) {
+                GetStatsJobs::dispatch($integration, $startPeriod, $endPeriod);
+            }
+        } elseif ($type === 'demo') {
+            Demo::createFbStats($startPeriod, $endPeriod);
         }
 
         return true;

@@ -99,9 +99,9 @@ class Facebook
             ];
         }
 
-        $response = $this->client->post('https://graph.facebook.com/v17.0/' . config('connects.whatsapp.phoneNumberId') . '/messages', [
+        $response = $this->client->post('https://graph.facebook.com/v17.0/' . config('integrations.whatsapp.phoneNumberId') . '/messages', [
             'headers' => [
-                'Authorization' => 'Bearer ' . config('connects.whatsapp.accessToken'),
+                'Authorization' => 'Bearer ' . config('integrations.whatsapp.accessToken'),
                 'Content-Type' => 'application/json'
             ],
             'json' => $json
@@ -116,7 +116,7 @@ class Facebook
     public function sendMeMessage(string $text, $psid)
     {
         $response = $this->client
-            ->post("https://graph.facebook.com/v17.0/" . config('connects.messenger.pageId') . "/messages?recipient={'id':'$psid'}&messaging_type=RESPONSE&message={'text':'$text'}&access_token=" . config('connects.messenger.pageAccessToken'));
+            ->post("https://graph.facebook.com/v17.0/" . config('integrations.messenger.pageId') . "/messages?recipient={'id':'$psid'}&messaging_type=RESPONSE&message={'text':'$text'}&access_token=" . config('integrations.messenger.pageAccessToken'));
 
         return json_decode($response->getBody());
     }

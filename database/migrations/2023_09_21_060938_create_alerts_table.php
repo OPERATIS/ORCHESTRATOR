@@ -15,6 +15,7 @@ class CreateAlertsTable extends Migration
     {
         Schema::create('alerts', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->index();
             $table->string('metric')->index();
             $table->string('result')->index();
             $table->string('period')->index();

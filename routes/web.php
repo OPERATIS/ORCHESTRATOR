@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\AlertsController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ConnectsController;
-use App\Http\Controllers\CustomAuthController;
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\IntegrationsController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\WebhooksController;
 use App\Http\Middleware\Authenticate;
@@ -34,21 +37,17 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('/connect/slack/login', [ConnectsController::class, 'slackLogin'])->name('slackLogin');
     Route::get('/connect/slack/callback', [ConnectsController::class, 'slackCallback'])->name('slackCallback');
 
-    Route::get('dashboard', [PagesController::class, 'dashboard'])->name('dashboard');
-
-    Route::get('metrics', [ApiController::class, 'metrics'])->name('metrics');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('chat', [ChatController::class, 'index'])->name('chat');
+    Route::get('alerts', [AlertsController::class, 'index'])->name('alerts');
+    Route::get('integrations', [IntegrationsController::class, 'index'])->name('integrations');
 });
 
-Route::get('login', [CustomAuthController::class, 'index'])->name('login');
-Route::post('custom-login', [CustomAuthController::class, 'customLogin'])->name('customLogin');
-Route::get('registration', [CustomAuthController::class, 'registration'])->name('registration');
-Route::post('custom-registration', [CustomAuthController::class, 'customRegistration'])->name('customRegistration');
-Route::get('logout', [CustomAuthController::class, 'logout'])->name('logout');
-
-Route::get('forgot-password', [CustomAuthController::class, 'forgotPassword'])->name('forgotPassword');
-Route::post('custom-forgot-password', [CustomAuthController::class, 'customForgotPassword'])->name('customForgotPassword');
-Route::get('reset-password/{token}', [CustomAuthController::class, 'resetPassword'])->name('resetPassword');
-Route::post('custom-reset-password', [CustomAuthController::class, 'customResetPassword'])->name('customResetPassword');
+Route::any('login', [AuthController::class, 'login'])->name('login');
+Route::any('registration', [AuthController::class, 'registration'])->name('registration');
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+Route::any('forgot-password', [AuthController::class, 'forgotPassword'])->name('forgotPassword');
+Route::any('reset-password/{token}', [AuthController::class, 'resetPassword'])->name('resetPassword');
 
 Route::get('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);
 Route::post('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);
