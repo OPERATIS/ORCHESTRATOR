@@ -9,13 +9,13 @@ abstract class AggregationStats extends Command
 {
     protected $startPeriod;
     protected $endPeriod;
-    protected $connectId;
+    protected $integrationId;
 
     public function beforeHandle()
     {
         // Logic for demo and old data
         $endPeriod = $this->argument('endPeriod');
-        $connectId = $this->argument('connectId');
+        $integrationId = $this->argument('integrationId');
 
         // Every five minutes
         if (!$endPeriod) {
@@ -28,6 +28,6 @@ abstract class AggregationStats extends Command
 
         $this->startPeriod = $startPeriod;
         $this->endPeriod = $endPeriod;
-        $this->connectId = $connectId;
+        $this->integrationId = $integrationId;
     }
 }

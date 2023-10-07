@@ -9,7 +9,7 @@ class Order extends Model
 {
     use HasFactory;
 
-    public const DEMO_CONNECT_ID = 6;
+    public const DEMO_INTEGRATION_ID = 6;
 
     protected $guarded = [];
     public $dates = [

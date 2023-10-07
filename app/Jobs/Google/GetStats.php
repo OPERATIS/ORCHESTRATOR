@@ -2,7 +2,7 @@
 
 namespace App\Jobs\Google;
 
-use App\Models\Connect;
+use App\Models\Integration;
 use App\Models\GaProfile;
 use App\Models\GaStat;
 use Carbon\Carbon;
@@ -20,13 +20,13 @@ class GetStats implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $connect = null;
+    protected $integration = null;
     protected $startPeriod = null;
     protected $endPeriod = null;
 
-    public function __construct(Connect $connect, $startPeriod, $endPeriod)
+    public function __construct(Integration $integration, $startPeriod, $endPeriod)
     {
-        $this->connect = $connect;
+        $this->integration = $integration;
         $this->startPeriod = $startPeriod;
         $this->endPeriod = $endPeriod;
     }
@@ -36,8 +36,8 @@ class GetStats implements ShouldQueue
      */
     public function handle(): void
     {
-        $google = $this->connect;
-        $logService = new LogService('google', $this->connect->id);
+        $google = $this->integration;
+        $logService = new LogService('google', $this->integration->id);
 
         $client = new Client();
         $client->setAuthConfig(config_path() . '/googleCredentials.json');
@@ -73,7 +73,7 @@ class GetStats implements ShouldQueue
             $client->setAccessToken($google->access_token);
             $analytics = new Analytics($client);
 
-            $profiles = GaProfile::where('connect_id', $google->id)
+            $profiles = GaProfile::where('integration_id', $google->id)
                 ->where('actual', 1)
                 ->get();
 
@@ -114,7 +114,7 @@ class GetStats implements ShouldQueue
                     if (!empty($results) && count($results->getRows()) > 0) {
                         $rows = $results->getRows();
                         $stats = [
-                            'connect_id' => $google->id,
+                            'integration_id' => $google->id,
                             'impressions' => $rows[0][0],
                             'pageviews' => $rows[0][1],
                             'unique_pageviews' => $rows[0][2],

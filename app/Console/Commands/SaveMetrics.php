@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Connect;
+use App\Models\Integration;
 use App\Models\FbStat;
 use App\Models\GaStat;
 use App\Models\Metric;
@@ -32,22 +32,22 @@ class SaveMetrics extends Command
         $endPeriod = Carbon::parse($startPeriod)->addHours()->toDateTimeString();
 
         if (!$type) {
-            $connects = Connect::get();
+            $integrations = Integration::get();
         } else {
-            $connects = Connect::whereIn('id', [
-                FbStat::DEMO_CONNECT_ID,
-                GaStat::DEMO_CONNECT_ID,
-                Order::DEMO_CONNECT_ID
+            $integrations = Integration::whereIn('id', [
+                FbStat::DEMO_INTEGRATION_ID,
+                GaStat::DEMO_INTEGRATION_ID,
+                Order::DEMO_INTEGRATION_ID
             ])->get();
         }
 
-        $connectIds = [];
+        $integrationIds = [];
         $preparedMetrics = [];
-        foreach ($connects as $connect) {
-            $connectIds[$connect->id] = $connect->user_id;
-            if (!isset($preparedMetrics[$connect->user_id])) {
-                $preparedMetrics[$connect->user_id] = [
-                    'user_id' => $connect->user_id,
+        foreach ($integrations as $integration) {
+            $integrationIds[$integration->id] = $integration->user_id;
+            if (!isset($preparedMetrics[$integration->user_id])) {
+                $preparedMetrics[$integration->user_id] = [
+                    'user_id' => $integration->user_id,
                     'period' => '1_hour',
                     'start_period' => $startPeriod,
                     'end_period' => $endPeriod,
@@ -76,18 +76,18 @@ class SaveMetrics extends Command
         $fbMetrics = FbStat::selectRaw("
             sum(impressions) as REACH,
             sum(clicks) as L,
-            connect_id
+            integration_id
         ")
             ->where('end_period', '>', $startPeriod)
             ->where('end_period', '<=', $endPeriod)
             ->when($type === 'demo', function ($query) {
-                return $query->where('connect_id', FbStat::DEMO_CONNECT_ID);
+                return $query->where('integration_id', FbStat::DEMO_INTEGRATION_ID);
             })
-            ->groupBy(['connect_id'])
+            ->groupBy(['integration_id'])
             ->get();
 
         foreach ($fbMetrics as $fbMetric) {
-            $userId = $connectIds[$fbMetric->connect_id] ?? null;
+            $userId = $integrationIds[$fbMetric->integration_id] ?? null;
             if ($userId) {
                 $preparedMetrics[$userId]['reach'] = $fbMetric->reach;
                 $preparedMetrics[$userId]['l'] = $fbMetric->l;
@@ -98,18 +98,18 @@ class SaveMetrics extends Command
         $gaMetrics = GaStat::selectRaw("
             sum(pageviews) as REACH,
             sum(ad_clicks) as L,
-            connect_id
+            integration_id
         ")
             ->where('end_period', '>', $startPeriod)
             ->where('end_period', '<=', $endPeriod)
             ->when($type === 'demo', function ($query) {
-                return $query->where('connect_id', GAStat::DEMO_CONNECT_ID);
+                return $query->where('integration_id', GAStat::DEMO_INTEGRATION_ID);
             })
-            ->groupBy(['connect_id'])
+            ->groupBy(['integration_id'])
             ->get();
 
         foreach ($gaMetrics as $gaMetric) {
-            $userId = $connectIds[$gaMetric->connect_id] ?? null;
+            $userId = $integrationIds[$gaMetric->integration_id] ?? null;
             if ($userId) {
                 $preparedMetrics[$userId]['reach'] += $gaMetric->reach;
                 $preparedMetrics[$userId]['l'] += $gaMetric->l;
@@ -123,18 +123,18 @@ class SaveMetrics extends Command
             count(*) as countOrders,
             count(DISTINCT(customer_id)) + count(DISTINCT CASE WHEN customer_id IS NULL THEN 1 END) as countCustomers,
             count(DISTINCT CASE WHEN ads THEN customer_id END) as AdsCLs,
-            connect_id
+            integration_id
         ")
             ->where('order_created_at', '>', $startPeriod)
             ->where('order_created_at', '<=', $endPeriod)
             ->when($type === 'demo', function ($query) {
-                return $query->where('connect_id', Order::DEMO_CONNECT_ID);
+                return $query->where('integration_id', Order::DEMO_INTEGRATION_ID);
             })
-            ->groupBy(['connect_id'])
+            ->groupBy(['integration_id'])
             ->get();
 
         foreach ($orderMetrics as $orderMetric) {
-            $userId = $connectIds[$orderMetric->connect_id] ?? null;
+            $userId = $integrationIds[$orderMetric->integration_id] ?? null;
             if ($userId) {
                 $preparedMetrics[$userId]['p'] = $orderMetric->p;
                 $preparedMetrics[$userId]['pu'] = $orderMetric->sumd ? ($orderMetric->p / $orderMetric->sumd) : 0;
@@ -155,17 +155,17 @@ class SaveMetrics extends Command
 
         $orderMetricsReturns = Order::selectRaw("
             count(*) as countOrders,
-            connect_id
+            integration_id
         ")
             ->where('financial_status', 'refunded')
             ->when($type === 'demo', function ($query) {
-                return $query->where('connect_id', Order::DEMO_CONNECT_ID);
+                return $query->where('integration_id', Order::DEMO_INTEGRATION_ID);
             })
-            ->groupBy(['connect_id'])
+            ->groupBy(['integration_id'])
             ->get();
 
         foreach ($orderMetricsReturns as $orderMetric) {
-            $userId = $connectIds[$orderMetric->connect_id] ?? null;
+            $userId = $integrationIds[$orderMetric->integration_id] ?? null;
             if ($userId) {
                 $preparedMetrics[$userId]['returns'] = $preparedMetrics[$userId]['count_customers'] ? ($orderMetric->countorders / $preparedMetrics[$userId]['count_customers']) : 0;
                 // Recalculate if found returns

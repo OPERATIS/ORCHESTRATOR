@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Connect;
+use App\Models\Integration;
 use App\Models\FbStat;
 use App\Models\GaStat;
 use App\Models\Order;
@@ -16,10 +16,10 @@ class Demo
     {
         // Create or update demo user
         User::updateOrCreate([
-            'id' => User::DEMO_ID,
             'name' => 'Demo',
             'email' => 'demo@demo.com'
         ], [
+            'id' => User::DEMO_ID,
             'password' => Hash::make('demo-password')
         ]);
     }
@@ -27,8 +27,8 @@ class Demo
     public static function createConnections()
     {
         // Create facebook connect
-        Connect::updateOrCreate([
-            'id' => FbStat::DEMO_CONNECT_ID,
+        Integration::updateOrCreate([
+            'id' => FbStat::DEMO_INTEGRATION_ID,
             'user_id' => User::DEMO_ID,
             'platform' => 'facebook',
         ], [
@@ -36,8 +36,8 @@ class Demo
         ]);
 
         // Create google connect
-        Connect::updateOrCreate([
-            'id' => GaStat::DEMO_CONNECT_ID,
+        Integration::updateOrCreate([
+            'id' => GaStat::DEMO_INTEGRATION_ID,
             'user_id' => User::DEMO_ID,
             'platform' => 'google',
         ], [
@@ -45,8 +45,8 @@ class Demo
         ]);
 
         // Create shopify connect
-        Connect::updateOrCreate([
-            'id' => Order::DEMO_CONNECT_ID,
+        Integration::updateOrCreate([
+            'id' => Order::DEMO_INTEGRATION_ID,
             'user_id' => User::DEMO_ID,
             'platform' => 'shopify',
         ], [
@@ -56,12 +56,12 @@ class Demo
 
     public static function createFbStats($startPeriod, $endPeriod)
     {
-        FbStat::where('connect_id', FbStat::DEMO_CONNECT_ID)
+        FbStat::where('integration_id', FbStat::DEMO_INTEGRATION_ID)
             ->where('ad_id', FbStat::DEMO_AD_ID)
             ->where('end_period', $endPeriod)
             ->delete();
 
-        $fbStat = FbStat::where('connect_id', FbStat::DEMO_CONNECT_ID)
+        $fbStat = FbStat::where('integration_id', FbStat::DEMO_INTEGRATION_ID)
             ->where('ad_id', FbStat::DEMO_AD_ID)
             ->orderByDesc('end_period')
             ->first();
@@ -73,7 +73,7 @@ class Demo
 
         $uniqueClicks = ($fbStat->unique_clicks ?? 0) + rand(0, 1000);
         FbStat::create([
-            'connect_id' => FbStat::DEMO_CONNECT_ID,
+            'integration_id' => FbStat::DEMO_INTEGRATION_ID,
             'clicks' => ($fbStat->clicks ?? 0) + rand(0, 3000) + $uniqueClicks,
             'impressions' => ($fbStat->impressions ?? 0) + rand(0, 5000),
             'spend' => ($fbStat->spend ?? 0) + rand(0, 500),
@@ -88,12 +88,12 @@ class Demo
 
     public static function createGaStats($startPeriod, $endPeriod)
     {
-        GaStat::where('connect_id', GaStat::DEMO_CONNECT_ID)
+        GaStat::where('integration_id', GaStat::DEMO_INTEGRATION_ID)
             ->where('unique_table_id', GaStat::DEMO_UNIQUE_TABLE_ID)
             ->where('end_period', $endPeriod)
             ->delete();
 
-        $gaStat = GaStat::where('connect_id', GaStat::DEMO_CONNECT_ID)
+        $gaStat = GaStat::where('integration_id', GaStat::DEMO_INTEGRATION_ID)
             ->where('unique_table_id', GaStat::DEMO_UNIQUE_TABLE_ID)
             ->orderByDesc('end_period')
             ->first();
@@ -105,7 +105,7 @@ class Demo
 
         $uniquePageviews = ($gaStat->unique_pageviews ?? 0) + rand(0, 1000);
         GaStat::create([
-            'connect_id' => GaStat::DEMO_CONNECT_ID,
+            'integration_id' => GaStat::DEMO_INTEGRATION_ID,
             'impressions' => ($gaStat->impressions ?? 0) + rand(0, 5000),
             'pageviews' => ($gaStat->pageviews ?? 0) + rand(0, 3000) + $uniquePageviews,
             'unique_pageviews' => $uniquePageviews,
@@ -121,7 +121,7 @@ class Demo
 
     public static function createOrders($startPeriod, $endPeriod)
     {
-        Order::where('connect_id', Order::DEMO_CONNECT_ID)
+        Order::where('integration_id', Order::DEMO_INTEGRATION_ID)
             ->where('order_created_at', '>=', $startPeriod)
             ->where('order_created_at', '<=', $endPeriod)
             ->delete();
@@ -131,7 +131,7 @@ class Demo
             $orderId = time() + $i;
             $price = rand(100, 500);
             Order::create([
-                'connect_id' => Order::DEMO_CONNECT_ID,
+                'integration_id' => Order::DEMO_INTEGRATION_ID,
                 'order_id' => $orderId,
                 'order_created_at' => Carbon::parse($startPeriod)->addSeconds(rand(0, 300)),
                 'financial_status' => rand(0, 100000) < 100 ? 'refunded' : '',

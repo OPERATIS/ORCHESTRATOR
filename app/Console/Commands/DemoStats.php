@@ -40,26 +40,26 @@ class DemoStats extends Command
             $this->info('Start add gaStats');
             Demo::createGaStats($startPeriod, $endPeriod);
 
-            $gaDemoConnectId = GaStat::DEMO_CONNECT_ID;
+            $gaDemoIntegrationId = GaStat::DEMO_INTEGRATION_ID;
             $this->info('Remove google:aggregation-stats');
-            AggregationGaStat::where('connect_id', $gaDemoConnectId)
+            AggregationGaStat::where('integration_id', $gaDemoIntegrationId)
                 ->where('end_period', '=', $startPeriod)
                 ->delete();
 
             $this->info('Start google:aggregation-stats');
-            Artisan::call("google:aggregation-stats '{$endPeriodAggregation}' {$gaDemoConnectId}");
+            Artisan::call("google:aggregation-stats '{$endPeriodAggregation}' {$gaDemoIntegrationId}");
 
             $this->info('Start add fbStats');
             Demo::createFbStats($startPeriod, $endPeriod);
 
             $this->info('Remove facebook:aggregation-stats');
-            $fbDemoConnectId = FbStat::DEMO_CONNECT_ID;
-            AggregationFbStat::where('connect_id', $fbDemoConnectId)
+            $fbDemoIntegrationId = FbStat::DEMO_INTEGRATION_ID;
+            AggregationFbStat::where('integration_id', $fbDemoIntegrationId)
                 ->where('end_period', '=', $startPeriod)
                 ->delete();
 
             $this->info('Start facebook:aggregation-stats');
-            Artisan::call("facebook:aggregation-stats '{$endPeriodAggregation}' {$fbDemoConnectId}");
+            Artisan::call("facebook:aggregation-stats '{$endPeriodAggregation}' {$fbDemoIntegrationId}");
 
             $this->info('Start add orders');
             Demo::createOrders($startPeriod, $endPeriod);
