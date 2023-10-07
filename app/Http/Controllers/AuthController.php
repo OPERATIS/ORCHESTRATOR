@@ -44,6 +44,9 @@ class AuthController extends Controller
                 }
             }
         } else {
+            if (Auth::user()) {
+                return redirect('dashboard');
+            }
             return view('auth.login');
         }
     }
