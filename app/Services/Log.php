@@ -8,12 +8,12 @@ use App\Models\Log as LogModel;
 class Log
 {
     public $platform;
-    public $connectId;
+    public $integrationId;
 
-    public function __construct($platform, $connectId)
+    public function __construct($platform, $integrationId)
     {
         $this->platform = $platform;
-        $this->connectId = $connectId;
+        $this->integrationId = $integrationId;
     }
 
     public function addSuccess($method, $additionalEntityId = null)
@@ -22,7 +22,7 @@ class Log
             'status' => 'success',
             'method' => $method,
             'platform' => $this->platform,
-            'connect_id' => $this->connectId,
+            'integration_id' => $this->integrationId,
             'additional_entity_id' => $additionalEntityId,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
@@ -36,7 +36,7 @@ class Log
             'method' => $method,
             'platform' => $this->platform,
             'message' => $message,
-            'connect_id' => $this->connectId,
+            'integration_id' => $this->integrationId,
             'additional_entity_id' => $additionalEntityId,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),

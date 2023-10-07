@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Facebook;
 
-use App\Models\Connect;
+use App\Models\Integration;
 use App\Services\Demo;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -21,11 +21,11 @@ class GetStats extends Command
         $endPeriod = Carbon::now()->setSeconds(0)->toDateTimeString();
 
         if (empty($type)) {
-            $connects = Connect::where('platform', 'facebook')
+            $integrations = Integration::where('platform', 'facebook')
                 ->get();
 
-            foreach ($connects as $connect) {
-                GetStatsJobs::dispatch($connect, $startPeriod, $endPeriod);
+            foreach ($integrations as $integration) {
+                GetStatsJobs::dispatch($integration, $startPeriod, $endPeriod);
             }
         } elseif ($type === 'demo') {
             Demo::createFbStats($startPeriod, $endPeriod);

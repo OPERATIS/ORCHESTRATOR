@@ -1,7 +1,11 @@
 <?php
 
+use App\Http\Controllers\AlertsController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ConnectsController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\IntegrationsController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\WebhooksController;
 use App\Http\Middleware\Authenticate;
@@ -33,7 +37,10 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('/connect/slack/login', [ConnectsController::class, 'slackLogin'])->name('slackLogin');
     Route::get('/connect/slack/callback', [ConnectsController::class, 'slackCallback'])->name('slackCallback');
 
-    Route::get('dashboard', [PagesController::class, 'dashboard'])->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('chat', [ChatController::class, 'index'])->name('chat');
+    Route::get('alerts', [AlertsController::class, 'index'])->name('alerts');
+    Route::get('integrations', [IntegrationsController::class, 'index'])->name('integrations');
 });
 
 Route::any('login', [AuthController::class, 'login'])->name('login');

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Shopify;
 
-use App\Models\Connect;
+use App\Models\Integration;
 use App\Services\Demo;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -21,11 +21,11 @@ class GetOrders extends Command
         $endPeriod = Carbon::parse($startPeriod)->addMinutes(5)->toDateTimeString();
 
         if (empty($type)) {
-            $connects = Connect::where('platform', 'shopify')
+            $integrations = Integration::where('platform', 'shopify')
                 ->get();
 
-            foreach ($connects as $connect) {
-                GetOrdersJobs::dispatch($connect, $startPeriod, $endPeriod);
+            foreach ($integrations as $integration) {
+                GetOrdersJobs::dispatch($integration, $startPeriod, $endPeriod);
             }
         } elseif ($type === 'demo') {
             Demo::createOrders($startPeriod, $endPeriod);

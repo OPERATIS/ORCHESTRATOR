@@ -9,15 +9,15 @@ use App\Console\Commands\AggregationStats as CommandsAggregationStats;
 
 class AggregationStats extends CommandsAggregationStats
 {
-    protected $signature = 'google:aggregation-stats {endPeriod?} {connectId?}';
+    protected $signature = 'google:aggregation-stats {endPeriod?} {integrationId?}';
 
     public function handle(): bool
     {
         $this->beforeHandle();
 
         $andWhere = '';
-        if ($this->connectId) {
-            $andWhere = ' AND connect_id = ' . $this->connectId;
+        if ($this->integrationId) {
+            $andWhere = ' AND integration_id = ' . $this->integrationId;
         }
 
         if (Carbon::parse($this->endPeriod)->minute === 0 and Carbon::parse($this->endPeriod)->hour === 0) {
@@ -30,11 +30,11 @@ class AggregationStats extends CommandsAggregationStats
                     MAX(ad_clicks) - MIN(ad_clicks) as ad_clicks,
                     MAX(ad_cost) - MIN(ad_cost) as ad_cost,
                     count(*) as count,
-                    connect_id,
+                    integration_id,
                     unique_table_id
                 FROM ga_stats
                 WHERE end_period >= '{$this->startPeriod}' and end_period < '{$this->endPeriod}' {$andWhere}
-                GROUP BY connect_id, unique_table_id
+                GROUP BY integration_id, unique_table_id
             ");
         } elseif (Carbon::parse($this->endPeriod)->minute === 5 and Carbon::parse($this->endPeriod)->hour === 0) {
             // 23:35 00:00 [00:05]
@@ -46,11 +46,11 @@ class AggregationStats extends CommandsAggregationStats
                     MAX(ad_clicks) as ad_clicks,
                     MAX(ad_cost) as ad_cost,
                     2 as count,
-                    connect_id,
+                    integration_id,
                     unique_table_id
                 FROM ga_stats
                 WHERE end_period = '{$this->endPeriod}' {$andWhere}
-                GROUP BY connect_id, unique_table_id
+                GROUP BY integration_id, unique_table_id
             ");
         } else {
             // 10:00:00 [10:01:01 10:03:03 10:04:00 10:05:00] 10:05:01
@@ -62,11 +62,11 @@ class AggregationStats extends CommandsAggregationStats
                     MAX(ad_clicks) - MIN(ad_clicks) as ad_clicks,
                     MAX(ad_cost) - MIN(ad_cost) as ad_cost,
                     count(*) as count,
-                    connect_id,
+                    integration_id,
                     unique_table_id
                 FROM ga_stats
                 WHERE end_period >= '{$this->startPeriod}' and end_period <= '{$this->endPeriod}' {$andWhere}
-                GROUP BY connect_id, unique_table_id
+                GROUP BY integration_id, unique_table_id
             ");
         }
 
@@ -79,7 +79,7 @@ class AggregationStats extends CommandsAggregationStats
                     'unique_pageviews' => $row->unique_pageviews,
                     'ad_clicks' => $row->ad_clicks,
                     'ad_cost' => $row->ad_cost,
-                    'connect_id' => $row->connect_id,
+                    'integration_id' => $row->integration_id,
                     'unique_table_id' => $row->unique_table_id,
                     'period' => '5_minutes',
                     'start_period' => $this->startPeriod,

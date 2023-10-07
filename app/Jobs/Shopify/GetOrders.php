@@ -2,7 +2,7 @@
 
 namespace App\Jobs\Shopify;
 
-use App\Models\Connect;
+use App\Models\Integration;
 use App\Models\Order;
 use App\Services\Log as LogService;
 use App\Services\Shopify;
@@ -18,26 +18,26 @@ class GetOrders implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $connect = null;
+    protected $integration = null;
     protected $startPeriod = null;
     protected $endPeriod = null;
 
     /**
-     * @param Connect $connect
+     * @param Integration $integration
      * @param $startPeriod
      * @param $endPeriod
      */
-    public function __construct(Connect $connect, $startPeriod, $endPeriod)
+    public function __construct(Integration $integration, $startPeriod, $endPeriod)
     {
-        $this->connect = $connect;
+        $this->integration = $integration;
         $this->startPeriod = $startPeriod;
         $this->endPeriod = $endPeriod;
     }
 
     public function handle(): void
     {
-        $shopify = $this->connect;
-        $logService = new LogService('shopify', $this->connect->id);
+        $shopify = $this->integration;
+        $logService = new LogService('shopify', $this->integration->id);
         Shopify::setContext($shopify->app_user_slug);
 
         $attempt = 0;
@@ -90,7 +90,7 @@ class GetOrders implements ShouldQueue
                     }
 
                     Order::updateOrCreate([
-                        "connect_id" => $shopify->id,
+                        "integration_id" => $shopify->id,
                         "order_id" => $order->id,
                         "order_number" => $order->order_number,
                     ], [

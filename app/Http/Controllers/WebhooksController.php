@@ -109,7 +109,7 @@ class WebhooksController extends Controller
                 ]);
 
                 if (Carbon::parse($tgUser->created_at)->seconds(0)->toDateTimeString() === Carbon::now()->seconds(0)->toDateTimeString()) {
-                    $telegram = new Telegram(config('connects.telegram.botToken'));
+                    $telegram = new Telegram(config('integrations.telegram.botToken'));
                     // TODO add text
                     $telegram->sendMessage($fromId, 'Your account has successful connected');
                 }
