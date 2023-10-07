@@ -1,0 +1,17 @@
+.btn {
+    @apply select-none px-4 py-2 text-sm rounded-md inline-flex items-center justify-center outline-none cursor-pointer
+    transition duration-200 ease-in-out bg-transparent whitespace-nowrap;
+    &:disabled {
+        @apply opacity-60;
+    }
+    &.lg{
+        height: 58px;
+        @apply text-xl rounded-xl;
+    }
+    &.btn_login{
+        @apply text-white bg-green_2;
+        &.disabled {
+            @apply bg-gray_4 opacity-100;
+        }
+    }
+}

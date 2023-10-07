@@ -16,14 +16,12 @@
 <body class="min-h-screen antialiased bg-body">
 
 {{-- LEFT SIDEBAR--}}
-<div class="sidebar fixed lg:absolute z-20 w-[20.25rem] md-max:w-full z-20 pl-12 pr-6 pt-12 pb-12 md-max:pt-0 md-max:p-0 lg:min-h-screen">
+<div class="sidebar fixed absolute z-20 w-[13.25rem] z-20 ">
     @include('layouts._menu')
 </div>
 
-<div class="content lg:pl-[20.25rem] pt-12 pb-12 md-max:pt-14">
+<div class="content lg:pl-[13.25rem] pb-12">
     @yield('content')
 </div>
-
-@livewireScripts
 </body>
 </html>

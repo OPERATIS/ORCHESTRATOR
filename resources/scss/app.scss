@@ -2,27 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-    .filter-none {
-        filter: none;
-    }
-    .filter-grayscale {
-        filter: grayscale(100%);
-    }
-    .filter-brightness{
-        filter: brightness(0.6);
-    }
-}
-
 :root {
-    --color-body: 256, 256, 256;
+    --color-body: 247, 249, 251;
     --color-default: 28, 28, 28;
     --color-dark: 0, 0, 0;
 
     --color-black: 28, 28, 28;
     --color-black_1: 207, 211, 212;
+    --color-black_2: 171, 175, 177;
     --color-black_4: 94, 99, 102;
     --color-black_5: 43, 47, 50;
+    --color-primary: 85, 112, 241;
 
     --color-secondary-blue: 28, 28, 28;
     --color-green_2: 39, 174, 96;
@@ -35,3 +25,7 @@
 }
 
 @import 'font';
+@import 'input';
+@import 'button';
+@import 'auth';
+@import 'helpers';
