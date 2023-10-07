@@ -68,7 +68,8 @@ services:
         networks:
             app-network:
                 aliases:
-                    - socket.connect-loc.com
+                    - operatis.loc
+                    - test-operatis.ai
 
 # Docker Networks
 networks:
