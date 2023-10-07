@@ -7,7 +7,7 @@
                     <div class="card">
                         <h3 class="card-header text-center">Password</h3>
                         <div class="card-body">
-                            <form method="POST" action="{{ route('customForgotPassword') }}">
+                            <form method="POST" action="{{ route('forgotPassword') }}">
                                 @csrf
                                 <div class="form-group mb-3">
                                     <input type="text" placeholder="Email" id="email" class="form-control" name="email" required
