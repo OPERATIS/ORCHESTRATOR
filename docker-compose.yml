@@ -41,7 +41,6 @@ services:
             - ./postgres-data:/var/lib/postgresql/data
         container_name: db
         restart: unless-stopped
-        tty: true
         ports:
             - "5432:5432"
         environment:
@@ -52,6 +51,25 @@ services:
             POSTGRES_USER: orchestrator_user
         networks:
             - app-network
+
+    soketi:
+        container_name: soketi
+        restart: unless-stopped
+        image: 'quay.io/soketi/soketi:0.17-16-alpine'
+        ports:
+            - '${SOKETI_PORT:-6001}:6001'
+            - '${SOKETI_METRICS_SERVER_PORT:-9601}:9601'
+        environment:
+            SOKETI_DEBUG: '${SOKETI_DEBUG:-1}'
+            SOKETI_DEFAULT_APP_ID: '${PUSHER_APP_ID:-app-id}'
+            SOKETI_DEFAULT_APP_KEY: '${PUSHER_APP_KEY:-app-key}'
+            SOKETI_DEFAULT_APP_SECRET: '${PUSHER_APP_SECRET:-app-secret}'
+            SOKETI_DEFAULT_APP_ENABLE_CLIENT_MESSAGES: ${SOKETI_DEFAULT_APP_ENABLE_CLIENT_MESSAGES:-false}
+        networks:
+            app-network:
+                aliases:
+                    - operatis.loc
+                    - test-operatis.ai
 
 # Docker Networks
 networks:

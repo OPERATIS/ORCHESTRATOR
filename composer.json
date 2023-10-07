@@ -16,6 +16,7 @@
         "laravel/sanctum": "^2.11",
         "laravel/socialite": "^5.8",
         "laravel/tinker": "^2.5",
+        "pusher/pusher-php-server": "^7.2",
         "shopify/shopify-api": "^4.3"
     },
     "require-dev": {

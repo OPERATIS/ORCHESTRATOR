@@ -1,39 +1,48 @@
 FROM php:8.1-fpm
 
-WORKDIR /var/www
+ENV USER=www
+ENV GROUP=www
 
-COPY composer.lock composer.json /var/www/
-
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim \
-    unzip \
     git \
     curl \
-    libpq-dev \
+    libpng-dev \
     libonig-dev \
-    libzip-dev
+    libxml2-dev \
+    zip \
+    unzip
 
+# Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl
-RUN docker-php-ext-install pdo pdo_pgsql
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Install Postgre PDO
+RUN apt-get update && apt-get install -y libpq-dev && docker-php-ext-install pdo pdo_pgsql
 
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
+RUN apt-get update && apt-get install -y nodejs npm
+COPY . /var/www/
+RUN npm install
 
-COPY . /var/www
-COPY --chown=www:www . /var/www
+# Get latest Composer
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-USER www
+# Setup working directory
+WORKDIR /var/www/
+
+# Create User and Group
+RUN groupadd -g 1000 ${GROUP} && useradd -u 1000 -ms /bin/bash -g ${GROUP} ${USER}
+
+# Grant Permissions
+RUN chown -R ${USER} /var/www
+
+# Select User
+USER ${USER}
+
+# Copy permission to selected user
+COPY --chown=${USER}:${GROUP} . .
 
 EXPOSE 9000
 CMD ["php-fpm"]
