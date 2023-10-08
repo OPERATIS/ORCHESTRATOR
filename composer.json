@@ -17,6 +17,7 @@
         "laravel/sanctum": "^2.11",
         "laravel/socialite": "^5.8",
         "laravel/tinker": "^2.5",
+        "openai-php/client": "^0.7.3",
         "pusher/pusher-php-server": "^7.2",
         "shopify/shopify-api": "^4.3"
     },
@@ -64,7 +65,10 @@
         "process-timeout": 600,
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true

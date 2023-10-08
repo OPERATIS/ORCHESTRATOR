@@ -75,4 +75,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(SlUser::class);
     }
+
+    /**
+     * @return HasMany
+     */
+    public function chats(): HasMany
+    {
+        return $this->hasMany(Chat::class);
+    }
 }

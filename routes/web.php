@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AlertsController;
-use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ChatsController;
 use App\Http\Controllers\ConnectsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -39,7 +39,11 @@ Route::middleware([Authenticate::class])->group(function () {
 
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('dashboard/metrics-chart', [DashboardController::class, 'metricsChart'])->name('metricsChart');
-    Route::get('chat', [ChatController::class, 'index'])->name('chat');
+    Route::get('chats', [ChatsController::class, 'index'])->name('chats');
+    Route::get('chats/create', [ChatsController::class, 'create'])->name('chatsCreate');
+    Route::get('chats/{chatId}', [ChatsController::class, 'show'])->name('chatShow');
+    Route::post('chats/{chatId}/send-message', [ChatsController::class, 'sendMessage'])->name('chatSendMessage');
+    Route::get('chats/{chatId}/messages', [ChatsController::class, 'messages'])->name('chatMessages');
     Route::get('alerts', [AlertsController::class, 'index'])->name('alerts');
     Route::get('integrations', [IntegrationsController::class, 'index'])->name('integrations');
 });
