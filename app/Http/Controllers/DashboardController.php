@@ -32,15 +32,15 @@ class DashboardController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        $validateUser = Validator::make($request->all(), [
+        $validateMetricsChart = Validator::make($request->all(), [
             'start' => 'required|date',
             'end' => 'required|date|after_or_equal:start_date'
         ]);
 
-        if ($validateUser->fails()) {
+        if ($validateMetricsChart->fails()) {
             return response()->json([
                 'status' => false,
-                'errors' => $validateUser->errors()
+                'errors' => $validateMetricsChart->errors()
             ], 401);
         }
 
