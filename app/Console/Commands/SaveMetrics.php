@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Analysis;
 use App\Models\Integration;
 use App\Models\FbStat;
 use App\Models\GaStat;
@@ -13,10 +14,16 @@ use Illuminate\Support\Facades\Artisan;
 
 class SaveMetrics extends Command
 {
-    protected $signature = 'save-metrics {endPeriod?} {type?}';
+    protected $signature = 'save-metrics {period} {endPeriod?} {type?}';
 
     public function handle(): bool
     {
+        $period = $this->argument('period');
+
+        if (!in_array($period, [Metric::PERIOD_HOUR, Metric::PERIOD_DAY])) {
+            return true;
+        }
+
         // Logic for old data
         $endPeriod = $this->argument('endPeriod');
 
@@ -24,12 +31,22 @@ class SaveMetrics extends Command
         $type = $this->argument('type');
 
         if (!$endPeriod) {
-            $startPeriod = Carbon::now()->setMinutes(0)->setSeconds(0)->subHour()->toDateTimeString();
+            $startPeriod = Carbon::now();
         } else {
-            $startPeriod = Carbon::parse($endPeriod)->subHour()->setMinutes(0)->setSeconds(0)->toDateTimeString();
+            $startPeriod = Carbon::parse($endPeriod);
         }
 
-        $endPeriod = Carbon::parse($startPeriod)->addHours()->toDateTimeString();
+        if ($period === Metric::PERIOD_HOUR) {
+            $startPeriod = $startPeriod->subHour()->setMinutes(0)->setSeconds(0)->toDateTimeString();
+        } elseif ($period === Metric::PERIOD_DAY) {
+            $startPeriod = $startPeriod->subDay()->startOfDay()->toDateTimeString();
+        }
+
+        if ($period === Metric::PERIOD_HOUR) {
+            $endPeriod = Carbon::parse($startPeriod)->addHours()->toDateTimeString();
+        } elseif ($period === Metric::PERIOD_DAY) {
+            $endPeriod = Carbon::parse($startPeriod)->addDays()->toDateTimeString();
+        }
 
         if (!$type) {
             $integrations = Integration::get();
@@ -48,7 +65,7 @@ class SaveMetrics extends Command
             if (!isset($preparedMetrics[$integration->user_id])) {
                 $preparedMetrics[$integration->user_id] = [
                     'user_id' => $integration->user_id,
-                    'period' => '1_hour',
+                    'period' => $period,
                     'start_period' => $startPeriod,
                     'end_period' => $endPeriod,
                     'reach' => 0,
@@ -178,8 +195,15 @@ class SaveMetrics extends Command
         Metric::insert($preparedMetrics);
 
         // Search alerts
-        Artisan::call("search-alerts '{$endPeriod}' {$type}");
-        Artisan::call("save-analyzes '{$endPeriod}' {$type}");
+        if ($period === Metric::PERIOD_HOUR) {
+            Artisan::call("search-alerts '{$endPeriod}' {$type}");
+            $analysisPeriod = Analysis::PERIOD_60_HOURS;
+        } elseif ($period === Metric::PERIOD_DAY) {
+            Artisan::call("search-recommendations '{$endPeriod}' {$type}");
+            $analysisPeriod = Analysis::PERIOD_30_DAYS;
+        }
+
+        Artisan::call("save-analyzes {$analysisPeriod} '{$endPeriod}' {$type}");
 
         return true;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Models\Metric;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -18,7 +19,6 @@ class Kernel extends ConsoleKernel
         // For example 13:15
         // All orders by period 13:10-13:15
         $schedule->command('shopify:get-orders')->everyFiveMinutes();
-        $schedule->command('shopify:get-orders')->dailyAt('23:59');
         $schedule->command('shopify:get-orders demo')->everyFiveMinutes();
 
         // All stats by full day
@@ -27,6 +27,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('facebook:get-stats demo')->everyFiveMinutes();
         // All stats by full day
         $schedule->command('google:get-stats')->everyFiveMinutes();
+        $schedule->command('google:get-stats')->dailyAt('23:59');
         $schedule->command('google:get-stats demo')->everyFiveMinutes();
 
         // For example 13:15
@@ -38,7 +39,11 @@ class Kernel extends ConsoleKernel
         // For example 13:15
         // Save metrics by period 12:00-13:00
         // Init search alerts and then init save analyzes
-        $schedule->command('save-metrics')->cron('15 * * * *');
+        $schedule->command("save-metrics '" . Metric::PERIOD_HOUR . "'")->cron('15 * * * *');
+        // For example 03.10.23 00:45
+        // Save metrics by period 02.10.23-03.10.23
+        // Init search recommendations and then init save analyzes
+        $schedule->command("save-metrics '" . Metric::PERIOD_DAY . "'")->dailyAt('00:45');
     }
 
     /**

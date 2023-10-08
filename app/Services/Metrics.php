@@ -13,9 +13,9 @@ class Metrics
      */
     public static function getActualData(int $userId): array
     {
-        $metrics = Metric::select(array_merge(Metric::METRCIS, ['end_period']))
+        $metrics = Metric::select(array_merge(Metric::METRICS, ['end_period']))
             ->where('user_id', $userId)
-            ->where('period', '1_hour')
+            ->where('period', Metric::PERIOD_HOUR)
             ->orderByDesc('end_period')
             ->limit(2)
             ->get();
@@ -33,7 +33,7 @@ class Metrics
                 $previousMetricCorrect = true;
             }
 
-            foreach (Metric::METRCIS as $metric) {
+            foreach (Metric::METRICS as $metric) {
                 $last = (float)$lastMetric->$metric ?? null;
                 $previous = $previousMetricCorrect ? ((float)$previousMetric->$metric ?? null) : null;
                 $sign = $last > 0 ? 1 : -1;
@@ -65,20 +65,20 @@ class Metrics
         $previousStart = $start->clone()->subDays($diffInDays);
         $previousEnd = $start->clone()->endOfDay()->subDay();
 
-        $currentMetrics = Metric::select(array_merge(Metric::METRCIS, ['end_period']))
+        $currentMetrics = Metric::select(array_merge(Metric::METRICS, ['end_period']))
             ->where('user_id', $userId)
             ->where('end_period', '>', $start->toDateTimeString())
             ->where('end_period', '<=', $end->toDateTimeString())
-            ->where('period', '1_hour')
+            ->where('period', Metric::PERIOD_HOUR)
             ->orderBy('end_period')
             ->get()
             ->toArray();
 
-        $previousMetrics = Metric::select(array_merge(Metric::METRCIS, ['end_period']))
+        $previousMetrics = Metric::select(array_merge(Metric::METRICS, ['end_period']))
             ->where('user_id', $userId)
             ->where('end_period', '>', $previousStart->toDateTimeString())
             ->where('end_period', '<=', $previousEnd->toDateTimeString())
-            ->where('period', '1_hour')
+            ->where('period', Metric::PERIOD_HOUR)
             ->orderBy('end_period')
             ->get()
             ->toArray();

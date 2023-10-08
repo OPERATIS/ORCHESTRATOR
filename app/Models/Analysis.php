@@ -9,6 +9,9 @@ class Analysis extends Model
 {
     use HasFactory;
 
+    public const PERIOD_60_HOURS = '60_hours';
+    public const PERIOD_30_DAYS = '30_days';
+
     protected $table = 'analyzes';
     protected $guarded = [];
     public $dates = [

@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Services\Metrics;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class DashboardController extends Controller
 {
@@ -18,5 +21,32 @@ class DashboardController extends Controller
         return view('dashboard.index')
             ->with('user', $user)
             ->with('metricsActualData', $metricsActualData);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function metricsChart(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        $validateUser = Validator::make($request->all(), [
+            'start' => 'required|date',
+            'end' => 'required|date|after_or_equal:start_date'
+        ]);
+
+        if ($validateUser->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validateUser->errors()
+            ], 401);
+        }
+
+        return response()->json([
+            'status' => true,
+            'metrics' => Metrics::getChartData($user->id, $request->get('start'), $request->get('end'))
+        ]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -42,4 +43,36 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * @return HasMany
+     */
+    public function telegrams(): HasMany
+    {
+        return $this->hasMany(TgUser::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function whatsApps(): HasMany
+    {
+        return $this->hasMany(WaUser::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function messengers(): HasMany
+    {
+        return $this->hasMany(MeUser::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function slacks(): HasMany
+    {
+        return $this->hasMany(SlUser::class);
+    }
 }
