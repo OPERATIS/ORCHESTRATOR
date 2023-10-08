@@ -38,6 +38,7 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('/connect/slack/callback', [ConnectsController::class, 'slackCallback'])->name('slackCallback');
 
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard/metrics-chart', [DashboardController::class, 'metricsChart'])->name('metricsChart');
     Route::get('chat', [ChatController::class, 'index'])->name('chat');
     Route::get('alerts', [AlertsController::class, 'index'])->name('alerts');
     Route::get('integrations', [IntegrationsController::class, 'index'])->name('integrations');
@@ -49,9 +50,6 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::any('forgot-password', [AuthController::class, 'forgotPassword'])->name('forgotPassword');
 Route::any('reset-password/{token}', [AuthController::class, 'resetPassword'])->name('resetPassword');
 
-Route::get('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);
-Route::post('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);
-
-Route::get('webhooks/messenger', [WebhooksController::class, 'messenger']);
-Route::post('webhooks/messenger', [WebhooksController::class, 'messenger']);
+Route::any('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);
+Route::any('webhooks/messenger', [WebhooksController::class, 'messenger']);
 Route::post('webhooks/telegram', [WebhooksController::class, 'telegram']);

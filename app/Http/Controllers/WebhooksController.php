@@ -71,7 +71,7 @@ class WebhooksController extends Controller
                     if (Carbon::parse($meUser->created_at)->seconds(0)->toDateTimeString() === Carbon::now()->seconds(0)->toDateTimeString()) {
                         $facebook = new Facebook();
                         // TODO add text
-                        $facebook->sendMeMessage('Add text', $meUser->psid);
+                        $facebook->sendMeMessage($meUser->psid, 'Add text');
                     }
                 }
             }
@@ -109,7 +109,7 @@ class WebhooksController extends Controller
                 ]);
 
                 if (Carbon::parse($tgUser->created_at)->seconds(0)->toDateTimeString() === Carbon::now()->seconds(0)->toDateTimeString()) {
-                    $telegram = new Telegram(config('integrations.telegram.botToken'));
+                    $telegram = new Telegram();
                     // TODO add text
                     $telegram->sendMessage($fromId, 'Your account has successful connected');
                 }

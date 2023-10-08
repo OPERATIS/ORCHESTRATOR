@@ -10,10 +10,7 @@ class Telegram
     private $client;
     private $token;
 
-    /**
-     * @param string $token
-     */
-    public function __construct(string $token)
+    public function __construct()
     {
         $options = [
             'curl' => [
@@ -21,7 +18,7 @@ class Telegram
             ],
         ];
         $this->client = new Client($options);
-        $this->token = $token;
+        $this->token = config('integrations.telegram.botToken');
     }
 
     /**
