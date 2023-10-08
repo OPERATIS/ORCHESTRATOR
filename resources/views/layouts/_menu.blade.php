@@ -29,7 +29,7 @@
                    class="menu-item @if(request()->routeIs('chat')) active @endif"
                 >
                     <x-icon name="arrow-right-icon" class="icon-arrow w-4 h-4"/>
-                    <x-icon name="chats-circle-icon" class="w-4 h-4 mx-1"/>
+                    <x-icon name="chats-circle-icon" class="text-black w-4 h-4 mx-1"/>
                     Chat
                 </a>
                 <a href="{{route('alerts')}}"

@@ -129,9 +129,9 @@
                     <div class="mt-11">
                         <button class="btn lg btn_login w-full"
                                 v-bind:class="{
-                                'disabled': !email || !password
-                            }"
-                                @click="login()"
+                                    'disabled': !email || !password || !name
+                                }"
+                                @click="signUp()"
                         >
                             Sign up
                         </button>
@@ -204,13 +204,18 @@ export default {
         login() {
             if (this.email && this.password){
                 let data = {
-                    username: this.email,
+                    email: this.email,
                     password: this.password
                 };
 
-                axios.post('/auth/login', data)
+                axios.post('/login', data)
                     .then(({data}) => {
-                        console.log(data);
+                        if(data.status == true){
+                            window.location.href = data.redirect;
+                        } else {
+                            this.error = data['errors'][0];
+                            // this.error = data.errors.email[0];
+                        }
                         // data.token
                         // data.user
                     })
@@ -219,8 +224,53 @@ export default {
                     });
             }
         },
-        resetPassword() {
+        signUp() {
+            if (this.email && this.password && this.name){
+                let data = {
+                    name: this.name,
+                    email: this.email,
+                    password: this.password
+                };
 
+                axios.post('/registration', data)
+                    .then(({data}) => {
+                        if(data.status == true){
+                            window.location.href = data.redirect;
+                        } else {
+                            console.log(data);
+                            this.error = data['errors'][0];
+                            // this.error = data.errors.email[0];
+                        }
+                        // data.token
+                        // data.user
+                    })
+                    .catch(({response}) => {
+                        alert(response.data.message);
+                    });
+            }
+        },
+        forgotPassword() {
+            if (this.name){
+                let data = {
+                    email: this.email
+                };
+
+                axios.post('/forgot-password', data)
+                    .then(({data}) => {
+                        if(data.status == true){
+                            window.location.href = data.redirect;
+                        } else {
+                            console.log(data);
+                            this.error = data['errors'][0];
+                            // this.error = data.errors.email[0];
+                        }
+                        // data.token
+                        // data.user
+                    })
+                    .catch(({response}) => {
+                        alert(response.data.message);
+                    });
+            }
         }
     },
     mounted() {

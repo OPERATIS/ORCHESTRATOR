@@ -14,10 +14,11 @@ class AlertsController extends Controller
         $user = Auth::user();
 
         $alerts = Alert::query()
-            ->where('user_id', $user->id)
+//            ->where('user_id', $user->id)
             ->orderByDesc('created_at')
             ->limit(24)
             ->get();
+
 
         return view('alerts.index')
             ->with('user', $user)

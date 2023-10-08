@@ -7,21 +7,22 @@
 {{--    <link rel="icon" type="image/png" sizes="128x128" href="/favicon.png">--}}
 
     <link rel="stylesheet" href="{{ mix('/css/app.css') }}">
-    <script src="{{ mix('/js/app.js') }}"></script>
 
     <title>ORCHESTRATOR</title>
 
     @stack('custom-styles')
 </head>
-<body class="min-h-screen antialiased bg-body">
+<body class="min-h-screen antialiased bg-white">
+    <div id="app">
+        {{-- LEFT SIDEBAR--}}
+        <div class="sidebar fixed absolute z-20 w-[13.25rem] z-20 ">
+            @include('layouts._menu')
+        </div>
 
-{{-- LEFT SIDEBAR--}}
-<div class="sidebar fixed absolute z-20 w-[13.25rem] z-20 ">
-    @include('layouts._menu')
-</div>
-
-<div class="content lg:pl-[13.25rem] pb-12">
-    @yield('content')
-</div>
+        <div class="content lg:pl-[13.25rem]">
+            @yield('content')
+        </div>
+    </div>
+    <script src="{{ mix('/js/app.js') }}"></script>
 </body>
 </html>
