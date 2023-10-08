@@ -22,7 +22,7 @@
                                         {{$alert->metric}} {{$alert->result}} {{$alert->period}}
                                     </div>
                                     <div class="text-xs text-black text-opacity-40" style="line-height: 18px;">
-                                        {{$alert->created_at}}
+                                        {{$alert->created_at->format('d M, H:i:s')}}
                                     </div>
                                 </div>
                             </div>
