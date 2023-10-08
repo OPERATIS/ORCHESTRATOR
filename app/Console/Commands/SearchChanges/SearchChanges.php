@@ -1,21 +1,26 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\SearchChanges;
 
 use App\Models\Alert;
 use App\Models\Analysis;
 use App\Models\Metric;
 use App\Models\User;
+use App\Services\Notifications;
 use App\Services\SixSigma;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
-class SearchAlerts extends Command
+abstract class SearchChanges extends Command
 {
-    protected $signature = 'search-alerts {endPeriod?} {type?}';
+    protected $period;
 
     public function handle(): bool
     {
+        if (!in_array($this->period, [Metric::PERIOD_HOUR, Metric::PERIOD_DAY])) {
+            return true;
+        }
+
         // Logic for old data
         $endPeriod = $this->argument('endPeriod');
 
@@ -24,13 +29,20 @@ class SearchAlerts extends Command
 
         // Search actual metric by current hour
         if (!$endPeriod) {
-            $endPeriod = Carbon::now()->setMinutes(0)->setSeconds(0)->toDateTimeString();
+            $endPeriod = Carbon::now();
         } else {
-            $endPeriod = Carbon::parse($endPeriod)->setMinutes(0)->setSeconds(0)->toDateTimeString();
+            $endPeriod = Carbon::parse($endPeriod);
         }
+
+        if ($this->period === Metric::PERIOD_HOUR) {
+            $endPeriod = $endPeriod->setMinutes(0)->setSeconds(0)->toDateTimeString();
+        } elseif ($this->period === Metric::PERIOD_DAY) {
+            $endPeriod = $endPeriod->startOfDay()->toDateTimeString();
+        }
+
         $endPeriodStr = $endPeriod;
         $metrics = Metric::query()
-            ->where('period', '1_hour')
+            ->where('period', $this->period)
             ->where('end_period', '=', $endPeriod)
             ->when($type === 'demo', function ($query) {
                 return $query->where('user_id', User::DEMO_ID);
@@ -38,9 +50,16 @@ class SearchAlerts extends Command
             ->get();
 
         // Search previous analyzes
-        $endPeriod = Carbon::parse($endPeriod)->subHour()->setMinutes(0)->setSeconds(0)->toDateTimeString();
+        $endPeriod = Carbon::parse($endPeriod);
+        if ($this->period === Metric::PERIOD_HOUR) {
+            $endPeriod = $endPeriod->subHour()->setMinutes(0)->setSeconds(0)->toDateTimeString();
+            $bigPeriod = '60_hours';
+        } elseif ($this->period === Metric::PERIOD_DAY) {
+            $endPeriod = $endPeriod->subDay()->startOfDay()->toDateTimeString();
+            $bigPeriod = '30_days';
+        }
         $analyzes = Analysis::query()
-            ->where('period', '60_hours')
+            ->where('period', $bigPeriod)
             ->where('end_period', '=', $endPeriod)
             ->when($type === 'demo', function ($query) {
                 $query->where('user_id', User::DEMO_ID);
@@ -67,14 +86,18 @@ class SearchAlerts extends Command
                     }
 
                     if (isset($alert['result'])) {
-                        $alert['period'] = '1_hour';
+                        $alert['period'] = $this->period;
                         $alert['created_at'] = Carbon::now();
                         $alert['updated_at'] = Carbon::now();
                         $alert['start_period'] = $startPeriodStr;
                         $alert['end_period'] = $endPeriodStr;
                         $alert['user_id'] = $lastMetric->user_id;
 
-                        Alert::insert($alert);
+                        $alertModel = Alert::create($alert);
+
+                        if ($this->period === Metric::PERIOD_HOUR) {
+                            Notifications::sendAlert($alertModel->user_id, $alertModel);
+                        }
                     }
                 }
             }

@@ -9,7 +9,9 @@ class Metric extends Model
 {
     use HasFactory;
 
-    public const METRCIS = ['l', 'c', 'p', 'q', 'ltv'];
+    public const PERIOD_HOUR = '1_hour';
+    public const PERIOD_DAY = '1_day';
+    public const METRICS = ['l', 'c', 'p', 'q', 'ltv'];
 
     protected $guarded = [];
     public $dates = [

@@ -28,8 +28,8 @@ class DemoStats extends Command
         $this->info('Connections created');
 
         // Generate old data
-        $start = Carbon::parse('2023-08-01');
-        $end = Carbon::parse('2023-09-01');
+        $start = Carbon::parse('2023-09-01');
+        $end = Carbon::parse('2023-10-01');
 
         do {
             $endPeriod = $start->clone()->addMinutes(5)->toDateTimeString();
@@ -81,7 +81,14 @@ class DemoStats extends Command
                     ->delete();
 
                 $this->info('Start save metrics');
-                Artisan::call("save-metrics '{$endPeriodAggregation}' demo");
+
+                $period = Metric::PERIOD_HOUR;
+                Artisan::call("save-metrics {$period} '{$endPeriodAggregation}' demo");
+            }
+
+            if (Carbon::parse($endPeriod)->hour === 0 && Carbon::parse($endPeriod)->minute === 45) {
+                $period = Metric::PERIOD_DAY;
+                Artisan::call("save-metrics {$period} '{$endPeriodAggregation}' demo");
             }
 
             $start = $start->addMinutes(5);

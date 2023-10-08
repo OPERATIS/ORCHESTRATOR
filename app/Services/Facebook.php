@@ -77,11 +77,18 @@ class Facebook
         return json_decode($response->getBody());
     }
 
-    public function sendWaMessage($phone, string $template = null, string $text = null)
+    /**
+     * @param $waId
+     * @param string|null $template
+     * @param string|null $text
+     * @return mixed
+     * @throws GuzzleException
+     */
+    public function sendWaMessage($waId, string $template = null, string $text = null)
     {
         $json = [
             'messaging_product' => 'whatsapp',
-            'to' => $phone,
+            'to' => $waId,
         ];
 
         if ($template) {
@@ -113,7 +120,7 @@ class Facebook
     /**
      * @throws GuzzleException
      */
-    public function sendMeMessage(string $text, $psid)
+    public function sendMeMessage($psid, string $text)
     {
         $response = $this->client
             ->post("https://graph.facebook.com/v17.0/" . config('integrations.messenger.pageId') . "/messages?recipient={'id':'$psid'}&messaging_type=RESPONSE&message={'text':'$text'}&access_token=" . config('integrations.messenger.pageAccessToken'));
