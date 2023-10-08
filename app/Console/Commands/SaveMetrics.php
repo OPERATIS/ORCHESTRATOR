@@ -20,7 +20,7 @@ class SaveMetrics extends Command
     {
         $period = $this->argument('period');
 
-        if (!in_array($this->period, [Metric::PERIOD_HOUR, Metric::PERIOD_DAY])) {
+        if (!in_array($period, [Metric::PERIOD_HOUR, Metric::PERIOD_DAY])) {
             return true;
         }
 
