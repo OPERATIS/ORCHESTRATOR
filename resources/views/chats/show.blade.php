@@ -16,3 +16,9 @@ ID #{{$chat->id}}
     <textarea name="content"></textarea>
     <button type="submit">Submit</button>
 </form>
+
+
+@foreach($chats as $item)
+    {{$item->title}}
+    {{$item->id}}
+@endforeach
