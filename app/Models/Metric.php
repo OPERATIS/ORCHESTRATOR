@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,4 +26,13 @@ class Metric extends Model
         'q' => 'float',
         'ltv' => 'float',
     ];
+
+    /**
+     * @param Builder $query
+     * @param $period
+     */
+    public function scopePeriod(Builder $query, $period)
+    {
+        $query->where('period', $period);
+    }
 }

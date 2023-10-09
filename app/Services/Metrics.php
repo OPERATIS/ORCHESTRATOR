@@ -14,8 +14,8 @@ class Metrics
     public static function getActualData(int $userId): array
     {
         $metrics = Metric::select(array_merge(Metric::METRICS, ['end_period']))
+            ->period(Metric::PERIOD_HOUR)
             ->where('user_id', $userId)
-            ->where('period', Metric::PERIOD_HOUR)
             ->orderByDesc('end_period')
             ->limit(2)
             ->get();
@@ -66,19 +66,19 @@ class Metrics
         $previousEnd = $start->clone()->endOfDay()->subDay();
 
         $currentMetrics = Metric::select(array_merge(Metric::METRICS, ['end_period']))
+            ->period(Metric::PERIOD_HOUR)
             ->where('user_id', $userId)
             ->where('end_period', '>', $start->toDateTimeString())
             ->where('end_period', '<=', $end->toDateTimeString())
-            ->where('period', Metric::PERIOD_HOUR)
             ->orderBy('end_period')
             ->get()
             ->toArray();
 
         $previousMetrics = Metric::select(array_merge(Metric::METRICS, ['end_period']))
+            ->period(Metric::PERIOD_HOUR)
             ->where('user_id', $userId)
             ->where('end_period', '>', $previousStart->toDateTimeString())
             ->where('end_period', '<=', $previousEnd->toDateTimeString())
-            ->where('period', Metric::PERIOD_HOUR)
             ->orderBy('end_period')
             ->get()
             ->toArray();

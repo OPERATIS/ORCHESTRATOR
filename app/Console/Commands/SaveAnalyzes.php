@@ -42,7 +42,6 @@ class SaveAnalyzes extends Command
             $endPeriod = Carbon::parse($startPeriod)->addDays(30)->toDateTimeString();
         }
 
-        $countUserMetrics = 0;
         if ($period === Analysis::PERIOD_60_HOURS) {
             $metricPeriod = Metric::PERIOD_HOUR;
             $countUserMetrics = 60;
@@ -53,9 +52,9 @@ class SaveAnalyzes extends Command
 
         // Search metrics for period
         $metrics = Metric::select(array_merge(SixSigma::METRICS, ['user_id']))
+            ->period($metricPeriod)
             ->where('end_period', '>', $startPeriod)
             ->where('end_period', '<=', $endPeriod)
-            ->where('period', $metricPeriod)
             ->when($type === 'demo', function ($query) {
                 return $query->where('user_id', User::DEMO_ID);
             })
