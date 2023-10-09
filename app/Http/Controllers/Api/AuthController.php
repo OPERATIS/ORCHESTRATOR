@@ -19,16 +19,16 @@ class AuthController extends Controller
     public function registerUser(Request $request): JsonResponse
     {
         try {
-            $validateRegisterUser = Validator::make($request->all(), [
+            $validatorRegisterUser = Validator::make($request->all(), [
                 'name' => 'required',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required'
             ]);
 
-            if ($validateRegisterUser->fails()) {
+            if ($validatorRegisterUser->fails()) {
                 return response()->json([
                     'status' => false,
-                    'errors' => $validateRegisterUser->errors()
+                    'errors' => $validatorRegisterUser->errors()
                 ], 401);
             }
 
@@ -58,15 +58,15 @@ class AuthController extends Controller
     public function loginUser(Request $request): JsonResponse
     {
         try {
-            $validateLoginUser = Validator::make($request->all(), [
+            $validatorLoginUser = Validator::make($request->all(), [
                 'email' => 'required|email',
                 'password' => 'required'
             ]);
 
-            if ($validateLoginUser->fails()) {
+            if ($validatorLoginUser->fails()) {
                 return response()->json([
                     'status' => false,
-                    'errors' => $validateLoginUser->errors()
+                    'errors' => $validatorLoginUser->errors()
                 ], 401);
             }
 

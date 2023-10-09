@@ -99,14 +99,14 @@ class ChatsController extends Controller
      */
     public function sendMessage(int $chatId, Request $request): JsonResponse
     {
-        $validateSendMessage = Validator::make($request->all(), [
+        $validatorSendMessage = Validator::make($request->all(), [
             'content' => 'required',
         ]);
 
-        if ($validateSendMessage->fails()) {
+        if ($validatorSendMessage->fails()) {
             return response()->json([
                 'status' => false,
-                'errors' => $validateSendMessage->errors()
+                'errors' => $validatorSendMessage->errors()
             ], 401);
         }
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IntegrationsController;
 use App\Http\Controllers\PagesController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WebhooksController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
@@ -39,13 +40,19 @@ Route::middleware([Authenticate::class])->group(function () {
 
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('dashboard/metrics-chart', [DashboardController::class, 'metricsChart'])->name('metricsChart');
+
     Route::get('chats', [ChatsController::class, 'index'])->name('chats');
     Route::get('chats/create', [ChatsController::class, 'create'])->name('chatsCreate');
     Route::get('chats/{chatId}', [ChatsController::class, 'show'])->name('chatShow');
     Route::post('chats/{chatId}/send-message', [ChatsController::class, 'sendMessage'])->name('chatSendMessage');
     Route::get('chats/{chatId}/messages', [ChatsController::class, 'messages'])->name('chatMessages');
+
     Route::get('alerts', [AlertsController::class, 'index'])->name('alerts');
+
     Route::get('integrations', [IntegrationsController::class, 'index'])->name('integrations');
+
+    Route::get('profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('profile/update', [ProfileController::class, 'update'])->name('profileUpdate');
 });
 
 Route::any('login', [AuthController::class, 'login'])->name('login');
