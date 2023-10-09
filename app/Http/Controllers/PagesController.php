@@ -6,6 +6,6 @@ class PagesController extends Controller
 {
     public function index()
     {
-        return view('landing');
+        return redirect('dashboard');
     }
 }
