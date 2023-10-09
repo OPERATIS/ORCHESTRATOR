@@ -47,6 +47,41 @@
 {{--                <br>--}}
 {{--            @endforeach--}}
         </div>
+        <div>
+            @if ($lastUpdateRecommendations)
+                Last Update {{$lastUpdateRecommendations}}
+            @endif
+            <br>
+            Recommendations
+            <br>
+            @if ($recommendationShort)
+                Here is priority list for today: 1. Improve {{$recommendationShort}}
+            @endif
+            @if (count($recommendations) > 1)
+                +{{count($recommendations) - 1}} others.
+            @endif
+        </div>
+        <div>
+            Revenue Attribution Factors
+            <br>
+            @if ($lastUpdateRevenueAttributionFactors)
+                Last Update {{$lastUpdateRevenueAttributionFactors}}
+            @endif
+            <br>
+            @if ($revenueAttributionFactors['positive'] ?? false)
+                @foreach ($revenueAttributionFactors['positive'] as $item)
+                    {{$item}}
+                    <br>
+                @endforeach
+            @endif
+            <br>
+            @if ($revenueAttributionFactors['negative'] ?? false)
+                @foreach ($revenueAttributionFactors['negative'] as $item)
+                    {{$item}}
+                    <br>
+                @endforeach
+            @endif
+        </div>
     </div>
 @endsection
 
