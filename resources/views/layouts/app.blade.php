@@ -7,23 +7,22 @@
 {{--    <link rel="icon" type="image/png" sizes="128x128" href="/favicon.png">--}}
 
     <link rel="stylesheet" href="{{ mix('/css/app.css') }}">
-    <script src="{{ mix('/js/app.js') }}"></script>
 
     <title>ORCHESTRATOR</title>
 
     @stack('custom-styles')
 </head>
-<body class="min-h-screen antialiased bg-body">
+<body class="min-h-screen antialiased bg-white">
+    <div id="app">
+        {{-- LEFT SIDEBAR--}}
+        <div class="sidebar fixed absolute z-20 w-[13.25rem] z-20 ">
+            @include('layouts._menu')
+        </div>
 
-{{-- LEFT SIDEBAR--}}
-<div class="sidebar fixed lg:absolute z-20 w-[20.25rem] md-max:w-full z-20 pl-12 pr-6 pt-12 pb-12 md-max:pt-0 md-max:p-0 lg:min-h-screen">
-    @include('layouts._menu')
-</div>
-
-<div class="content lg:pl-[20.25rem] pt-12 pb-12 md-max:pt-14">
-    @yield('content')
-</div>
-
-@livewireScripts
+        <div class="content lg:pl-[13.25rem]">
+            @yield('content')
+        </div>
+    </div>
+    <script src="{{ mix('/js/app.js') }}"></script>
 </body>
 </html>

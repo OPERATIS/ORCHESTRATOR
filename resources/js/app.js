@@ -1,5 +1,10 @@
 require('./bootstrap');
 
-import Alpine from 'alpinejs';
-window.Alpine = Alpine;
-Alpine.start();
+import { createApp } from 'vue';
+import LoginBlocks from './components/LoginBlocks.vue';
+
+createApp({
+    components: {
+        LoginBlocks,
+    }
+}).mount('#app');

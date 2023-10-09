@@ -1,0 +1,40 @@
+.input-block{
+    @apply relative;
+    .input {
+        height: 58px;
+        padding-top: 30px;
+        @apply w-full text-base text-black_4 rounded-lg border-black_1 px-4 shadow-none;
+        &::placeholder{
+            @apply text-black_2;
+        }
+        &:focus{
+            outline: none;
+            --tw-ring-offset-width: 0px;
+            box-shadow: none;
+            @apply focus:border-primary #{!important};
+        }
+        &.fill{
+            @apply border-black_4;
+        }
+    }
+    &:focus-within{
+        label{
+            @apply text-primary;
+        }
+    }
+    &.error{
+        .input {
+            @apply border-dangers;
+        }
+        .label{
+            @apply text-dangers;
+        }
+    }
+    .label {
+        @apply absolute left-4 top-2 text-black_4 text-xs;
+    }
+    .error{
+        @apply absolute text-xs text-dangers;
+        bottom: -18px;
+    }
+}

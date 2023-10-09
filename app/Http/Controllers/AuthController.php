@@ -58,7 +58,7 @@ class AuthController extends Controller
                 'name' => 'required',
                 'email' => 'required|email|unique:users',
                 'password' => 'required|min:6',
-                'confirm_password' => 'required|min:6|same:password',
+//                'confirm_password' => 'required|min:6|same:password',
             ]);
 
             if ($validator->fails()) {
@@ -75,8 +75,8 @@ class AuthController extends Controller
                 'password' => Hash::make($data['password'])
             ]);
 
-            Mail::to($data['email'])
-                ->send(new Registration($data['name'], $data['password']));
+//            Mail::to($data['email'])
+//                ->send(new Registration($data['name'], $data['password']));
 
             Auth::login($user);
 

@@ -3,12 +3,16 @@ const colors = require('./resources/js/_colors.js');
 module.exports = {
     content: [
         './resources/views/**/*.blade.php',
+        './resources/js/components/**/*.vue',
         './storage/framework/views/*.php',
         "./resources/**/*.js",
     ],
     theme: {
         extend: {
-            colors: colors
+            colors: colors,
+            fontFamily: {
+                inter: ['"Inter"', 'Helvetica']
+            },
         },
     },
     plugins: [

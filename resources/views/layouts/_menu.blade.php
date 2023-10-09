@@ -1,8 +1,59 @@
-<div x-data="{
-        menu_open: false
-     }"
->
-    menu
+<div class="flex flex-col px-4 pt-12 pt-5 pb-7 lg:min-h-screen border-r border-black border-opacity-10">
+    <div class="flex-1">
+        <div class="w-full flex items-center py-1 px-2">
+            <img class="h-6 w-6" src="/img/profile_icon.png" alt="logo">
+            <div class="text-sm text-black ml-2">
+                ByeWind
+            </div>
+            <div class="ml-auto">
+                <div class="p-1 pr-0 cursor-pointer">
+                <x-icon name="dots-icon" class="w-4 h-4 ml-3"/>
+                </div>
+            </div>
+        </div>
+        <div class="mt-4">
+            <div class="flex items-center h-7 text-sm text-black text-opacity-40 px-3 mb-1">
+                Pages
+            </div>
+            <div class="space-y-1">
+                <a href="{{route('dashboard')}}"
+                   class="menu-item
+                            hover:bg-black hover:bg-opacity-5
+                            @if(request()->routeIs('dashboard')) bg-black bg-opacity-5 active @endif"
+                >
+                    <x-icon name="arrow-right-icon" class="icon-arrow w-4 h-4"/>
+                    <x-icon name="chart-pie-icon" class="w-4 h-4 mx-1"/>
+                    Dashboard
+                </a>
+                <a href="{{route('chat')}}"
+                   class="menu-item @if(request()->routeIs('chat')) active @endif"
+                >
+                    <x-icon name="arrow-right-icon" class="icon-arrow w-4 h-4"/>
+                    <x-icon name="chats-circle-icon" class="text-black w-4 h-4 mx-1"/>
+                    Chat
+                </a>
+                <a href="{{route('alerts')}}"
+                   class="menu-item @if(request()->routeIs('alerts')) active @endif"
+                >
+                    <x-icon name="arrow-right-icon" class="icon-arrow w-4 h-4"/>
+                    <x-icon name="bell-ringing-icon" class="w-4 h-4 mx-1"/>
+                    Alerts
+                </a>
+                <a href="{{route('integrations')}}"
+                   class="menu-item @if(request()->routeIs('integrations')) active @endif"
+                >
+                    <x-icon name="arrow-right-icon" class="icon-arrow w-4 h-4"/>
+                    <x-icon name="book-open-icon" class="w-4 h-4 mx-1"/>
+                    Integrations
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="mt-auto">
+        <a href="{{route('dashboard')}}">
+            <img class="h-9" src="/img/logo.svg" alt="logo">
+        </a>
+    </div>
 {{--    <div class="menu_mob">--}}
 {{--        <button--}}
 {{--            class="menu-toggle"--}}

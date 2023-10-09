@@ -1,0 +1,14 @@
+.auth-block {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.auth-block-enter-active,
+.auth-block-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.auth-block-enter,
+.auth-block-leave-to {
+    opacity: 0;
+}

@@ -1,8 +1,54 @@
-Metrics
-@foreach($metricsActualData as $metricKey => $metricActualData)
-    {{$metricKey}}
-    {{$metricActualData['last']}}
-    {{$metricActualData['previous']}}
-    {{$metricActualData['percent']}}
-    <br>
-@endforeach
+@extends('layouts.app')
+@section('content')
+    <div>
+        <div class="h-[4.25rem] flex items-center px-7 text-sm text-gray_1 border-b border-black border-opacity-10">
+            Dashboard
+        </div>
+        <div class="max-w-[76.75rem]">
+            <div class="px-7 py-8">
+                <div class="grid grid-cols-6 gap-3">
+                    <div class="h-[7rem] w-full text-black p-6 col-span-1 rounded-2xl" style="background: #E3FFE4;">
+                        <div class="text-sm font-semibold mb-2">
+                            L
+                        </div>
+                        <div class="w-full flex items-center">
+                            <div class="text-2xl font-semibold mr-2" style="line-height: 36px;">
+                                721K
+                            </div>
+                            <div class="flex items-center text-xs ml-auto" style="line-height: 18px;">
+                                <span>+11.01%</span>
+                                <x-icon name="arrow-rise-icon" class="w-4 h-4 ml-1"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h-[7rem] w-full text-black p-6 col-span-1 rounded-2xl" style="background: #F6E5E5;">
+                        <div class="text-sm font-semibold mb-2">
+                            C
+                        </div>
+                        <div class="w-full flex items-center">
+                            <div class="text-2xl font-semibold mr-2" style="line-height: 36px;">
+                                367K
+                            </div>
+                            <div class="flex items-center text-xs ml-auto" style="line-height: 18px;">
+                                <span>-11.01%</span>
+                                <span>
+                                <x-icon name="arrow-rise-down-icon" class="w-4 h-4 ml-1"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+{{--            Metrics--}}
+{{--            @foreach($metricsActualData as $metricKey => $metricActualData)--}}
+{{--                {{$metricKey}}--}}
+{{--                {{$metricActualData['last']}}--}}
+{{--                {{$metricActualData['previous']}}--}}
+{{--                {{$metricActualData['percent']}}--}}
+{{--                <br>--}}
+{{--            @endforeach--}}
+        </div>
+    </div>
+@endsection
+
+
+
