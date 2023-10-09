@@ -35,15 +35,15 @@ class MetricsController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        $validateUser = Validator::make($request->all(), [
+        $validateChartData = Validator::make($request->all(), [
             'start' => 'required|date',
             'end' => 'required|date|after_or_equal:start_date'
         ]);
 
-        if ($validateUser->fails()) {
+        if ($validateChartData->fails()) {
             return response()->json([
                 'status' => false,
-                'errors' => $validateUser->errors()
+                'errors' => $validateChartData->errors()
             ], 401);
         }
 

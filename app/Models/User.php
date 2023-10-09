@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'id'
     ];
 
     /**
@@ -74,5 +75,13 @@ class User extends Authenticatable
     public function slacks(): HasMany
     {
         return $this->hasMany(SlUser::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function chats(): HasMany
+    {
+        return $this->hasMany(Chat::class);
     }
 }
