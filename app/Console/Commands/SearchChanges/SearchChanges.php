@@ -42,7 +42,7 @@ abstract class SearchChanges extends Command
 
         $endPeriodStr = $endPeriod;
         $metrics = Metric::query()
-            ->where('period', $this->period)
+            ->period($this->period)
             ->where('end_period', '=', $endPeriod)
             ->when($type === 'demo', function ($query) {
                 return $query->where('user_id', User::DEMO_ID);

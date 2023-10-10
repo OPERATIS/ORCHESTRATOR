@@ -19,9 +19,8 @@ class ChatsController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        $chats = $user->chats();
         return view('chats.index')
-            ->with('chats', $chats);
+            ->with('chats', $user->chats);
     }
 
     /**
@@ -62,13 +61,18 @@ class ChatsController extends Controller
 
     public function show(int $chatId)
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         $chat = Chat::where('id', $chatId)
+            ->where('user_id', $user->id)
             ->with(['messages'])
             ->first();
 
         $messages = $this->getMessages($chat, ['updated_at', 'id']);
         return view('chats.show')
             ->with('chat', $chat)
+            ->with('chats', $user->chats)
             ->with('messages', $messages);
     }
 
@@ -95,14 +99,14 @@ class ChatsController extends Controller
      */
     public function sendMessage(int $chatId, Request $request): JsonResponse
     {
-        $validateSendMessage = Validator::make($request->all(), [
+        $validatorSendMessage = Validator::make($request->all(), [
             'content' => 'required',
         ]);
 
-        if ($validateSendMessage->fails()) {
+        if ($validatorSendMessage->fails()) {
             return response()->json([
                 'status' => false,
-                'errors' => $validateSendMessage->errors()
+                'errors' => $validatorSendMessage->errors()
             ], 401);
         }
 

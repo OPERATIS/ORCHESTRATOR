@@ -25,7 +25,7 @@
                     <x-icon name="chart-pie-icon" class="w-4 h-4 mx-1"/>
                     Dashboard
                 </a>
-                <a href="{{route('chat')}}"
+                <a href="{{route('chats')}}"
                    class="menu-item @if(request()->routeIs('chat')) active @endif"
                 >
                     <x-icon name="arrow-right-icon" class="icon-arrow w-4 h-4"/>

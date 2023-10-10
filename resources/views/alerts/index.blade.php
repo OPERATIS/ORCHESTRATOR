@@ -27,7 +27,7 @@
                                 </div>
                             </div>
                             <div class="ml-auto">
-                                <a href="{{route('chat', ['alert' => $alert->id])}}"
+                                <a href="{{route('chatsCreate', ['alert' => $alert->id])}}"
                                    class="flex items-center font-extrabold text-sm text-green_2"
                                 >
                                     <x-icon name="chats-circle-icon" class="text-green_1 w-5 h-5 mr-3"/>
