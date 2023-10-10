@@ -39,7 +39,10 @@ class AuthController extends Controller
                 } else {
                     return response()->json([
                         'status' => false,
-                        'errors' => ['Invalid credentials']
+                        'errors' => [
+                            'email' => [' '],
+                            'password' => ['Invalid credentials']
+                        ]
                     ]);
                 }
             }
@@ -58,7 +61,7 @@ class AuthController extends Controller
                 'name' => 'required',
                 'email' => 'required|email|unique:users',
                 'password' => 'required|min:6',
-//                'confirm_password' => 'required|min:6|same:password',
+                'confirm_password' => 'required|min:6|same:password',
             ]);
 
             if ($validator->fails()) {
@@ -140,8 +143,9 @@ class AuthController extends Controller
         if ($request->isMethod('post')) {
             $validator = Validator::make($request->all(), [
                 'token' => 'required',
-                'email' => 'required|email',
-                'password' => 'required|min:8|confirmed',
+//                'email' => 'required|email',
+                'password' => 'required|min:6',
+                'confirm_password' => 'required|min:6|same:password',
             ]);
 
             if ($validator->fails()) {

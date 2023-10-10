@@ -1,35 +1,7 @@
-@extends('app')
+
+@extends('layouts.login')
 @section('content')
-    <main class="login-form">
-        <div class="cotainer">
-            <div class="row justify-content-center">
-                <div class="col-md-4">
-                    <div class="card">
-                        <h3 class="card-header text-center">Password</h3>
-                        <div class="card-body">
-                            <form method="POST" action="{{ route('resetPassword', ['token' => $token]) }}">
-                                @csrf
-                                <input name="token" style="display: none" value="{{$token}}">
-                                <div class="form-group mb-3">
-                                    <input type="text" placeholder="Email" id="email" class="form-control" name="email" required
-                                           autofocus>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <input type="password" placeholder="Password" id="password" class="form-control"
-                                           name="password" required>
-                                </div>
-                                <div class="form-group mb-3">
-                                    <input type="password" placeholder="Password" id="password_confirmation" class="form-control"
-                                           name="password_confirmation" required>
-                                </div>
-                                <div class="d-grid mx-auto">
-                                    <button type="submit" class="btn btn-dark btn-block">Send</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+    <div class="min-h-screen min-h-screen flex justify-center pt-20 pb-14">
+        <reset-password-block></reset-password-block>
+    </div>
 @endsection
