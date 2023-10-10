@@ -16,10 +16,10 @@ class Demo
     {
         // Create or update demo user
         User::updateOrCreate([
-            'name' => 'Demo',
-            'email' => 'demo@demo.com'
-        ], [
             'id' => User::DEMO_ID,
+            'email' => 'demo@demo.com',
+        ], [
+            'name' => 'Demo',
             'password' => Hash::make('demo-password')
         ]);
     }

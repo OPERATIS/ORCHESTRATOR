@@ -35,14 +35,14 @@ class SlackController extends Controller
 
     public function callback(Request $request): JsonResponse
     {
-        $validateUser = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'code' => 'required|string',
         ]);
 
-        if ($validateUser->fails()) {
+        if ($validator->fails()) {
             return response()->json([
                 'status' => false,
-                'errors' => $validateUser->errors()
+                'errors' => $validator->errors()
             ], 401);
         }
 

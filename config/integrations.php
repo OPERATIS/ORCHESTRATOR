@@ -20,5 +20,8 @@ return [
         'pageAccessToken' => env('MESSENGER_PAGE_ACCESS_TOKEN'),
         'pageName' => env('MESSENGER_PAGE_NAME'),
         'pageId' => env('MESSENGER_PAGE_ID'),
-    ]
+    ],
+    'openai' => [
+        'apiKey' => env('OPENAI_API_KEY')
+    ],
 ];
