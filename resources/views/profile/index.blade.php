@@ -8,7 +8,7 @@
 
             <form method="POST" action="{{route('profileUpdate')}}" >
                 @csrf
-                <input name="brand" placeholder="brand" value="{{$user->brand}}">
+                <input name="brand" placeholder="brand_name" value="{{$user->brand_name}}">
                 <input name="email" placeholder="EMAIL" value="{{$user->email}}">
                 <input name="new_email" placeholder="EMAIL">
                 <input name="password" placeholder="OLD PASSWORD">

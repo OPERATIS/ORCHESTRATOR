@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Session;
@@ -72,14 +73,21 @@ class AuthController extends Controller
             }
 
             $data = $request->all();
+
+            $emailParts = explode('@', $data['email']);
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'password' => Hash::make($data['password'])
+                'password' => Hash::make($data['password']),
+                'brand_name' => $emailParts[0]
             ]);
 
-//            Mail::to($data['email'])
-//                ->send(new Registration($data['name'], $data['password']));
+            try {
+                Mail::to($data['email'])
+                    ->send(new Registration($data['name'], $data['password']));
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+            }
 
             Auth::login($user);
 
@@ -115,10 +123,16 @@ class AuthController extends Controller
             } else {
                 $status = Password::sendResetLink($request->only('email'),
                     function ($user, $token) {
-                        Mail::to($user->email)
-                            ->send(new RecoverPassword($token));
+                        try {
+                            Mail::to($user->email)
+                                ->send(new RecoverPassword($token));
 
-                        return Password::RESET_LINK_SENT;
+                            return Password::RESET_LINK_SENT;
+                        } catch (\Exception $e) {
+                            Log::error($e->getMessage());
+
+                            return false;
+                        }
                     }
                 );
 
@@ -143,7 +157,6 @@ class AuthController extends Controller
         if ($request->isMethod('post')) {
             $validator = Validator::make($request->all(), [
                 'token' => 'required',
-//                'email' => 'required|email',
                 'password' => 'required|min:6',
                 'confirm_password' => 'required|min:6|same:password',
             ]);
@@ -155,7 +168,7 @@ class AuthController extends Controller
                 ]);
             } else {
                 $status = Password::reset(
-                    $request->only('email', 'password', 'password_confirmation', 'token'),
+                    $request->only('password', 'password_confirmation', 'token'),
                     function (User $user, string $password) {
                         $user->forceFill([
                             'password' => Hash::make($password)
