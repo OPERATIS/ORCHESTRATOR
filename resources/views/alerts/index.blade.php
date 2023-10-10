@@ -22,7 +22,12 @@
                                         {{$alert->metric}} {{$alert->result}} {{$alert->period}}
                                     </div>
                                     <div class="text-xs text-black text-opacity-40" style="line-height: 18px;">
-                                        {{$alert->created_at->format('d M, H:i:s')}}
+                                        {{-- Condition for demo --}}
+                                        @if ($alert->created_at->day == $alert->end_period->day)
+                                            {{$alert->created_at->format('d M, H:i:s')}}
+                                        @else
+                                            {{$alert->end_period->format('d M, H:i:s')}}
+                                        @endif
                                     </div>
                                 </div>
                             </div>
