@@ -62,9 +62,12 @@ class DashboardController extends Controller
                 $lastUpdateRecommendations = $alertForRecommendations->updated_at;
             }
 
-            if ($alertForRecommendationLastDay === $alertForRecommendations->end_period) {
+            if ($alertForRecommendationLastDay->day === $alertForRecommendations->end_period->day &&
+                $alertForRecommendationLastDay->month === $alertForRecommendations->end_period->month &&
+                $alertForRecommendationLastDay->year === $alertForRecommendations->end_period->year
+            ) {
                 $actualAlertsForRecommendations[] = $alertForRecommendations;
-                $lastAlertIdForRecommendation[] = $alertForRecommendations->id;
+                $lastAlertIdForRecommendation = $alertForRecommendations->id;
             }
         }
 
