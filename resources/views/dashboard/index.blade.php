@@ -55,10 +55,19 @@
             Recommendations
             <br>
             @if ($recommendationShort)
-                Here is priority list for today: 1. Improve {{$recommendationShort}}
+                Here is priority list for today:
+                @if (count($recommendations) == 1)
+                    <a href="{{route('chatsCreate', ['alert' => $lastAlertIdForRecommendation])}}">
+                        1. Improve {{$recommendationShort}}
+                    </a>
+                @else
+                    1. Improve {{$recommendationShort}}
+                @endif
             @endif
             @if (count($recommendations) > 1)
-                +{{count($recommendations) - 1}} others.
+                <a href="{{route('chatsCreate', ['alert' => $lastAlertIdForRecommendation])}}">
+                    +{{count($recommendations) - 1}} others.
+                ></a>
             @endif
         </div>
         <div>
