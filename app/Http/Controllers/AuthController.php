@@ -58,7 +58,7 @@ class AuthController extends Controller
     {
         if ($request->isMethod('post')) {
             $validator = Validator::make($request->all(), [
-                'name' => 'required',
+//                'name' => 'required',
                 'email' => 'required|email|unique:users',
                 'password' => 'required|min:6',
                 'confirm_password' => 'required|min:6|same:password',
@@ -72,8 +72,10 @@ class AuthController extends Controller
             }
 
             $data = $request->all();
+
+            $name = preg_match('/^([^@]+)@/', $data['email'], $matches) ? $matches[1] : $data['email'];
             $user = User::create([
-                'name' => $data['name'],
+                'name' => $name,
                 'email' => $data['email'],
                 'password' => Hash::make($data['password'])
             ]);

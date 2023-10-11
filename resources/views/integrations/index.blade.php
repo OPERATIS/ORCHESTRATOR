@@ -21,7 +21,7 @@
                                     Shopify
                                 </div>
                                 <div class="text-sm text-black mt-2" style="line-height: 18px;">
-                                    Description DescriptionDescription Description Description Description
+                                    E-commerce platform
                                 </div>
                             </div>
                         </div>
@@ -54,7 +54,7 @@
                                     Google Analytics
                                 </div>
                                 <div class="text-sm text-black mt-2" style="line-height: 18px;">
-                                    Description DescriptionDescription Description Description Description
+                                    Analytics platform
                                 </div>
                             </div>
                         </div>
@@ -80,7 +80,7 @@
                                     Google Ads
                                 </div>
                                 <div class="text-sm text-black mt-2" style="line-height: 18px;">
-                                    Description DescriptionDescription Description Description Description
+                                    Online advertising platform
                                 </div>
                             </div>
                         </div>
@@ -106,7 +106,7 @@
                                     Meta Ads
                                 </div>
                                 <div class="text-sm text-black mt-2" style="line-height: 18px;">
-                                    Description DescriptionDescription Description Description Description
+                                    Online advertising platform
                                 </div>
                             </div>
                         </div>
