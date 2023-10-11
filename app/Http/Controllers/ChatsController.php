@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Alert;
 use App\Models\Chat;
 use App\Models\ChatMessage;
+use App\Models\Metric;
 use App\Models\User;
+use App\Services\Recommendations;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,14 +25,12 @@ class ChatsController extends Controller
             ->with('chats', $user->chats);
     }
 
-    /**
-     * @param int|null $alertId
-     */
-    public function create(int $alertId = null)
+    public function create(Request $request)
     {
         /** @var User $user */
         $user = Auth::user();
 
+        $alertId = $request->get('alert');
         if ($alertId) {
             // Search alert
             $alert = Alert::where('id', $alertId)
@@ -66,14 +66,25 @@ class ChatsController extends Controller
 
         $chat = Chat::where('id', $chatId)
             ->where('user_id', $user->id)
-            ->with(['messages'])
+            ->with(['messages', 'alert'])
             ->first();
+
+        $systemMessage = null;
+        if ($chat->alert) {
+            // From notifications
+            if ($chat->alert->period === Metric::PERIOD_HOUR) {
+                $systemMessage = 'Metric ' . $chat->alert->metric . ' has ' . $chat->alert->result;
+            } elseif ($chat->alert->period === Metric::PERIOD_DAY) {
+                $systemMessage = implode(' ', Recommendations::getListAdvice([$chat->alert]));
+            }
+        }
 
         $messages = $this->getMessages($chat, ['updated_at', 'id']);
         return view('chats.show')
             ->with('chat', $chat)
             ->with('chats', $user->chats)
-            ->with('messages', $messages);
+            ->with('messages', $messages)
+            ->with('systemMessage', $systemMessage);
     }
 
     /**

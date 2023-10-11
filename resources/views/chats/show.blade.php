@@ -2,6 +2,11 @@ ID #{{$chat->id}}
 <br>
 {{$chat->title}}
 
+
+@if ($systemMessage)
+    {{$systemMessage}}
+@endif
+
 @foreach ($messages as $message)
     {{$message['role']}}
     <br>
