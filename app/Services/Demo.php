@@ -20,6 +20,7 @@ class Demo
             'email' => 'demo@demo.com',
         ], [
             'name' => 'Demo',
+            'brand_name' => 'Demo',
             'password' => Hash::make('demo-password')
         ]);
     }
