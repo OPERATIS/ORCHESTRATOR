@@ -42,7 +42,8 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('dashboard/metrics-chart', [DashboardController::class, 'metricsChart'])->name('metricsChart');
 
     Route::get('chats', [ChatsController::class, 'index'])->name('chats');
-    Route::get('chats/create', [ChatsController::class, 'create'])->name('chatsCreate');
+    Route::get('chats/list', [ChatsController::class, 'list'])->name('chatsList');
+    Route::any('chats/create', [ChatsController::class, 'create'])->name('chatsCreate');
     Route::get('chats/{chatId}', [ChatsController::class, 'show'])->name('chatShow');
     Route::post('chats/{chatId}/send-message', [ChatsController::class, 'sendMessage'])->name('chatSendMessage');
     Route::get('chats/{chatId}/messages', [ChatsController::class, 'messages'])->name('chatMessages');
