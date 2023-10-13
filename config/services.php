@@ -41,4 +41,10 @@ return [
         'client_secret' => env('SLACK_CLIENT_SECRET'),
         'redirect' =>env('APP_URL') . '/connect/slack/callback',
     ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('APP_URL') . '/google/callback',
+    ]
 ];
