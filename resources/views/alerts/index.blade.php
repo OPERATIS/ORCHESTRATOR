@@ -22,7 +22,12 @@
                                         {{$alert->metric}} {{$alert->result}} {{$alert->period}}
                                     </div>
                                     <div class="text-xs text-black text-opacity-40" style="line-height: 18px;">
-                                        {{$alert->created_at->format('d M, H:i:s')}}
+                                        {{-- Condition for demo --}}
+                                        @if ($alert->created_at->day == $alert->end_period->day)
+                                            {{$alert->created_at->format('d M, H:i:s')}}
+                                        @else
+                                            {{$alert->end_period->format('d M, H:i:s')}}
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -73,7 +78,7 @@
                         </div>
                         <div class="flex items-center">
                             <a class="flex items-center text-lg text-black font-semibold rounded-lg px-4 h-11" style="background: rgba(217, 228, 239, 0.60);"
-                               href="{{route('slackLogin')}}"
+                               href="{{route('integrationsSlackLogin')}}"
                             >
                                 <x-icon name="messenger-icon" class="w-7 h-7 mr-2"/>
                                 Slack

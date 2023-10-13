@@ -68,7 +68,7 @@ services:
         networks:
             app-network:
                 aliases:
-                    - operatis.loc
+                    - operatis.com
                     - test-operatis.ai
 
 # Docker Networks

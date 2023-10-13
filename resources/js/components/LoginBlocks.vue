@@ -53,7 +53,9 @@
                         <div class="p-2 border !border-gray_4 hover:!border-black_2 cursor-pointer"
                              style="border-radius: 10px;"
                         >
-                            <img width="30" src="/icons/google-icon.png" alt="google">
+                            <a href="/google/login">
+                                <img width="30" src="/icons/google-icon.png" alt="google">
+                            </a>
                         </div>
                     </div>
                     <div @click="changeView('forgot_password')"

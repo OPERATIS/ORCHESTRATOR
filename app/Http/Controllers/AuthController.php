@@ -4,16 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Mail\RecoverPassword;
 use App\Mail\Registration;
+use App\Models\UserSocial;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -73,15 +76,20 @@ class AuthController extends Controller
 
             $data = $request->all();
 
-            $name = preg_match('/^([^@]+)@/', $data['email'], $matches) ? $matches[1] : $data['email'];
+            $emailParts = explode('@', $data['email']);
             $user = User::create([
-                'name' => $name,
+                'name' => $data['name'],
                 'email' => $data['email'],
-                'password' => Hash::make($data['password'])
+                'password' => Hash::make($data['password']),
+                'brand_name' => $emailParts[0]
             ]);
 
-//            Mail::to($data['email'])
-//                ->send(new Registration($data['name'], $data['password']));
+            try {
+                Mail::to($data['email'])
+                    ->send(new Registration($data['name'], $data['password']));
+            } catch (\Exception $e) {
+                Log::error($e->getMessage());
+            }
 
             Auth::login($user);
 
@@ -117,10 +125,16 @@ class AuthController extends Controller
             } else {
                 $status = Password::sendResetLink($request->only('email'),
                     function ($user, $token) {
-                        Mail::to($user->email)
-                            ->send(new RecoverPassword($token));
+                        try {
+                            Mail::to($user->email)
+                                ->send(new RecoverPassword($token));
 
-                        return Password::RESET_LINK_SENT;
+                            return Password::RESET_LINK_SENT;
+                        } catch (\Exception $e) {
+                            Log::error($e->getMessage());
+
+                            return false;
+                        }
                     }
                 );
 
@@ -145,7 +159,6 @@ class AuthController extends Controller
         if ($request->isMethod('post')) {
             $validator = Validator::make($request->all(), [
                 'token' => 'required',
-//                'email' => 'required|email',
                 'password' => 'required|min:6',
                 'confirm_password' => 'required|min:6|same:password',
             ]);
@@ -157,7 +170,7 @@ class AuthController extends Controller
                 ]);
             } else {
                 $status = Password::reset(
-                    $request->only('email', 'password', 'password_confirmation', 'token'),
+                    $request->only('password', 'password_confirmation', 'token'),
                     function (User $user, string $password) {
                         $user->forceFill([
                             'password' => Hash::make($password)
@@ -185,5 +198,50 @@ class AuthController extends Controller
         } else {
             return abort(404);
         }
+    }
+
+    public function googleLogin()
+    {
+        return Socialite::driver('google')
+            ->redirect();
+    }
+
+    public function googleCallback()
+    {
+        // Get user from social
+        $socialiteUser = Socialite::driver('google')
+            ->user();
+
+        // Search user
+        $user = User::where('email', $socialiteUser->getEmail())
+            ->first();
+
+        if (!$user) {
+            $emailParts = explode('@', $socialiteUser->getEmail());
+            $user = User::create([
+                'name' => $socialiteUser->getName(),
+                'email' => $socialiteUser->getEmail(),
+                'password' => Hash::make(uniqid(rand())),
+                'brand_name' => $emailParts[0]
+            ]);
+        }
+
+        UserSocial::updateOrCreate([
+            'user_id' => $user->id,
+            'social' => 'google',
+            'social_id' => $socialiteUser->getId(),
+        ], [
+            // OAuth 2.0 providers...
+            'token' => $socialiteUser->token,
+            'refresh_token' => $socialiteUser->refreshToken,
+            'expires_in' => $socialiteUser->expiresIn,
+            // All providers...
+            'nickname' => $socialiteUser->getNickname(),
+            'avatar' => $socialiteUser->getAvatar(),
+        ]);
+
+        Auth::login($user);
+
+        return redirect('dashboard');
     }
 }

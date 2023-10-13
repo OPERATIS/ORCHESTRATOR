@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Alert;
 use App\Models\Chat;
 use App\Models\ChatMessage;
+use App\Models\Metric;
 use App\Models\User;
+use App\Services\Recommendations;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,40 +25,19 @@ class ChatsController extends Controller
             ->with('chats', $user->chats);
     }
 
-    /**
-     * @param int|null $alertId
-     */
-    public function create(int $alertId = null)
+    public function create(Request $request)
     {
-        /** @var User $user */
-        $user = Auth::user();
-
-        if ($alertId) {
-            // Search alert
-            $alert = Alert::where('id', $alertId)
-                ->where('user_id', $user->id)
-                ->first();
-
-            $chat = Chat::where('alert_id', $alert->id)
-                ->first();
-
-            if (!$chat) {
-                $chat = Chat::create([
-                    // TODO add text
-                    'title' => 'Chat from alert #' . $alertId,
-                    'user_id' => $user->id,
-                    'alert_id' => $alert->id,
-                ]);
-            }
-        } else {
-            $chat = Chat::create([
-                // TODO add text
-                'title' => 'New chat #' . time(),
-                'user_id' => $user->id,
+        $chatArray = $this->getChat($request->get('alert'));
+        if ($request->isMethod('post')) {
+            return response()->json([
+                'status' => true,
+                'chat' => $chatArray
             ]);
+        } else {
+            return redirect(route('chatShow', [
+                'chatId' => $chatArray['id']
+            ]));
         }
-
-        return redirect(route('chatShow', ['chatId' => $chat->id]));
     }
 
     public function show(int $chatId)
@@ -66,14 +47,47 @@ class ChatsController extends Controller
 
         $chat = Chat::where('id', $chatId)
             ->where('user_id', $user->id)
-            ->with(['messages'])
+            ->with(['messages', 'alert'])
             ->first();
+
+        $systemMessage = null;
+        if ($chat->alert) {
+            // From notifications
+            if ($chat->alert->period === Metric::PERIOD_HOUR) {
+                $systemMessage = 'Metric ' . $chat->alert->metric . ' has ' . $chat->alert->result;
+            } elseif ($chat->alert->period === Metric::PERIOD_DAY) {
+                $systemMessage = implode(' ', Recommendations::getListAdvice([$chat->alert]));
+            }
+        }
 
         $messages = $this->getMessages($chat, ['updated_at', 'id']);
         return view('chats.show')
             ->with('chat', $chat)
             ->with('chats', $user->chats)
-            ->with('messages', $messages);
+            ->with('messages', $messages)
+            ->with('systemMessage', $systemMessage);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function list(): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        $chats = [];
+        foreach ($user->chats as $chat) {
+            $chats[] = [
+                'title' => $chat->title,
+                'id' => $chat->id,
+            ];
+        }
+
+        return response()->json([
+            'status' => true,
+            'chats' => $chats
+        ]);
     }
 
     /**
@@ -193,5 +207,45 @@ class ChatsController extends Controller
         }
 
         return $messages;
+    }
+
+    /**
+     * @param null $alertId
+     * @return array
+     */
+    protected function getChat($alertId = null): array
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($alertId) {
+            // Search alert
+            $alert = Alert::where('id', $alertId)
+                ->where('user_id', $user->id)
+                ->first();
+
+            $chat = Chat::where('alert_id', $alert->id)
+                ->first();
+
+            if (!$chat) {
+                $chat = Chat::create([
+                    // TODO add text
+                    'title' => 'Chat from alert #' . $alertId,
+                    'user_id' => $user->id,
+                    'alert_id' => $alert->id,
+                ]);
+            }
+        } else {
+            $chat = Chat::create([
+                // TODO add text
+                'title' => 'New chat #' . time(),
+                'user_id' => $user->id,
+            ]);
+        }
+
+        return [
+            'id' => $chat->id,
+            'title' => $chat->title,
+        ];
     }
 }

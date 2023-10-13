@@ -23,7 +23,7 @@ class DashboardController extends Controller
         $metricsActualData = Metrics::getActualData($user->id);
 
         // Search recommendations
-        $this->getRecommendations($user->id, $recommendations, $lastUpdateRecommendations);
+        $this->getRecommendations($user->id, $recommendations, $lastUpdateRecommendations, $lastAlertIdForRecommendation);
 
         // Search revenue attribution factors
         $this->getRevenueAttributionFactors($user->id, $revenueAttributionFactors, $lastUpdateRevenueAttributionFactors);
@@ -33,6 +33,7 @@ class DashboardController extends Controller
             ->with('recommendations', $recommendations)
             ->with('recommendationShort', array_key_first($recommendations))
             ->with('lastUpdateRecommendations', $lastUpdateRecommendations)
+            ->with('lastAlertIdForRecommendation', $lastAlertIdForRecommendation)
             ->with('revenueAttributionFactors', $revenueAttributionFactors)
             ->with('lastUpdateRevenueAttributionFactors', $lastUpdateRevenueAttributionFactors)
             ->with('metricsActualData', $metricsActualData);
@@ -42,9 +43,10 @@ class DashboardController extends Controller
      * @param int $userId
      * @param $recommendations
      * @param $lastUpdateRecommendations
+     * @param $lastAlertIdForRecommendation
      * @return void
      */
-    protected function getRecommendations(int $userId, &$recommendations, &$lastUpdateRecommendations)
+    protected function getRecommendations(int $userId, &$recommendations, &$lastUpdateRecommendations, &$lastAlertIdForRecommendation)
     {
         $alertsForRecommendations = Alert::query()
             ->where('user_id', $userId)
@@ -61,8 +63,12 @@ class DashboardController extends Controller
                 $lastUpdateRecommendations = $alertForRecommendations->updated_at;
             }
 
-            if ($alertForRecommendationLastDay === $alertForRecommendations->end_period) {
+            if ($alertForRecommendationLastDay->day === $alertForRecommendations->end_period->day &&
+                $alertForRecommendationLastDay->month === $alertForRecommendations->end_period->month &&
+                $alertForRecommendationLastDay->year === $alertForRecommendations->end_period->year
+            ) {
                 $actualAlertsForRecommendations[] = $alertForRecommendations;
+                $lastAlertIdForRecommendation = $alertForRecommendations->id;
             }
         }
 

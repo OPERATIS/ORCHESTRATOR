@@ -19,7 +19,8 @@ class Demo
             'id' => User::DEMO_ID,
             'email' => 'demo@demo.com',
         ], [
-            'name' => 'Demo1',
+            'name' => 'Demo',
+            'brand_name' => 'Demo',
             'password' => Hash::make('demo-password')
         ]);
     }

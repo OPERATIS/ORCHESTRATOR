@@ -26,7 +26,7 @@
                             </div>
                         </div>
                         <div class="mt-5">
-                            <form method='POST' action="{{route('shopifyLogin')}}">
+                            <form method='POST' action="{{route('integrationsShopifyLogin')}}">
                                 {{ csrf_field() }}
                                 <label class="hidden">
                                     <input name="shop" value="quickstart-2bd07cf2.myshopify.com" placeholder="quickstart-2bd07cf2.myshopify.com">
@@ -59,7 +59,7 @@
                             </div>
                         </div>
                         <div class="mt-5">
-                            <a href="{{route('googleLogin', ['service' => 'analytics'])}}"
+                            <a href="{{route('integrationsGoogleLogin', ['service' => 'analytics'])}}"
                                 class="w-full btn md btn_connect"
                             >
                                 Connect
@@ -85,7 +85,7 @@
                             </div>
                         </div>
                         <div class="mt-5">
-                            <a href="{{route('googleLogin', ['service' => 'adwords'])}}"
+                            <a href="{{route('integrationsGoogleLogin', ['service' => 'adwords'])}}"
                                class="w-full btn md btn_connect"
                             >
                                 Connect
@@ -111,7 +111,7 @@
                             </div>
                         </div>
                         <div class="mt-5">
-                            <a href="{{route('facebookLogin')}}"
+                            <a href="{{route('integrationsFacebookLogin')}}"
                                class="w-full btn md btn_connect"
                             >
                                 Connect

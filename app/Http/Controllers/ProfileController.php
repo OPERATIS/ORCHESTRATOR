@@ -25,7 +25,7 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         $validatorUpdate = Validator::make($request->all(), [
-            'brand' => 'nullable|min:3',
+            'brand_name' => 'nullable|min:3',
             'email' => 'nullable|email',
             'new_email' => 'nullable|required_with:email|email',
             'password' => 'nullable|min:8',
@@ -53,8 +53,8 @@ class ProfileController extends Controller
         $updateData = array_filter($updateData);
 
         foreach ($updateData as $key => $value) {
-            if ($key === 'brand') {
-                $user->brand = $value;
+            if ($key === 'brand_name') {
+                $user->brand_name = $value;
             }
 
             if ($key === 'new_email') {
