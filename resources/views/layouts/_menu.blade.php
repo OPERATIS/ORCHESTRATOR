@@ -3,7 +3,7 @@
         <div class="w-full flex items-center py-1 px-2">
             <img class="h-6 w-6" src="/img/profile_icon.png" alt="logo">
             <div class="text-sm text-black ml-2">
-                ByeWind
+                {{auth()->user()->brand_name}}
             </div>
             <div class="ml-auto">
                 <div class="p-1 pr-0 cursor-pointer">
