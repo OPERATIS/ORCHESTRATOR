@@ -33,12 +33,18 @@ return [
     'facebook' => [
         'client_id' => env('FACEBOOK_APP_ID'),
         'client_secret' => env('FACEBOOK_APP_SECRET'),
-        'redirect' => env('APP_URL') . '/connect/facebook/callback',
+        'redirect' => env('APP_URL') . '/integrations/facebook/callback',
     ],
 
     'slack' => [
         'client_id' => env('SLACK_CLIENT_ID'),
         'client_secret' => env('SLACK_CLIENT_SECRET'),
-        'redirect' =>env('APP_URL') . '/connect/slack/callback',
+        'redirect' =>env('APP_URL') . '/integrations/slack/callback',
     ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('APP_URL') . '/google/callback',
+    ]
 ];
