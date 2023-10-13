@@ -6,81 +6,99 @@
         </div>
         <div class="max-w-[76.75rem]">
             <div class="px-7 py-8">
-                <div class="grid grid-cols-6 gap-3">
-                    <div class="h-[7rem] w-full text-black p-6 col-span-1 rounded-2xl" style="background: #E3FFE4;">
-                        <div class="text-sm font-semibold mb-2">
-                            L
-                        </div>
-                        <div class="w-full flex items-center">
-                            <div class="text-2xl font-semibold mr-2" style="line-height: 36px;">
-                                721K
+                <div class="flex items-center w-full items-center gap-3">
+                    @foreach($metricsActualData as $metricKey => $metricActualData)
+                        <div class="h-[7rem] w-full text-black p-6 rounded-2xl" style="@if($metricActualData['percent'] > 0) background: #E3FFE4; @else background: #F6E5E5; @endif">
+                            <div class="text-sm font-semibold uppercase mb-2">
+                                {{$metricKey}}
                             </div>
-                            <div class="flex items-center text-xs ml-auto" style="line-height: 18px;">
-                                <span>+11.01%</span>
-                                <x-icon name="arrow-rise-icon" class="w-4 h-4 ml-1"/>
+                            <div class="w-full flex items-center">
+                                <div class="text-2xl font-semibold mr-2" style="line-height: 36px;">
+                                    {{\App\Helpers\Shorts::formatNumber($metricActualData['last'], null, 1)}}
+{{--                                    {{$metricActualData['previous']}}--}}
+                                </div>
+                                <div class="flex items-center text-xs ml-auto" style="line-height: 18px;">
+                                    <span>{{$metricActualData['percent']}}%</span>
+                                    @if($metricActualData['percent'] > 0)
+                                        <x-icon name="arrow-rise-icon" class="w-4 h-4 ml-1"/>
+                                    @else
+                                        <x-icon name="arrow-rise-down-icon" class="w-4 h-4 ml-1"/>
+                                    @endif
+                                </div>
                             </div>
                         </div>
+                    @endforeach
+                </div>
+                <div class="flex justify-center items-center w-full min-h-[20rem] mt-8 bg-primary_light rounded-2xl pt-5 pb-6 px-4">
+                    Chart
+                </div>
+                <div class="mt-8">
+                    <div class="flex items-center text-black text-2xl font-semibold">
+                        <x-icon name="lightbulb-icon" class="w-8 h-8 text-black mr-1"/>
+                        AI Assistance Hints
                     </div>
-                    <div class="h-[7rem] w-full text-black p-6 col-span-1 rounded-2xl" style="background: #F6E5E5;">
-                        <div class="text-sm font-semibold mb-2">
-                            C
-                        </div>
-                        <div class="w-full flex items-center">
-                            <div class="text-2xl font-semibold mr-2" style="line-height: 36px;">
-                                367K
+                    <div class="grid grid-cols-2 gap-7 mt-5">
+                        <div class="rounded-2xl py-7 px-5 pb-5 col-span-1" style="background: #FBFAF7;">
+                            <div class="text-2xl text-black font-semibold">
+                                Recommendations
                             </div>
-                            <div class="flex items-center text-xs ml-auto" style="line-height: 18px;">
-                                <span>-11.01%</span>
-                                <span>
-                                <x-icon name="arrow-rise-down-icon" class="w-4 h-4 ml-1"/>
+                            <div class="w-full bg-black h-px bg-opacity-20 mb-6 mt-5"></div>
+                            @if ($lastUpdateRecommendations)
+                                <div class="text-sm text-black text-opacity-40">
+                                    Last Update {{$lastUpdateRecommendations->format('d.m.y H:i')}}
+                                </div>
+                            @endif
+                            <div class="flex items-center text-sm text-dark mt-4">
+                                @if ($recommendationShort)
+                                    Here is priority list for today: 1. Improve {{$recommendationShort}}
+                                @endif
+                                @if (count($recommendations) > 1)
+                                    <span class="font-bold text-green_2">+{{count($recommendations) - 1}} others</span>.
+                                @endif
+                            </div>
+                        </div>
+                        <div class="rounded-2xl py-7 px-5 pb-10 col-span-1" style="background: #F8FBF7;">
+                            <div class="text-2xl text-black font-semibold">
+                                Revenue Attribution Factors
+                            </div>
+                            <div class="w-full bg-black h-px bg-opacity-20 mb-6 mt-5"></div>
+                            @if ($lastUpdateRevenueAttributionFactors)
+                                <div class="text-sm text-black text-opacity-40">
+                                    Last Update {{$lastUpdateRevenueAttributionFactors->format('d.m.y H:i')}}
+                                </div>
+                            @endif
+                            <div class="w-full flex items-start mt-6 space-x-6">
+                                @if ($revenueAttributionFactors['positive'] ?? false)
+                                    <div class="w-full border-2 border-dark bg-primary_light p-6" style="border-radius: 8px;">
+                                        <div class="flex items-center text-sm text-black font-semibold mb-1">
+                                            <span class="w-2.5 h-2.5 rounded-full bg-green_2 mr-2"></span>
+                                            Top positive factors
+                                        </div>
+                                        @foreach ($revenueAttributionFactors['positive'] as $item)
+                                            <div class="text-sm text-black text-opacity-40" style="margin-bottom: 1px;">
+                                                {{$item}}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                                @if ($revenueAttributionFactors['negative'] ?? false)
+                                    <div class="w-full border-2 border-dark bg-primary_light p-6" style="border-radius: 8px;">
+                                        <div class="flex items-center text-sm text-black font-semibold mb-1">
+                                            <span class="w-2.5 h-2.5 rounded-full bg-red mr-2"></span>
+                                            Top negative factors
+                                        </div>
+                                        @foreach ($revenueAttributionFactors['negative'] as $item)
+                                            <div class="text-sm text-black text-opacity-40" style="margin-bottom: 1px;">
+                                                {{$item}}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-{{--            Metrics--}}
-{{--            @foreach($metricsActualData as $metricKey => $metricActualData)--}}
-{{--                {{$metricKey}}--}}
-{{--                {{$metricActualData['last']}}--}}
-{{--                {{$metricActualData['previous']}}--}}
-{{--                {{$metricActualData['percent']}}--}}
-{{--                <br>--}}
-{{--            @endforeach--}}
-        </div>
-        <div>
-            @if ($lastUpdateRecommendations)
-                Last Update {{$lastUpdateRecommendations}}
-            @endif
-            <br>
-            Recommendations
-            <br>
-            @if ($recommendationShort)
-                Here is priority list for today: 1. Improve {{$recommendationShort}}
-            @endif
-            @if (count($recommendations) > 1)
-                +{{count($recommendations) - 1}} others.
-            @endif
-        </div>
-        <div>
-            Revenue Attribution Factors
-            <br>
-            @if ($lastUpdateRevenueAttributionFactors)
-                Last Update {{$lastUpdateRevenueAttributionFactors}}
-            @endif
-            <br>
-            @if ($revenueAttributionFactors['positive'] ?? false)
-                @foreach ($revenueAttributionFactors['positive'] as $item)
-                    {{$item}}
-                    <br>
-                @endforeach
-            @endif
-            <br>
-            @if ($revenueAttributionFactors['negative'] ?? false)
-                @foreach ($revenueAttributionFactors['negative'] as $item)
-                    {{$item}}
-                    <br>
-                @endforeach
-            @endif
         </div>
     </div>
 @endsection

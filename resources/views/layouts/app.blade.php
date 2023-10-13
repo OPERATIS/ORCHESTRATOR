@@ -19,7 +19,7 @@
 <body class="min-h-screen antialiased bg-white">
     <div id="app">
         {{-- LEFT SIDEBAR--}}
-        <div class="sidebar fixed absolute z-20 w-[13.25rem] z-20 ">
+        <div class="sidebar fixed z-20 w-[13.25rem] z-20 ">
             @include('layouts._menu')
         </div>
 
