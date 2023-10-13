@@ -5,6 +5,10 @@ use App\Http\Controllers\ChatsController;
 use App\Http\Controllers\ConnectsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Integrations\FacebookController;
+use App\Http\Controllers\Integrations\GoogleController;
+use App\Http\Controllers\Integrations\ShopifyController;
+use App\Http\Controllers\Integrations\SlackController;
 use App\Http\Controllers\IntegrationsController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\ProfileController;
@@ -26,17 +30,17 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PagesController::class, 'index'])->name('landing');
 
 Route::middleware([Authenticate::class])->group(function () {
-    Route::post('/connect/shopify/login', [ConnectsController::class, 'shopifyLogin'])->name('shopifyLogin');
-    Route::get('/connect/shopify/callback', [ConnectsController::class, 'shopifyCallback'])->name('shopifyCallback');
+    Route::post('integrations/shopify/login', [ShopifyController::class, 'login'])->name('integrationsShopifyLogin');
+    Route::get('integrations/shopify/callback', [ShopifyController::class, 'callback'])->name('integrationsShopifyCallback');
 
-    Route::get('/connect/google/login', [ConnectsController::class, 'googleLogin'])->name('googleLogin2');
-    Route::get('/connect/google/callback', [ConnectsController::class, 'googleCallback'])->name('googleCallback2');
+    Route::get('integrations/google/login', [GoogleController::class, 'login'])->name('integrationsGoogleLogin');
+    Route::get('integrations/google/callback', [GoogleController::class, 'callback'])->name('integrationsGoogleCallback');
 
-    Route::get('/connect/facebook/login', [ConnectsController::class, 'facebookLogin'])->name('facebookLogin');
-    Route::get('/connect/facebook/callback', [ConnectsController::class, 'facebookCallback'])->name('facebookCallback');
+    Route::get('integrations/facebook/login', [FacebookController::class, 'login'])->name('integrationsFacebookLogin');
+    Route::get('integrations/facebook/callback', [FacebookController::class, 'callback'])->name('integrationsFacebookCallback');
 
-    Route::get('/connect/slack/login', [ConnectsController::class, 'slackLogin'])->name('slackLogin');
-    Route::get('/connect/slack/callback', [ConnectsController::class, 'slackCallback'])->name('slackCallback');
+    Route::get('integrations/slack/login', [SlackController::class, 'login'])->name('integrationsSlackLogin');
+    Route::get('integrations/slack/callback', [SlackController::class, 'callback'])->name('integrationsSlackCallback');
 
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('dashboard/metrics-chart', [DashboardController::class, 'metricsChart'])->name('metricsChart');
