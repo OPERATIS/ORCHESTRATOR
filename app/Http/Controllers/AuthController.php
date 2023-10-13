@@ -145,7 +145,9 @@ class AuthController extends Controller
                 } else {
                     return response()->json([
                         'status' => true,
-                        'errors' => ['Invalid credentials']
+                        'errors' => [
+                            'email' => ['Invalid credentials']
+                        ]
                     ]);
                 }
             }

@@ -5,10 +5,11 @@ import vueClickOutsideElement from 'vue-click-outside-element'
 
 import LoginBlocks from './components/LoginBlocks.vue';
 import ResetPasswordBlock from './components/ResetPasswordBlock.vue';
+import ProfilePage from './components/ProfilePage.vue';
 
 createApp({
     components: {
-        LoginBlocks, ResetPasswordBlock
+        LoginBlocks, ResetPasswordBlock, ProfilePage
     },
     data() {
         return {
