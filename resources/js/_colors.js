@@ -15,6 +15,7 @@ const colors = {
     gray_1: withOpacity('--color-gray_1'),
     gray_4: withOpacity('--color-gray_4'),
     blue_1: withOpacity('--color-blue_1'),
+    red: withOpacity('--color-red'),
     dangers: withOpacity('--color-danger'),
     primary: withOpacity('--color-primary'),
 }

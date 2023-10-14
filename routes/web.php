@@ -58,6 +58,7 @@ Route::middleware([Authenticate::class])->group(function () {
 
     Route::get('profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('profile/update', [ProfileController::class, 'update'])->name('profileUpdate');
+    Route::any('profile/check', [ProfileController::class, 'checkPassword'])->name('checkPassword');
 });
 
 Route::any('login', [AuthController::class, 'login'])->name('login');

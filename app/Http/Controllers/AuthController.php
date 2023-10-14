@@ -61,7 +61,7 @@ class AuthController extends Controller
     {
         if ($request->isMethod('post')) {
             $validator = Validator::make($request->all(), [
-                'name' => 'required',
+//                'name' => 'required',
                 'email' => 'required|email|unique:users',
                 'password' => 'required|min:6',
                 'confirm_password' => 'required|min:6|same:password',
@@ -145,7 +145,9 @@ class AuthController extends Controller
                 } else {
                     return response()->json([
                         'status' => true,
-                        'errors' => ['Invalid credentials']
+                        'errors' => [
+                            'email' => ['Invalid credentials']
+                        ]
                     ]);
                 }
             }

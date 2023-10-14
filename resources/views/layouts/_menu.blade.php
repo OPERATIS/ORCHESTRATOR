@@ -2,12 +2,29 @@
     <div class="flex-1">
         <div class="w-full flex items-center py-1 px-2">
             <img class="h-6 w-6" src="/img/profile_icon.png" alt="logo">
-            <div class="text-sm text-black ml-2">
-                {{auth()->user()->brand_name}}
+            <div class="text-sm text-black line-clamp-1 mx-2">
+                {{Auth::user()->name}}
             </div>
             <div class="ml-auto">
-                <div class="p-1 pr-0 cursor-pointer">
-                <x-icon name="dots-icon" class="w-4 h-4 ml-3"/>
+                <div class="relative pr-0 cursor-pointer" v-click-outside-element="closeMenuDropdown">
+                    <div class="p-1 pr-0" @click="isOpenMenuDropdown = !isOpenMenuDropdown">
+                        <x-icon name="dots-icon" class="w-4 h-4"/>
+                    </div>
+                    <ul
+                        v-if="isOpenMenuDropdown"
+                        class="absolute mt-3 py-2 px-3 bg-white whitespace-nowrap z-10"
+                        style="box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.15); border-radius: 10px; transform: translateX(-30%);"
+
+                    >
+                        <li class="flex items-center text-sm text-dark pb-1.5" style="line-height: 18px;">
+                            <x-icon name="user-icon" class="w-5 h-5 text-black mr-1"/>
+                            <a href="{{ route('profile') }}">Profile Settings</a>
+                        </li>
+                        <li class="flex items-center text-sm text-dark pt-1.5 border-t border-dark border-opacity-10" style="line-height: 18px;">
+                            <x-icon name="logout-icon" class="w-5 h-5 text-black mr-1"/>
+                            <a href="{{ route('logout') }}">Log Out</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

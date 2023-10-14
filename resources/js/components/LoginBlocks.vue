@@ -90,24 +90,6 @@
                     <div class="mt-10 space-y-6">
                         <div class="input-block"
                              v-bind:class="{
-                                'error': error && error.name
-                             }"
-                        >
-                            <label for="name" class="label">Brand Name</label>
-                            <input id="name"
-                                   v-bind:class="{
-                                    'fill': name
-                              }"
-                                   placeholder="Enter name"
-                                   class="input"
-                                   type="email"
-                                   v-model="name"
-                                   @input="error.name = null"
-                            >
-                            <div v-if="error && error.name" class="error">{{ error.name }}</div>
-                        </div>
-                        <div class="input-block"
-                             v-bind:class="{
                                 'error': error && error.email
                              }"
                         >
@@ -174,7 +156,7 @@
                     <div class="mt-11">
                         <button class="btn lg btn_login w-full"
                                 v-bind:class="{
-                                    'disabled': !email || !password || !name || !confirm_password
+                                    'disabled': !email || !password || !confirm_password
                                 }"
                                 @click="registration()"
                         >
@@ -256,12 +238,10 @@ export default {
     data() {
         return {
             view: 'login',
-            name: null,
             email: null,
             password: null,
             confirm_password: null,
             error: {
-                name: null,
                 email: null,
                 password: null,
                 confirm_password: null
@@ -271,13 +251,11 @@ export default {
     methods: {
         changeView(view){
             this.view = view;
-            this.name = null;
             this.email = null;
             this.password = null;
             this.confirm_password = null;
 
             this.error = {
-                name: null,
                 email: null,
                 password: null,
                 confirm_password: null
@@ -304,9 +282,8 @@ export default {
             }
         },
         registration() {
-            if (this.email && this.password && this.name && this.confirm_password){
+            if (this.email && this.password && this.confirm_password){
                 let data = {
-                    name: this.name,
                     email: this.email,
                     password: this.password,
                     confirm_password: this.confirm_password
@@ -317,8 +294,6 @@ export default {
                         if(data.status === true){
                             window.location.href = data.redirect;
                         } else {
-                            console.log(data);
-                            this.error.name = data['errors'] && data['errors']['name'] ? data['errors']['name'][0] : null;
                             this.error.email = data['errors'] && data['errors']['email'] ? data['errors']['email'][0] : null;
                             this.error.password = data['errors'] && data['errors']['password'] ? data['errors']['password'][0] : null;
                             this.error.confirm_password = data['errors'] && data['errors']['confirm_password'] ? data['errors']['confirm_password'][0] : null;
