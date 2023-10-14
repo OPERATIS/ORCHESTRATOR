@@ -18,3 +18,4 @@ yarn-error.log
 /public/css/
 .DS_Store
 /public/mix-manifest.json
+/config/googleCredentials.json

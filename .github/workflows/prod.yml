@@ -1,0 +1,24 @@
+name: Deploy
+on: workflow_dispatch
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_KEY }}
+          port: ${{ secrets.PROD_PORT }}
+          envs: GITHUB_REF
+          script: |
+            echo "Deploying to prod server on branch ${GITHUB_REF##*/}"
+            cd ~/ORCHESTRATOR/
+            git reset --hard
+            git fetch origin ${GITHUB_REF##*/}
+            git switch ${GITHUB_REF##*/}
+            git pull origin ${GITHUB_REF##*/}
+            make build
