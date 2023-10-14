@@ -83,7 +83,7 @@ class AuthController extends Controller
 
             try {
                 Mail::to($data['email'])
-                    ->send(new Registration($data['brand_name'], $data['password']));
+                    ->send(new Registration($emailParts[0], $data['password']));
             } catch (\Exception $e) {
                 Log::error($e->getMessage());
             }
