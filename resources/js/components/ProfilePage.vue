@@ -100,7 +100,7 @@
                            class="input"
                            type="password"
                            v-model="new_password"
-                           @input="error.new_password = null"
+                           @input="error.new_password = null; is_edit = true;"
                     >
                     <div v-if="error && error.new_password" class="error">{{ error.new_password }}</div>
                 </div>
@@ -118,7 +118,7 @@
                            class="input"
                            type="password"
                            v-model="new_password_confirmation"
-                           @input="error.new_password_confirmation = null"
+                           @input="error.new_password_confirmation = null; is_edit = true;"
                     >
                     <div v-if="error && error.new_password_confirmation" class="error">{{ error.new_password_confirmation }}</div>
                 </div>
@@ -171,6 +171,7 @@ export default {
             };
             axios.post('/profile/update', data)
                 .then(({data}) => {
+                    console.log(data);
                     if (data.status === true) {
                         // додати вспливаху
                     } else {
