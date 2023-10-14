@@ -1,3 +1,6 @@
+# important: you must set correct APP_ENV value in `.env` file before first run.
+# Based on this value, docker-compose chooses the configuration path for nginx
+
 version: '3'
 services:
   # PHP Service
