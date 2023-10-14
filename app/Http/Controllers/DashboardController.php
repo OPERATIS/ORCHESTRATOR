@@ -8,6 +8,7 @@ use App\Models\Metric;
 use App\Models\User;
 use App\Services\Metrics;
 use App\Services\Recommendations;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -60,7 +61,12 @@ class DashboardController extends Controller
         foreach ($alertsForRecommendations as $alertForRecommendations) {
             if (empty($preparedRecommendations)) {
                 $alertForRecommendationLastDay = $alertForRecommendations->end_period;
-                $lastUpdateRecommendations = $alertForRecommendations->updated_at;
+                // Logic for demo
+                if ($userId === User::DEMO_ID) {
+                    $lastUpdateRecommendations = Carbon::parse($alertForRecommendations->end_period)->addMinutes(30);
+                } else {
+                    $lastUpdateRecommendations = $alertForRecommendations->updated_at;
+                }
             }
 
             if ($alertForRecommendationLastDay->day === $alertForRecommendations->end_period->day &&
@@ -91,7 +97,12 @@ class DashboardController extends Controller
         if (count($metrics) > 1) {
             $lastMetric = $metrics->first();
             $previousMetric = $metrics->last();
-            $lastUpdateRevenueAttributionFactors = $lastMetric->updated_at;
+            // Logic for demo
+            if ($userId === User::DEMO_ID) {
+                $lastUpdateRevenueAttributionFactors = Carbon::parse($lastMetric->end_period)->addMinutes(15);
+            } else {
+                $lastUpdateRevenueAttributionFactors = $lastMetric->updated_at;
+            }
 
             $revenueAttributionFactors = [];
             foreach (Metric::METRICS as $metric) {
