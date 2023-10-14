@@ -14,4 +14,4 @@
    ```npm run dev```
 8. Configuration local environment\
    ```sudo nano /etc/hosts```\
-   ```127.0.0.1 operatis.com```
+   ```127.0.0.1 operatis-loc.ai```
