@@ -29,7 +29,7 @@
                         </div>
                     @endforeach
                 </div>
-                <div class="flex justify-center items-center w-full min-h-[20rem] mt-8 bg-primary_light rounded-2xl pt-5 pb-6 px-4">
+                <div class="flex justify-center items-center w-full min-h-[18rem] mt-8 bg-primary_light rounded-2xl pt-0 pb-4 px-4">
                     <dashboard-chart-block></dashboard-chart-block>
                 </div>
                 <div class="mt-8">
