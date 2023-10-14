@@ -59,11 +59,11 @@ class ProfileController extends Controller
                 $user->brand_name = $value;
             }
 
-            if ($key === 'email') {
+            if ($key === 'email' && !empty($value)) {
                 $user->email = $value;
             }
 
-            if ($key === 'new_password') {
+            if ($key === 'new_password' && !empty($value)) {
                 $user->password = Hash::make($value);
             }
         }
