@@ -40,7 +40,7 @@ class ProfileController extends Controller
                     'errors' => [
                         'password' => ['Invalid credentials']
                     ]
-                ], 401);
+                ]);
             }
         }
 
@@ -48,7 +48,7 @@ class ProfileController extends Controller
             return response()->json([
                 'status' => false,
                 'errors' => $validatorUpdate->errors()
-            ], 401);
+            ]);
         }
 
         $updateData = $request->all();
@@ -72,7 +72,7 @@ class ProfileController extends Controller
 
         return response()->json([
             'status' => true
-        ], 401);
+        ]);
     }
 
     public function checkPassword(Request $request)

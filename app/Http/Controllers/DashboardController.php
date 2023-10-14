@@ -133,7 +133,7 @@ class DashboardController extends Controller
             return response()->json([
                 'status' => false,
                 'errors' => $validatorMetricsChart->errors()
-            ], 401);
+            ]);
         }
 
         return response()->json([
