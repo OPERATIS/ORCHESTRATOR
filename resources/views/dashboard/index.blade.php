@@ -62,9 +62,9 @@
                                 @if (count($recommendations) > 1)
                                     <span class="font-bold text-green_2">
                                         <a href="{{route('chatsCreate', ['alert' => $lastAlertIdForRecommendation])}}">
-                                            +{{count($recommendations) - 1}} others.
+                                            +{{count($recommendations) - 1}} others
                                         </a>
-                                    </span>.
+                                    </span>
                                 @endif
                             </div>
                         </div>
