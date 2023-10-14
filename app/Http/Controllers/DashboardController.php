@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Shorts;
 use App\Models\Alert;
 use App\Models\Metric;
 use App\Models\User;
@@ -95,9 +96,9 @@ class DashboardController extends Controller
             $revenueAttributionFactors = [];
             foreach (Metric::METRICS as $metric) {
                 if ($lastMetric->{$metric} < $previousMetric->{$metric}) {
-                    $revenueAttributionFactors['negative'][] = "{$metric} is " . $lastMetric->{$metric};
+                    $revenueAttributionFactors['negative'][] = "{$metric} is " . Shorts::formatNumber($lastMetric->{$metric}, null, 0);
                 } elseif ($lastMetric->{$metric} > $previousMetric->{$metric}) {
-                    $revenueAttributionFactors['positive'][] = "{$metric} is " . $lastMetric->{$metric};
+                    $revenueAttributionFactors['positive'][] = "{$metric} is " . Shorts::formatNumber($lastMetric->{$metric}, null, 0);
                 }
             }
         }

@@ -37,7 +37,9 @@ class ProfileController extends Controller
             if ($user->password !== Hash::make($password)) {
                 return response()->json([
                     'status' => false,
-                    'errors' => ['Invalid credentials']
+                    'errors' => [
+                        'password' => ['Invalid credentials']
+                    ]
                 ], 401);
             }
         }
@@ -71,5 +73,38 @@ class ProfileController extends Controller
         return response()->json([
             'status' => true
         ], 401);
+    }
+
+    public function checkPassword(Request $request)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        $validatorUpdate = Validator::make($request->all(), [
+            'password' => 'nullable|min:8'
+        ]);
+
+        $password = $request->get('password');
+        if (empty($password)) {
+            if ($user->password !== Hash::make($password)) {
+                return response()->json([
+                    'status' => false,
+                    'errors' => [
+                        'password' => ['Invalid credentials']
+                    ]
+                ]);
+            }
+        }
+
+        if ($validatorUpdate->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validatorUpdate->errors()
+            ]);
+        }
+
+        return response()->json([
+            'status' => true
+        ]);
     }
 }
