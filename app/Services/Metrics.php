@@ -83,9 +83,27 @@ class Metrics
             ->get()
             ->toArray();
 
-        return [
-            'current' => $currentMetrics,
-            'previous' => $previousMetrics
-        ];
+        $metrics = [];
+        foreach ($currentMetrics as $currentMetric) {
+            foreach (Metric::METRICS as $key) {
+                $metrics[$key . '_current'][] = [
+                    $currentMetric[$key],
+                    Carbon::parse($currentMetric['end_period'])->getTimestampMs()
+                ];
+            }
+        }
+        unset($currentMetrics);
+
+        foreach ($previousMetrics as $previousMetric) {
+            foreach (Metric::METRICS as $key) {
+                $metrics[$key . '_previous'][] = [
+                    $previousMetric[$key],
+                    Carbon::parse($previousMetric['end_period'])->getTimestampMs()
+                ];
+            }
+        }
+        unset($previousMetrics);
+
+        return $metrics;
     }
 }

@@ -4,7 +4,7 @@
         <form method='POST' action="{{route('integrationsShopifyLogin')}}">
             {{ csrf_field() }}
             <label>
-                <input name="shop" value="quickstart-2bd07cf2.myshopify.com" placeholder="quickstart-2bd07cf2.myshopify.com">
+                <input name="shop" value="test-orchestrator.myshopify.com" placeholder="test-orchestrator.myshopify.com">
             </label>
             <button type="submit">Shopify</button>
             @if ($shopify ?? null)

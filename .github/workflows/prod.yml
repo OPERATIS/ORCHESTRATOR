@@ -1,22 +1,22 @@
-name: DEV Deploy
-on: push
+name: Deploy
+on: workflow_dispatch
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: executing remote deploy
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DEV_HOST }}
-          username: ${{ secrets.DEV_USER }}
-          key: ${{ secrets.DEV_KEY }}
-          port: ${{ secrets.DEV_PORT }}
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_KEY }}
+          port: ${{ secrets.PROD_PORT }}
           envs: GITHUB_REF
           script: |
-            echo "Deploying to dev server on branch ${GITHUB_REF##*/}"
+            echo "Deploying to prod server on branch ${GITHUB_REF##*/}"
             cd ~/ORCHESTRATOR/
             git reset --hard
             git fetch origin ${GITHUB_REF##*/}
