@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -26,15 +27,14 @@ class ProfileController extends Controller
 
         $validatorUpdate = Validator::make($request->all(), [
             'brand_name' => 'nullable|min:3',
-            'email' => 'nullable|email',
-            'new_email' => 'nullable|required_with:email|email',
+            'email' => 'nullable|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:8',
-            'new_password' => 'nullable|required_with:password|min:8|confirmed',
+            'new_password' => 'nullable|min:8|confirmed',
         ]);
 
         $password = $request->get('password');
-        if (empty($password)) {
-            if ($user->password !== Hash::make($password)) {
+        if (!empty($password)) {
+            if (!Hash::check($password, $user->password)) {
                 return response()->json([
                     'status' => false,
                     'errors' => [
@@ -59,7 +59,7 @@ class ProfileController extends Controller
                 $user->brand_name = $value;
             }
 
-            if ($key === 'new_email') {
+            if ($key === 'email') {
                 $user->email = $value;
             }
 
@@ -75,7 +75,11 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function checkPassword(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function checkPassword(Request $request): JsonResponse
     {
         /** @var User $user */
         $user = Auth::user();
@@ -84,22 +88,20 @@ class ProfileController extends Controller
             'password' => 'nullable|min:8'
         ]);
 
-        $password = $request->get('password');
-        if (empty($password)) {
-            if ($user->password !== Hash::make($password)) {
-                return response()->json([
-                    'status' => false,
-                    'errors' => [
-                        'password' => ['Invalid credentials']
-                    ]
-                ]);
-            }
-        }
-
         if ($validatorUpdate->fails()) {
             return response()->json([
                 'status' => false,
                 'errors' => $validatorUpdate->errors()
+            ]);
+        }
+
+        $password = $request->get('password');
+        if (!Hash::check($password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'errors' => [
+                    'password' => ['Invalid credentials']
+                ]
             ]);
         }
 

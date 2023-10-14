@@ -106,21 +106,21 @@
                 </div>
                 <div class="input-block"
                      v-bind:class="{
-                            'error': error && error.confirm_password
+                            'error': error && error.new_password_confirmation
                          }"
                 >
-                    <label for="user_confirm_password" class="label">Confirm New Password</label>
-                    <input id="user_confirm_password"
+                    <label for="user_new_password_confirmation" class="label">Confirm New Password</label>
+                    <input id="user_new_password_confirmation"
                            v-bind:class="{
-                                'fill': confirm_password
+                                'fill': new_password_confirmation
                            }"
                            placeholder="Enter new password again"
                            class="input"
                            type="password"
-                           v-model="confirm_password"
-                           @input="error.confirm_password = null"
+                           v-model="new_password_confirmation"
+                           @input="error.new_password_confirmation = null"
                     >
-                    <div v-if="error && error.confirm_password" class="error">{{ error.confirm_password }}</div>
+                    <div v-if="error && error.new_password_confirmation" class="error">{{ error.new_password_confirmation }}</div>
                 </div>
             </template>
             <div class="mt-11">
@@ -148,13 +148,13 @@ export default {
             email: null,
             password: null,
             new_password: null,
-            confirm_password: null,
+            new_password_confirmation: null,
             error: {
                 brand_name: null,
                 email: null,
                 password: null,
                 new_password: null,
-                confirm_password: null,
+                new_password_confirmation: null,
             },
             is_edit: null,
             isChangePasswordFields: false
@@ -167,7 +167,7 @@ export default {
                 email: this.email,
                 password: this.password ?? null,
                 new_password: this.new_password ?? null,
-                confirm_password: this.confirm_password ?? null,
+                new_password_confirmation: this.new_password_confirmation ?? null,
             };
             axios.post('/profile/update', data)
                 .then(({data}) => {
@@ -178,7 +178,7 @@ export default {
                         this.error.email = data['errors'] && data['errors']['email'] ? data['errors']['email'][0] : null;
                         this.error.password = data['errors'] && data['errors']['password'] ? data['errors']['password'][0] : null;
                         this.error.new_password = data['errors'] && data['errors']['new_password'] ? data['errors']['new_password'][0] : null;
-                        this.error.confirm_password = data['errors'] && data['errors']['confirm_password'] ? data['errors']['confirm_password'][0] : null;
+                        this.error.new_password_confirmation = data['errors'] && data['errors']['new_password_confirmation'] ? data['errors']['new_password_confirmation'][0] : null;
                     }
                 })
                 .catch(({response}) => {
