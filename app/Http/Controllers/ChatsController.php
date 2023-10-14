@@ -121,7 +121,7 @@ class ChatsController extends Controller
             return response()->json([
                 'status' => false,
                 'errors' => $validatorSendMessage->errors()
-            ], 401);
+            ]);
         }
 
         $content = $request->get('content');

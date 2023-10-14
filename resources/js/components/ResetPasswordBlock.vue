@@ -27,27 +27,27 @@
                     </div>
                     <div class="input-block"
                          v-bind:class="{
-                                'error': error && error.confirm_password
+                                'error': error && error.password_confirmation
                              }"
                     >
                         <label for="user_password_confirm" class="label">Confirm Password</label>
                         <input id="user_password_confirm"
                                v-bind:class="{
-                                    'fill': confirm_password
+                                    'fill': password_confirmation
                                }"
                                placeholder="Enter password again"
                                class="input"
                                type="password"
-                               v-model="confirm_password"
-                               @input="error.confirm_password = null"
+                               v-model="password_confirmation"
+                               @input="error.password_confirmation = null"
                         >
-                        <div v-if="error && error.confirm_password" class="error">{{ error.confirm_password }}</div>
+                        <div v-if="error && error.password_confirmation" class="error">{{ error.password_confirmation }}</div>
                     </div>
                 </div>
                 <div class="mt-11">
                     <button class="btn lg btn_login w-full"
                             v-bind:class="{
-                                'disabled': !password || !confirm_password
+                                'disabled': !password || !password_confirmation
                             }"
                             @click="resetPassword()"
                     >
@@ -65,20 +65,20 @@ export default {
         return {
             resetToken: null,
             password: null,
-            confirm_password: null,
+            password_confirmation: null,
             error: {
                 password: null,
-                confirm_password: null
+                password_confirmation: null
             }
         };
     },
     methods: {
         resetPassword() {
-            if (this.password && this.confirm_password){
+            if (this.password && this.password_confirmation){
                 let data = {
                     token: this.resetToken,
                     password: this.password,
-                    confirm_password: this.confirm_password
+                    password_confirmation: this.password_confirmation
                 };
 
                 axios.post('/reset-password/'+this.resetToken, data)
@@ -88,7 +88,7 @@ export default {
                         } else {
                             console.log(data);
                             this.error.password = data['errors'] && data['errors']['password'] ? data['errors']['password'][0] : null;
-                            this.error.confirm_password = data['errors'] && data['errors']['confirm_password'] ? data['errors']['confirm_password'][0] : null;
+                            this.error.password_confirmation = data['errors'] && data['errors']['password_confirmation'] ? data['errors']['password_confirmation'][0] : null;
                         }
                     })
                     .catch(({response}) => {
