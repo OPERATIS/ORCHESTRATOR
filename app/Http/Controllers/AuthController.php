@@ -61,7 +61,6 @@ class AuthController extends Controller
     {
         if ($request->isMethod('post')) {
             $validator = Validator::make($request->all(), [
-//                'name' => 'required',
                 'email' => 'required|email|unique:users',
                 'password' => 'required|min:6',
                 'confirm_password' => 'required|min:6|same:password',
@@ -78,7 +77,6 @@ class AuthController extends Controller
 
             $emailParts = explode('@', $data['email']);
             $user = User::create([
-                'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'brand_name' => $emailParts[0]
@@ -86,7 +84,7 @@ class AuthController extends Controller
 
             try {
                 Mail::to($data['email'])
-                    ->send(new Registration($data['name'], $data['password']));
+                    ->send(new Registration($data['brand_name'], $data['password']));
             } catch (\Exception $e) {
                 Log::error($e->getMessage());
             }
