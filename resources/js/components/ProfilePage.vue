@@ -1,7 +1,12 @@
 <template>
     <div class="max-w-[76.75rem] px-9 py-6">
-        <div>
-            menu
+        <div class="flex items-center">
+            <div class="h-10 w-[20rem] flex justify-center items-center border-b-4 border-green_2 text-black_5">
+                Profile Details
+            </div>
+            <div class="h-10 w-[20rem] flex justify-center items-center text-black_2">
+                Plans and billing
+            </div>
         </div>
         <div class="bg-primary_light rounded-2xl p-7 mt-16 space-y-6">
             <div class="input-block"
