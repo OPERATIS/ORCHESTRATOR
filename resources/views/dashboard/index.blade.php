@@ -30,7 +30,7 @@
                     @endforeach
                 </div>
                 <div class="flex justify-center items-center w-full min-h-[20rem] mt-8 bg-primary_light rounded-2xl pt-5 pb-6 px-4">
-                    Chart
+                    <dashboard-chart-block></dashboard-chart-block>
                 </div>
                 <div class="mt-8">
                     <div class="flex items-center text-black text-2xl font-semibold">
@@ -115,4 +115,9 @@
 @endsection
 
 
-
+<script>
+    import DashboardChartBlock from "../../js/components/DashboardChartBlock";
+    export default {
+        components: {DashboardChartBlock}
+    }
+</script>
