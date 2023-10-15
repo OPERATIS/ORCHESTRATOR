@@ -20,7 +20,7 @@ help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 up: ## Start all containers (in background) for development ##
-	$(docker_compose_bin) up -d app webserver soketi
+	$(docker_compose_bin) up -d app webserver
 
 down: ## Stop all started for development containers
 	$(docker_compose_bin) down
