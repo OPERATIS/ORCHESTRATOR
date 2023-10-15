@@ -22,6 +22,7 @@ class GetStats extends Command
 
         if (empty($type)) {
             $integrations = Integration::where('platform', 'google')
+                ->ignoreDemo()
                 ->get();
 
             foreach ($integrations as $integration) {
