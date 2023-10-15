@@ -3,7 +3,7 @@
         <div class="w-full flex items-center py-1 px-2">
             <img class="h-6 w-6" src="/img/profile_icon.png" alt="logo">
             <div class="text-sm text-black line-clamp-1 mx-2">
-                {{Auth::user()->name}}
+                {{Auth::user()->brand_name}}
             </div>
             <div class="ml-auto">
                 <div class="relative pr-0 cursor-pointer" v-click-outside-element="closeMenuDropdown">
