@@ -1,11 +1,12 @@
 name: DEV Deploy
-on: push
-
+on:
+  push:
+    branches:
+      - develop
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
     steps:
       - name: executing remote deploy
         uses: appleboy/ssh-action@master
