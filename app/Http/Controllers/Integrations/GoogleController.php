@@ -93,10 +93,13 @@ class GoogleController extends BaseController
                 'scope' => implode(',', explode(' ', $token['scope']))
             ]);
 
-            // Save profiles
-            $client->setAccessToken($integration->access_token);
-            $analytics = new Analytics($client);
-            Google::getProfileId($analytics, $integration->id);
+            $scope = explode(',', $integration['scope']);
+            if (in_array(Analytics::ANALYTICS, $scope)) {
+                // Save profiles
+                $client->setAccessToken($integration->access_token);
+                $analytics = new Analytics($client);
+                Google::getProfileId($analytics, $integration->id);
+            }
         }
 
         // TODO add text
