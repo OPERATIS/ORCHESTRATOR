@@ -22,6 +22,7 @@ class GetOrders extends Command
 
         if (empty($type)) {
             $integrations = Integration::where('platform', 'shopify')
+                ->whereNotNull('app_user_slug')
                 ->get();
 
             foreach ($integrations as $integration) {
