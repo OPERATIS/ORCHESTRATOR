@@ -269,7 +269,7 @@ export default {
                 this.generateChart(this.selectedMetric);
             })
             .catch(({response}) => {
-                console.log(response.data.message);
+                console.log(response);
             });
         }
     },
