@@ -12,7 +12,12 @@
 
     <link rel="stylesheet" href="{{ mix('/css/app.css') }}">
 
-    <title>ORCHESTRATOR</title>
+    {!! SEO::generate() !!}
+    @if (!SEO::getTitle())
+        <title>
+            {{ ucfirst(collect(explode('/',url()->current()))->last()) }} - ORCHESTRATOR
+        </title>
+    @endif
 
     @stack('custom-styles')
 </head>
@@ -27,6 +32,7 @@
             @yield('content')
         </div>
     </div>
+    @include('components.flash_messages')
     <script src="{{ mix('/js/app.js') }}"></script>
 </body>
 </html>

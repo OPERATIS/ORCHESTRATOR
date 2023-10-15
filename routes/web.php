@@ -28,6 +28,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [PagesController::class, 'index'])->name('landing');
+Route::get('thank-you', [PagesController::class, 'thankYou'])->name('thank.you');
+// temp
+Route::get('404', [PagesController::class, 'error404'])->name('error404');
+Route::get('500', [PagesController::class, 'error500'])->name('error500');
 
 Route::middleware([Authenticate::class])->group(function () {
     Route::post('integrations/shopify/login', [ShopifyController::class, 'login'])->name('integrationsShopifyLogin');

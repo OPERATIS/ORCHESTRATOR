@@ -45,7 +45,7 @@
                     </div>
                 </div>
                 <div class="mt-11">
-                    <button class="btn lg btn_login w-full"
+                    <button class="btn lg btn_default w-full"
                             v-bind:class="{
                                 'disabled': !password || !password_confirmation
                             }"

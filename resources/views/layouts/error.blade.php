@@ -7,7 +7,6 @@
 
         <link rel="alternate icon" type="image/png" href="{{asset('/favicon.png')}}">
         <link rel="icon" type="image/svg+xml" href="{{asset('/favicon.svg')}}">
-{{--        <link rel="manifest" href="{{asset('/favicon/manifest.json')}}">--}}
 
         {!! SEO::generate() !!}
         @if (!SEO::getTitle())

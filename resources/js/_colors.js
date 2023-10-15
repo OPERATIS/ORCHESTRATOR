@@ -13,6 +13,7 @@ const colors = {
     green_1: withOpacity('--color-green_1'),
     green_2: withOpacity('--color-green_2'),
     gray_1: withOpacity('--color-gray_1'),
+    gray_3: withOpacity('--color-gray_3'),
     gray_4: withOpacity('--color-gray_4'),
     blue_1: withOpacity('--color-blue_1'),
     red: withOpacity('--color-red'),
