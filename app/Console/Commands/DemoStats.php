@@ -29,7 +29,7 @@ class DemoStats extends Command
 
         // Generate old data
         $start = Carbon::parse('2023-08-01 00:00:00')->startOfMonth();
-        $end = Carbon::now()->endOfMonth();
+        $end = Carbon::now()->endOfDay();
 
         do {
             $endPeriod = $start->clone()->addMinutes(5)->toDateTimeString();
