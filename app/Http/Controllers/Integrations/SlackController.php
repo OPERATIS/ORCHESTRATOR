@@ -72,6 +72,6 @@ class SlackController extends BaseController
             Session::flash('error-message', 'Some missing');
         }
 
-        return redirect('dashboard');
+        return redirect('alerts');
     }
 }

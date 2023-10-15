@@ -74,13 +74,13 @@ class GoogleController extends BaseController
             $token = $client->fetchAccessTokenWithAuthCode($code);
         } catch (\Exception $exception) {
             Session::flash('success-message', 'Some error please contact us');
-            return redirect('dashboard');
+            return redirect('integrations');
         }
 
         if (isset($token['error'])) {
             // TODO add text
             Session::flash('success-message', 'Some error please contact us');
-            return redirect('dashboard');
+            return redirect('integrations');
         } else {
             $integration = Integration::updateOrCreate([
                 'user_id' => $user->id,
@@ -104,6 +104,6 @@ class GoogleController extends BaseController
 
         // TODO add text
         Session::flash('success-message', 'Connect shopify added/updated');
-        return redirect('dashboard');
+        return redirect('integrations');
     }
 }
