@@ -1,5 +1,5 @@
-1. ```copy .env.example .env```
-2. ```docker-compose up -d```
+1. ```cp .env.example .env```
+2. ```docker-compose --profile local up -d```
 3. Go to docker\
    ```docker-compose exec app bash```
 4. Run inside docker\
