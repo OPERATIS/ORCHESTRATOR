@@ -48,7 +48,7 @@ class GoogleController extends BaseController
         $client->setAccessType('offline');
         $client->setPrompt('consent');
 
-        $redirectUri = route('googleCallback');
+        $redirectUri = route('integrationsGoogleCallback');
         $client->setRedirectUri($redirectUri);
         $url = $client->createAuthUrl();
         return redirect()->to($url);
