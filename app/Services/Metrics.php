@@ -97,7 +97,7 @@ class Metrics
         foreach ($previousMetrics as $previousMetric) {
             foreach (Metric::METRICS as $key) {
                 $metrics[$key]['previous'][] = [
-                    Carbon::parse($previousMetric['end_period'])->addDays(8)->getTimestampMs(),
+                    Carbon::parse($previousMetric['end_period'])->addDays($diffInDays)->getTimestampMs(),
                     $previousMetric[$key]
                 ];
             }
