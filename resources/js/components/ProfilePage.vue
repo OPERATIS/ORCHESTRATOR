@@ -208,7 +208,7 @@ export default {
         }
     },
     mounted() {
-        this.brand_name = this.userData.name ?? null;
+        this.brand_name = this.userData.brand_name ?? null;
         this.email = this.userData.email ?? null;
     }
 }
