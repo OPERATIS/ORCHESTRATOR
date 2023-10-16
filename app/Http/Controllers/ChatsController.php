@@ -7,7 +7,7 @@ use App\Models\Chat;
 use App\Models\ChatMessage;
 use App\Models\Metric;
 use App\Models\User;
-use App\Services\Recommendations;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,7 +56,8 @@ class ChatsController extends Controller
             if ($chat->alert->period === Metric::PERIOD_HOUR) {
                 $systemMessage = 'Metric ' . $chat->alert->metric . ' has ' . $chat->alert->result;
             } elseif ($chat->alert->period === Metric::PERIOD_DAY) {
-                $systemMessage = implode(' ', Recommendations::getListAdvice([$chat->alert]));
+                // TODO add text
+                $systemMessage = '???';
             }
         }
 
@@ -228,19 +229,27 @@ class ChatsController extends Controller
                 ->first();
 
             if (!$chat) {
+                $dateTime = Carbon::parse($alert->end_period)->toDateTimeString('minute');
+                $chatTitle = 'Chat for alert #' . $alertId . ' (' . $dateTime . ')';
+                if ($alert->period === Metric::PERIOD_DAY) {
+                    $chatTitle = 'Chat for recommendation #' . $alertId . ' (' . $dateTime . ')';;
+                }
+
                 $chat = Chat::create([
-                    // TODO add text
-                    'title' => 'Chat from alert #' . $alertId,
+                    'title' => $chatTitle,
                     'user_id' => $user->id,
                     'alert_id' => $alert->id,
                 ]);
             }
         } else {
+            $dateTime = Carbon::now()->toDateTimeString('minute');
             $chat = Chat::create([
-                // TODO add text
-                'title' => 'New chat #' . time(),
+                'title' => 'Chat #',
                 'user_id' => $user->id,
             ]);
+
+            $chat->title = 'Chat #' . $chat->id . ' (' . $dateTime . ')';
+            $chat->save();
         }
 
         return [
