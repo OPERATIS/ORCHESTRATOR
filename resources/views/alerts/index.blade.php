@@ -19,7 +19,7 @@
                                 </div>
                                 <div class="flex flex-col">
                                     <div class="text-sm text-black">
-                                        {{$alert->metric}} {{$alert->result}} {{$alert->period}}
+                                        {{$alert->getMessage()}}
                                     </div>
                                     <div class="text-xs text-black text-opacity-40" style="line-height: 18px;">
                                         {{-- Condition for demo --}}
@@ -62,7 +62,7 @@
                         </div>
                         <div class="flex items-center">
                             <a class="flex items-center text-lg text-black font-semibold rounded-lg px-4 h-11" style="background: #E3FFE4;"
-                               href="https://wa.me/{{config('integrations.whatsapp.displayPhoneNumber')}}?text={{urlencode('Start to notifications #' . $user->id)}}"
+                               href="https://wa.me/{{config('integrations.whatsapp.displayPhoneNumber')}}?text={{urlencode('I want to receive alerts #' . $user->id)}}"
                             >
                                 <x-icon name="messenger-icon" class="w-7 h-7 mr-2"/>
                                 WhatsApp
@@ -70,7 +70,7 @@
                         </div>
                         <div class="flex items-center">
                             <a class="flex items-center text-lg text-black font-semibold rounded-lg px-4 h-11" style="background: rgba(217, 228, 239, 0.60);"
-                               href="https://m.me/{{config('integrations.messenger.pageName')}}?text={{urlencode('Start to notifications #' . $user->id)}}"
+                               href="https://m.me/{{config('integrations.messenger.pageName')}}?text={{urlencode('I want to receive alerts #' . $user->id)}}"
                             >
                                 <x-icon name="messenger-icon" class="w-7 h-7 mr-2"/>
                                 Messenger

@@ -22,7 +22,7 @@ class WebhooksController extends Controller
             // Check first message
             if (isset($response['entry'][0]['changes'][0]['value']['messages'][0]['text']['body'])) {
                 $message = $response['entry'][0]['changes'][0]['value']['messages'][0]['text']['body'];
-                $userId = str_replace('Start to notifications #', '', $message);
+                $userId = str_replace('I want to receive alerts #', '', $message);
                 $username = $response['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name'];
                 $waId = $response['entry'][0]['changes'][0]['value']['contacts'][0]['wa_id'];
 
@@ -36,8 +36,7 @@ class WebhooksController extends Controller
 
                     if (Carbon::parse($waUser->created_at)->seconds(0)->toDateTimeString() === Carbon::now()->seconds(0)->toDateTimeString()) {
                         $facebook = new Facebook();
-                        // TODO add text
-                        $facebook->sendWaMessage($waId, null, 'add text');
+                        $facebook->sendWaMessage($waId, null, 'Successful subscribe');
                     }
                 }
             }
@@ -61,7 +60,7 @@ class WebhooksController extends Controller
             if (isset($response['entry'][0]['messaging'][0]['message']['text'])) {
                 $message = $response['entry'][0]['messaging'][0]['message']['text'];
                 $psid = $response['entry'][0]['messaging'][0]['sender']['id'];
-                $userId = str_replace('Start to notifications #', '', $message);
+                $userId = str_replace('I want to receive alerts #', '', $message);
                 if (is_numeric($userId)) {
                     $meUser = MeUser::updateOrCreate([
                         'user_id' => $userId,
@@ -70,8 +69,7 @@ class WebhooksController extends Controller
 
                     if (Carbon::parse($meUser->created_at)->seconds(0)->toDateTimeString() === Carbon::now()->seconds(0)->toDateTimeString()) {
                         $facebook = new Facebook();
-                        // TODO add text
-                        $facebook->sendMeMessage($meUser->psid, 'Add text');
+                        $facebook->sendMeMessage($meUser->psid, 'Successful subscribe');
                     }
                 }
             }
@@ -110,8 +108,7 @@ class WebhooksController extends Controller
 
                 if (Carbon::parse($tgUser->created_at)->seconds(0)->toDateTimeString() === Carbon::now()->seconds(0)->toDateTimeString()) {
                     $telegram = new Telegram();
-                    // TODO add text
-                    $telegram->sendMessage($fromId, 'Your account has successful connected');
+                    $telegram->sendMessage($fromId, 'Successful subscribe');
                 }
             }
         }
