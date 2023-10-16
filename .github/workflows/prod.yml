@@ -1,12 +1,11 @@
 name: Deploy
-on:
-  push:
-    branches:
-      - main
+on: workflow_dispatch
+
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: executing remote deploy
         uses: appleboy/ssh-action@master
