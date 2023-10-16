@@ -25,7 +25,7 @@ class DashboardController extends Controller
         $metricsActualData = Metrics::getActualData($user->id);
 
         // Search recommendations
-        $this->getRecommendations($user->id, $recommendations, $lastUpdateRecommendations, $lastAlertIdForRecommendation);
+        $this->getRecommendationsInfo($user->id, $priorityRecommendation, $lastUpdateRecommendations, $lastAlertIdForRecommendation);
 
         // Search revenue attribution factors
         $this->getRevenueAttributionFactors($user->id, $revenueAttributionFactors, $lastUpdateRevenueAttributionFactors);
@@ -34,8 +34,7 @@ class DashboardController extends Controller
 
         return view('dashboard.index')
             ->with('user', $user)
-            ->with('recommendations', $recommendations)
-            ->with('recommendationShort', array_key_first($recommendations))
+            ->with('priorityRecommendation', $priorityRecommendation)
             ->with('lastUpdateRecommendations', $lastUpdateRecommendations)
             ->with('lastAlertIdForRecommendation', $lastAlertIdForRecommendation)
             ->with('revenueAttributionFactors', $revenueAttributionFactors)
@@ -45,12 +44,12 @@ class DashboardController extends Controller
 
     /**
      * @param int $userId
-     * @param $recommendations
+     * @param $priorityRecommendation
      * @param $lastUpdateRecommendations
      * @param $lastAlertIdForRecommendation
      * @return void
      */
-    protected function getRecommendations(int $userId, &$recommendations, &$lastUpdateRecommendations, &$lastAlertIdForRecommendation)
+    protected function getRecommendationsInfo(int $userId, &$priorityRecommendation, &$lastUpdateRecommendations, &$lastAlertIdForRecommendation)
     {
         $alertsForRecommendations = Alert::query()
             ->where('user_id', $userId)
@@ -59,11 +58,15 @@ class DashboardController extends Controller
             ->limit(4)
             ->get();
 
+        // Search last alert
+        $endPeriod = $alertsForRecommendations->first();
+        // Get only last alerts
+        $alertsForRecommendations = $alertsForRecommendations->where('end_period', $endPeriod);
+
         $actualAlertsForRecommendations = [];
-        $alertForRecommendationLastDay = null;
+        $lastAlertIds = [];
         foreach ($alertsForRecommendations as $alertForRecommendations) {
-            if (empty($preparedRecommendations)) {
-                $alertForRecommendationLastDay = $alertForRecommendations->end_period;
+            if (empty($lastUpdateRecommendations)) {
                 // Logic for demo
                 if ($userId === User::DEMO_ID) {
                     $lastUpdateRecommendations = Carbon::parse($alertForRecommendations->end_period)->addMinutes(30);
@@ -72,16 +75,35 @@ class DashboardController extends Controller
                 }
             }
 
-            if ($alertForRecommendationLastDay->day === $alertForRecommendations->end_period->day &&
-                $alertForRecommendationLastDay->month === $alertForRecommendations->end_period->month &&
-                $alertForRecommendationLastDay->year === $alertForRecommendations->end_period->year
-            ) {
-                $actualAlertsForRecommendations[] = $alertForRecommendations;
-                $lastAlertIdForRecommendation = $alertForRecommendations->id;
+            $actualAlertsForRecommendations[] = $alertForRecommendations;
+
+            if ($alertForRecommendations->result === Alert::UNCHANGED) {
+                if (!isset($lastAlertIds[Alert::UNCHANGED])) {
+                    $lastAlertIds[Alert::UNCHANGED] = $alertForRecommendations->id;
+                }
+            } else {
+                if (!isset($lastAlertIds[Alert::INCREASED_DECREASED])) {
+                    $lastAlertIds[Alert::INCREASED_DECREASED] = $alertForRecommendations->id;
+                }
             }
         }
 
+        if (isset($lastAlertIds[Alert::INCREASED_DECREASED])) {
+            $lastAlertIdForRecommendation = $lastAlertIds[Alert::INCREASED_DECREASED];
+        } elseif (isset($lastAlertIds[Alert::UNCHANGED])) {
+            $lastAlertIdForRecommendation = $lastAlertIds[Alert::UNCHANGED];
+        }
+
         $recommendations = Recommendations::getListAdvice($actualAlertsForRecommendations);
+
+        $priorityRecommendation = null;
+        if (isset($recommendations[Alert::INCREASED_DECREASED])) {
+            $array = array_reverse($recommendations[Alert::INCREASED_DECREASED]);
+            $priorityRecommendation = array_pop($array);
+        } elseif (isset($recommendations[Alert::UNCHANGED])) {
+            $array = array_reverse($recommendations[Alert::UNCHANGED]);
+            $priorityRecommendation = array_pop($array);
+        }
     }
 
     /**

@@ -45,9 +45,9 @@
     <div>
         <a href="https://t.me/{{config('integrations.telegram.botName')}}?start={{base64_encode($user->id)}}">Telegram</a>
         <br>
-        <a href="https://wa.me/{{config('integrations.whatsapp.displayPhoneNumber')}}?text={{urlencode('Start to notifications #' . $user->id)}}">WhatsApp</a>
+        <a href="https://wa.me/{{config('integrations.whatsapp.displayPhoneNumber')}}?text={{urlencode(\App\Services\Notifications::getMessageForInitSubscribe() . $user->id)}}">WhatsApp</a>
         <br>
-        <a href="https://m.me/{{config('integrations.messenger.pageName')}}?text={{urlencode('Start to notifications #' . $user->id)}}">Messenger</a>
+        <a href="https://m.me/{{config('integrations.messenger.pageName')}}?text={{urlencode(\App\Services\Notifications::getMessageForInitSubscribe() . $user->id)}}">Messenger</a>
         <br>
         <a href="{{route('integrationsSlackLogin')}}">Slack</a>
     </div>

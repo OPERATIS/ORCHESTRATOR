@@ -80,9 +80,11 @@ abstract class SearchChanges extends Command
                     $alert['metric'] = $metric;
 
                     if ($lastMetric->{$metric} > $analysis->{$metric . '_ucl'}) {
-                        $alert['result'] = 'Increased';
+                        $alert['result'] = Alert::INCREASED;
                     } elseif ($lastMetric->{$metric} < $analysis->{$metric . '_lcl'}) {
-                        $alert['result'] = 'Decreased';
+                        $alert['result'] = Alert::DECREASED;
+                    } else {
+                        $alert['result'] = Alert::UNCHANGED;
                     }
 
                     if (isset($alert['result'])) {
@@ -95,7 +97,7 @@ abstract class SearchChanges extends Command
 
                         $alertModel = Alert::create($alert);
 
-                        if ($this->period === Metric::PERIOD_HOUR) {
+                        if ($this->period === Metric::PERIOD_HOUR && in_array($alert['result'], Alert::RESULT_FOR_NOTIFICATIONS)) {
                             Notifications::sendAlert($alertModel->user_id, $alertModel);
                         }
                     }

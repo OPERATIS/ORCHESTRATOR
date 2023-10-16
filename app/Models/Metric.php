@@ -12,7 +12,22 @@ class Metric extends Model
 
     public const PERIOD_HOUR = '1_hour';
     public const PERIOD_DAY = '1_day';
+
     public const METRICS = ['l', 'c', 'p', 'q', 'ltv'];
+
+    public const L = 'l';
+    public const C = 'c';
+    public const P = 'p';
+    public const Q = 'q';
+    public const LTV = 'ltv';
+
+    public const NAMES = [
+        self::L => 'Leads',
+        self::C => 'Conversion Rate',
+        self::P => 'Average Check',
+        self::Q => 'Average Quantity of Orders per Client',
+        self::LTV => 'Average lifetime value per successful client',
+    ];
 
     protected $guarded = [];
     public $dates = [
