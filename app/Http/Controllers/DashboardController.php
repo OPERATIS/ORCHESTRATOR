@@ -132,9 +132,9 @@ class DashboardController extends Controller
             $revenueAttributionFactors = [];
             foreach (Metric::METRICS as $metric) {
                 if ($lastMetric->{$metric} < $previousMetric->{$metric}) {
-                    $revenueAttributionFactors['negative'][] = "{$metric} is " . Shorts::formatNumber($lastMetric->{$metric}, null, 0);
+                    $revenueAttributionFactors['negative'][] = strtoupper($metric) . ' is ' . Shorts::formatNumber($lastMetric->{$metric}, null, 0);
                 } elseif ($lastMetric->{$metric} > $previousMetric->{$metric}) {
-                    $revenueAttributionFactors['positive'][] = "{$metric} is " . Shorts::formatNumber($lastMetric->{$metric}, null, 0);
+                    $revenueAttributionFactors['positive'][] = strtoupper($metric) . ' is ' . Shorts::formatNumber($lastMetric->{$metric}, null, 0);
                 }
             }
         }
