@@ -43,7 +43,7 @@
                     Dashboard
                 </a>
                 <a href="{{route('chats')}}"
-                   class="menu-item @if(request()->routeIs('chat')) active @endif"
+                   class="menu-item @if(request()->routeIs('chats')) active @endif"
                 >
                     <x-icon name="arrow-right-icon" class="icon-arrow w-4 h-4"/>
                     <x-icon name="chats-circle-icon" class="text-black w-4 h-4 mx-1"/>

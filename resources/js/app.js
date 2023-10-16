@@ -8,10 +8,11 @@ import LoginBlocks from './components/LoginBlocks.vue';
 import ResetPasswordBlock from './components/ResetPasswordBlock.vue';
 import ProfilePage from './components/ProfilePage.vue';
 import DashboardChartBlock from './components/DashboardChartBlock.vue';
+import ChatPage from './components/ChatPage.vue';
 
 createApp({
     components: {
-        LoginBlocks, ResetPasswordBlock, ProfilePage, DashboardChartBlock
+        LoginBlocks, ResetPasswordBlock, ProfilePage, DashboardChartBlock, ChatPage
     },
     data() {
         return {
