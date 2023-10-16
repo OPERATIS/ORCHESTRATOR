@@ -9,6 +9,16 @@ use GuzzleHttp\Exception\GuzzleException;
 
 class Notifications
 {
+    public static function getMessageForInitSubscribe(): string
+    {
+        return 'I want to receive alerts #';
+    }
+
+    public static function getMessageAfterSubscribe(): string
+    {
+        return 'Successful subscribe';
+    }
+
     /**
      * @param Alert $alert
      * @return string|null
