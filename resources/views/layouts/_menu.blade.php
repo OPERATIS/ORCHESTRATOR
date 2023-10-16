@@ -42,8 +42,11 @@
                     <x-icon name="chart-pie-icon" class="w-4 h-4 mx-1"/>
                     Dashboard
                 </a>
-                <a href="{{route('chats')}}"
-                   class="menu-item @if(request()->routeIs('chat')) active @endif"
+                <a
+{{--                    href="{{route('chats')}}"--}}
+                    href="https://app.slack.com/client/T055NGS6N3G/D058FV1BXHB"
+                    target="_blank"
+                   class="menu-item @if(request()->routeIs('chats')) active @endif"
                 >
                     <x-icon name="arrow-right-icon" class="icon-arrow w-4 h-4"/>
                     <x-icon name="chats-circle-icon" class="text-black w-4 h-4 mx-1"/>
