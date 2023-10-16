@@ -13,10 +13,14 @@
         border-radius: 10px;
         @apply text-sm px-3;
     }
-    &.btn_login{
+    &.btn_default{
         @apply text-white bg-green_2;
         &.disabled {
-            @apply bg-gray_4 opacity-100;
+            @apply bg-gray_4 opacity-100 pointer-events-none;
+        }
+        font-weight: 400;
+        &:hover{
+            @apply bg-opacity-80;
         }
     }
     &.btn_connect{

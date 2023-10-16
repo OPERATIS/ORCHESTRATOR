@@ -12,3 +12,10 @@
         }
     }
 }
+
+#dashboard-chart{
+    @apply h-[18rem];
+}
+.highcharts-credits{
+    @apply hidden;
+}

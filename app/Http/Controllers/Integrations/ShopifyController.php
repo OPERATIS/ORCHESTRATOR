@@ -76,7 +76,7 @@ class ShopifyController extends BaseController
         } catch (\Exception $exception) {
             // TODO add text
             Session::flash('success-message', 'Some error please contact us');
-            return redirect('dashboard');
+            return redirect('integrations');
         }
 
         Integration::updateOrCreate([
@@ -92,6 +92,6 @@ class ShopifyController extends BaseController
 
         // TODO add text
         Session::flash('success-message', 'Connect shopify added/updated');
-        return redirect('dashboard');
+        return redirect('integrations');
     }
 }

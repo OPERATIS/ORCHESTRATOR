@@ -29,8 +29,8 @@
                         </div>
                     @endforeach
                 </div>
-                <div class="flex justify-center items-center w-full min-h-[20rem] mt-8 bg-primary_light rounded-2xl pt-5 pb-6 px-4">
-                    Chart
+                <div class="flex justify-center items-center w-full min-h-[18rem] mt-8 bg-primary_light rounded-2xl pt-0 pb-4 px-4">
+                    <dashboard-chart-block></dashboard-chart-block>
                 </div>
                 <div class="mt-8">
                     <div class="flex items-center text-black text-2xl font-semibold">
@@ -38,73 +38,83 @@
                         AI Assistance Hints
                     </div>
                     <div class="grid grid-cols-2 gap-7 mt-5">
-                        <div class="rounded-2xl py-7 px-5 pb-5 col-span-1" style="background: #FBFAF7;">
-                            <div class="text-2xl text-black font-semibold">
-                                Recommendations
+                        <div class="relative rounded-2xl py-7 px-5 pb-5 col-span-1" style="background: #FBFAF7;">
+                            <div class="absolute left-0 top-0 h-full w-full z-1 rounded-2xl" style="opacity: 0.12;">
+                                <img src="/img/assistance_bg.png" alt="bg assistance">
                             </div>
-                            <div class="w-full bg-black h-px bg-opacity-20 mb-6 mt-5"></div>
-                            @if ($lastUpdateRecommendations)
-                                <div class="text-sm text-black text-opacity-40">
-                                    Last Update {{$lastUpdateRecommendations->format('d.m.y H:i')}}
+                            <div class="relative z-10">
+                                <div class="text-2xl text-black font-semibold">
+                                    Recommendations
                                 </div>
-                            @endif
-                            <div class="flex items-center text-sm text-dark mt-4">
-                                @if ($recommendationShort)
-                                    Here is priority list for today:
-                                    @if (count($recommendations) == 1)
-                                        <a href="{{route('chatsCreate', ['alert' => $lastAlertIdForRecommendation])}}">
+                                <div class="w-full bg-black h-px bg-opacity-20 mb-6 mt-5"></div>
+                                @if ($lastUpdateRecommendations)
+                                    <div class="text-sm text-black text-opacity-40">
+                                        Last Update {{$lastUpdateRecommendations->format('d.m.y H:i')}}
+                                    </div>
+                                @endif
+                                <div class="flex items-center text-sm text-dark mt-4">
+                                    @if ($recommendationShort)
+                                        Here is priority list for today:
+                                        @if (count($recommendations) == 1)
+                                            <a href="{{route('chatsCreate', ['alert' => $lastAlertIdForRecommendation])}}">
+                                                1. Improve {{$recommendationShort}}
+                                            </a>
+                                        @else
                                             1. Improve {{$recommendationShort}}
-                                        </a>
-                                    @else
-                                        1. Improve {{$recommendationShort}}
+                                        @endif
                                     @endif
-                                @endif
-                                @if (count($recommendations) > 1)
-                                    <span class="font-bold text-green_2">
-                                        <a href="{{route('chatsCreate', ['alert' => $lastAlertIdForRecommendation])}}">
-                                            +{{count($recommendations) - 1}} others
-                                        </a>
-                                    </span>
-                                @endif
+                                    @if (count($recommendations) > 1)
+                                        <span class="font-bold text-green_2">
+                                            <a href="{{route('chatsCreate', ['alert' => $lastAlertIdForRecommendation])}}">
+                                                +{{count($recommendations) - 1}} others
+                                            </a>
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
                         </div>
-                        <div class="rounded-2xl py-7 px-5 pb-10 col-span-1" style="background: #F8FBF7;">
-                            <div class="text-2xl text-black font-semibold">
-                                Revenue Attribution Factors
+                        <div class="relative rounded-2xl py-7 px-5 pb-10 col-span-1" style="background: #F8FBF7;">
+                            <div class="absolute left-0 top-0 h-full w-full z-1 rounded-2xl" style="opacity: 0.12;">
+                                <img src="/img/assistance_bg.png" alt="bg assistance">
                             </div>
-                            <div class="w-full bg-black h-px bg-opacity-20 mb-6 mt-5"></div>
-                            @if ($lastUpdateRevenueAttributionFactors)
-                                <div class="text-sm text-black text-opacity-40">
-                                    Last Update {{$lastUpdateRevenueAttributionFactors->format('d.m.y H:i')}}
+                            <div class="relative z-10">
+                                <div class="text-2xl text-black font-semibold">
+                                    Revenue Attribution Factors
                                 </div>
-                            @endif
-                            <div class="w-full flex items-start mt-6 space-x-6">
-                                @if ($revenueAttributionFactors['positive'] ?? false)
-                                    <div class="w-full border-2 border-dark bg-primary_light p-6" style="border-radius: 8px;">
-                                        <div class="flex items-center text-sm text-black font-semibold mb-1">
-                                            <span class="w-2.5 h-2.5 rounded-full bg-green_2 mr-2"></span>
-                                            Top positive factors
-                                        </div>
-                                        @foreach ($revenueAttributionFactors['positive'] as $item)
-                                            <div class="text-sm text-black text-opacity-40" style="margin-bottom: 1px;">
-                                                {{$item}}
-                                            </div>
-                                        @endforeach
+                                <div class="w-full bg-black h-px bg-opacity-20 mb-6 mt-5"></div>
+                                @if ($lastUpdateRevenueAttributionFactors)
+                                    <div class="text-sm text-black text-opacity-40">
+                                        Last Update {{$lastUpdateRevenueAttributionFactors->format('d.m.y H:i')}}
                                     </div>
                                 @endif
-                                @if ($revenueAttributionFactors['negative'] ?? false)
-                                    <div class="w-full border-2 border-dark bg-primary_light p-6" style="border-radius: 8px;">
-                                        <div class="flex items-center text-sm text-black font-semibold mb-1">
-                                            <span class="w-2.5 h-2.5 rounded-full bg-red mr-2"></span>
-                                            Top negative factors
-                                        </div>
-                                        @foreach ($revenueAttributionFactors['negative'] as $item)
-                                            <div class="text-sm text-black text-opacity-40" style="margin-bottom: 1px;">
-                                                {{$item}}
+                                <div class="w-full flex items-start mt-6 space-x-6">
+                                    @if ($revenueAttributionFactors['positive'] ?? false)
+                                        <div class="w-full border-2 border-dark bg-primary_light p-6" style="border-radius: 8px;">
+                                            <div class="flex items-center text-sm text-black font-semibold mb-1">
+                                                <span class="w-2.5 h-2.5 rounded-full bg-green_2 mr-2"></span>
+                                                Top positive factors
                                             </div>
-                                        @endforeach
-                                    </div>
-                                @endif
+                                            @foreach ($revenueAttributionFactors['positive'] as $item)
+                                                <div class="text-sm text-black text-opacity-40" style="margin-bottom: 1px;">
+                                                    {{$item}}
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                    @if ($revenueAttributionFactors['negative'] ?? false)
+                                        <div class="w-full border-2 border-dark bg-primary_light p-6" style="border-radius: 8px;">
+                                            <div class="flex items-center text-sm text-black font-semibold mb-1">
+                                                <span class="w-2.5 h-2.5 rounded-full bg-red mr-2"></span>
+                                                Top negative factors
+                                            </div>
+                                            @foreach ($revenueAttributionFactors['negative'] as $item)
+                                                <div class="text-sm text-black text-opacity-40" style="margin-bottom: 1px;">
+                                                    {{$item}}
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -115,4 +125,9 @@
 @endsection
 
 
-
+<script>
+    import DashboardChartBlock from "../../js/components/DashboardChartBlock";
+    export default {
+        components: {DashboardChartBlock}
+    }
+</script>

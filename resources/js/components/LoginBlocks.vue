@@ -63,7 +63,7 @@
                         Forgot password?
                     </div>
                     <div class="mt-3">
-                        <button class="btn lg btn_login w-full cursor-pointer"
+                        <button class="btn lg btn_default w-full cursor-pointer"
                                 v-bind:class="{
                                 'disabled': !email || !password
                             }"
@@ -154,7 +154,7 @@
                         </div>
                     </div>
                     <div class="mt-11">
-                        <button class="btn lg btn_login w-full"
+                        <button class="btn lg btn_default w-full"
                                 v-bind:class="{
                                     'disabled': !email || !password || !password_confirmation
                                 }"
@@ -198,7 +198,7 @@
                         </div>
                     </div>
                     <div class="mt-11">
-                        <button class="btn lg btn_login w-full"
+                        <button class="btn lg btn_default w-full"
                                 v-bind:class="{
                                 'disabled': !email
                             }"
@@ -221,7 +221,7 @@
                     <div class="text-black_5 text-center text-xl">
                         Password reset instruction has been sent to your email.
                     </div>
-                    <button class="mt-10 btn lg btn_login w-full"
+                    <button class="mt-10 btn lg btn_default w-full"
                             @click="changeView('login')"
                     >
                         Back to Sign in

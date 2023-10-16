@@ -1,0 +1,74 @@
+#flash_messages {
+    @apply fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-primary_light rounded-lg border border-black_2 border-opacity-20;
+    z-index: 1000;
+}
+
+.flash_message {
+    width: calc(100vw - 2rem);
+
+    @apply
+        flex items-center min-h-[3.5rem] bg-secondary_blue pl-4 py-3 rounded md:w-auto max-w-[40rem];
+
+    &-left_icon {
+        @apply w-4 h-4 flex-shrink-0 mr-4;
+    }
+
+    &-title {
+        @apply text-sm font-bold;
+    }
+
+    &:not(.flash_message-full) {
+        .flash_message-subtitle {
+            @apply line-clamp-1;
+        }
+    }
+
+    &-subtitle {
+        @apply text-black text-sm;
+    }
+
+    &-close {
+        @apply
+            flex items-center justify-center flex-shrink-0 w-8 h-8 mr-2 ml-auto text-black
+            hover:text-default
+            focus:text-default focus:outline-none;
+    }
+
+    &-appear {
+        animation: flash_appear .45s ease-in-out;
+
+        @keyframes flash_appear {
+            from {
+                @apply opacity-0;
+                transform: translateY(12px);
+                filter: blur(4px);
+            }
+            to {
+                @apply opacity-100;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+    }
+
+    &-disappear {
+        animation: flash_disappear .45s ease-in-out;
+
+        @keyframes flash_disappear {
+            from {
+                @apply opacity-100;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+            to {
+                @apply opacity-0;
+                transform: translateY(12px);
+                filter: blur(4px);
+            }
+        }
+    }
+
+    +.flash_message {
+        @apply mt-3;
+    }
+}

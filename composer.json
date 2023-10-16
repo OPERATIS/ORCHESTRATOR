@@ -8,6 +8,7 @@
         "php": "^7.3|^8.0",
         "ext-curl": "*",
         "ext-json": "*",
+        "artesaos/seotools": "^1.2",
         "blade-ui-kit/blade-icons": "^1.5",
         "doctrine/dbal": "^3.6",
         "fruitcake/laravel-cors": "^2.0",

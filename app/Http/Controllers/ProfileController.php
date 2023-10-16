@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
@@ -24,6 +25,8 @@ class ProfileController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
+
+        Session::flash('success-message', 'Update ');
 
         $validatorUpdate = Validator::make($request->all(), [
             'brand_name' => 'nullable|min:3',

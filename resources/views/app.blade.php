@@ -6,30 +6,6 @@
 </head>
 <body>
 <div id="app">
-    <script>
-        window.Echo.connector.pusher.connection.bind('connected', () => {
-            console.log('connected');
-        });
-
-        window.Echo.channel('public')
-            .listen('PublicEvent', (e) => {
-                console.log(e);
-            });
-
-        @if (auth())
-            window.Echo.private('alert.{{auth()->id()}}')
-                .listen('AlertEvent', (e) => {
-                        console.log(e);
-                    }
-                );
-
-            window.Echo.private('metrics.{{auth()->id()}}')
-                .listen('MetricsEvent', (e) => {
-                        console.log(e);
-                    }
-                );
-        @endif
-    </script>
     <nav class="navbar navbar-light navbar-expand-lg mb-5" style="background-color: #e3f2fd;">
         <div class="container">
             <a class="navbar-brand mr-auto" href="#">ConnectLoc</a>

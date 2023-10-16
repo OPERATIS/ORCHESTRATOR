@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Artesaos\SEOTools\Facades\SEOTools;
 
 class DashboardController extends Controller
 {
@@ -28,6 +29,8 @@ class DashboardController extends Controller
 
         // Search revenue attribution factors
         $this->getRevenueAttributionFactors($user->id, $revenueAttributionFactors, $lastUpdateRevenueAttributionFactors);
+
+        SEOTools::setTitle('Dashboard - ORCHESTRATOR');
 
         return view('dashboard.index')
             ->with('user', $user)

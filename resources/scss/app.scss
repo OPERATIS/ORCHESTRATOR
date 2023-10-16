@@ -21,6 +21,7 @@
     --color-green_2: 39, 174, 96;
 
     --color-gray_1: 51, 51, 51;
+    --color-gray_3: 130, 130, 130;
     --color-gray_4: 189, 189, 189;
     --color-blue_1: 47, 128, 237;
 
@@ -33,3 +34,4 @@
 @import 'button';
 @import 'auth';
 @import 'helpers';
+@import 'flash_messages';
