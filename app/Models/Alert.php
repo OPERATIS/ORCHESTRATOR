@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Notifications;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,16 @@ use Illuminate\Database\Eloquent\Model;
 class Alert extends Model
 {
     use HasFactory;
+
+    public const INCREASED = 'Increased';
+    public const DECREASED = 'Decreased';
+    public const UNCHANGED = 'Unchanged';
+    public const INCREASED_DECREASED = 'Increased-Decreased';
+
+    public const RESULT_FOR_NOTIFICATIONS = [
+        self::INCREASED,
+        self::DECREASED
+    ];
 
     protected $guarded = [];
     public $dates = [
@@ -21,7 +32,8 @@ class Alert extends Model
      */
     public function scopeForNotifications(Builder $query)
     {
-        $query->where('period', Metric::PERIOD_HOUR);
+        $query->where('period', Metric::PERIOD_HOUR)
+            ->whereIn('result', self::RESULT_FOR_NOTIFICATIONS);
     }
 
     /**
@@ -30,5 +42,13 @@ class Alert extends Model
     public function scopeForRecommendations(Builder $query)
     {
         $query->where('period', Metric::PERIOD_DAY);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMessage(): ?string
+    {
+        return Notifications::getMessageFromAlert($this);
     }
 }
