@@ -53,22 +53,11 @@
                                     </div>
                                 @endif
                                 <div class="flex items-center text-sm text-dark mt-4">
-                                    @if ($recommendationShort)
-                                        Here is priority list for today:
-                                        @if (count($recommendations) == 1)
-                                            <a href="{{route('chatsCreate', ['alert' => $lastAlertIdForRecommendation])}}">
-                                                1. Improve {{$recommendationShort}}
-                                            </a>
-                                        @else
-                                            1. Improve {{$recommendationShort}}
-                                        @endif
-                                    @endif
-                                    @if (count($recommendations) > 1)
-                                        <span class="font-bold text-green_2">
-                                            <a href="{{route('chatsCreate', ['alert' => $lastAlertIdForRecommendation])}}">
-                                                +{{count($recommendations) - 1}} others
-                                            </a>
-                                        </span>
+                                    @if ($priorityRecommendation)
+                                        {{$priorityRecommendation}}
+                                        <a href="{{route('chatsCreate', ['alert' => $lastAlertIdForRecommendation])}}">
+                                            Learn more.
+                                        </a>
                                     @endif
                                 </div>
                             </div>

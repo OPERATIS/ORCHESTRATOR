@@ -14,6 +14,7 @@ class Alert extends Model
     public const INCREASED = 'Increased';
     public const DECREASED = 'Decreased';
     public const UNCHANGED = 'Unchanged';
+    public const INCREASED_DECREASED = 'Increased-Decreased';
 
     public const RESULT_FOR_NOTIFICATIONS = [
         self::INCREASED,
