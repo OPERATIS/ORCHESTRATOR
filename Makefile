@@ -29,30 +29,30 @@ restart: ## Restart all started for development containers
 	$(docker_compose_bin) restart
 
 shell: up ## Start shell into application container
-	$(docker_compose_bin) exec --user=www "$(APP_CONTAINER_NAME)" bash
+	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" bash
 
 exec: ## Execute command Usage: make exec COMMAND="composer install"
-	$(docker_compose_bin) exec --user=www "$(APP_CONTAINER_NAME)" $(COMMAND)
+	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" $(COMMAND)
 
 install: up ## Install application dependencies into application container
-	$(docker_compose_bin) exec -T --user=www "$(APP_CONTAINER_NAME)" bash -c "composer install --no-dev"
-	$(docker_compose_bin) exec -T --user=www "$(APP_CONTAINER_NAME)" bash -c "npm ci"
+	$(docker_compose_bin) exec -T "$(APP_CONTAINER_NAME)" bash -c "composer install --no-dev"
+	$(docker_compose_bin) exec -T "$(APP_CONTAINER_NAME)" bash -c "npm ci"
 
 init: install ## Make full application initialization (install, seed, build assets, etc)
-	$(docker_compose_bin) exec --user=www "$(APP_CONTAINER_NAME)" bash -c "php artisan key:generate"
-	$(docker_compose_bin) exec --user=www "$(APP_CONTAINER_NAME)" bash -c "php artisan migrate"
-	$(docker_compose_bin) exec --user=www "$(APP_CONTAINER_NAME)" bash -c "php artisan optimize"
+	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" bash -c "php artisan key:generate"
+	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" bash -c "php artisan migrate"
+	$(docker_compose_bin) exec "$(APP_CONTAINER_NAME)" bash -c "php artisan optimize"
 
 build: install ## Install new packages, run migration and optimize
-	$(docker_compose_bin) exec -T --user=www "$(APP_CONTAINER_NAME)" bash -c "composer dumpautoload"
-	$(docker_compose_bin) exec -T --user=www "$(APP_CONTAINER_NAME)" bash -c "php artisan migrate --force"
-	$(docker_compose_bin) exec -T --user=www "$(APP_CONTAINER_NAME)" bash -c "php artisan route:clear"
-	$(docker_compose_bin) exec -T --user=www "$(APP_CONTAINER_NAME)" bash -c "php artisan optimize"
-	$(docker_compose_bin) exec -T --user=www "$(APP_CONTAINER_NAME)" bash -c "npm run prod"
+	$(docker_compose_bin) exec -T "$(APP_CONTAINER_NAME)" bash -c "composer dumpautoload"
+	$(docker_compose_bin) exec -T "$(APP_CONTAINER_NAME)" bash -c "php artisan migrate --force"
+	$(docker_compose_bin) exec -T "$(APP_CONTAINER_NAME)" bash -c "php artisan route:clear"
+	$(docker_compose_bin) exec -T "$(APP_CONTAINER_NAME)" bash -c "php artisan optimize"
+	$(docker_compose_bin) exec -T "$(APP_CONTAINER_NAME)" bash -c "npm run prod"
 	$(docker_compose_bin) restart app
 
 ## Clear cache (undefined index + php class)
 cache:
-	$(docker_compose_bin) exec -T --user=www "$(APP_CONTAINER_NAME)" bash -c "composer dumpautoload"
-	$(docker_compose_bin) exec -T --user=www "$(APP_CONTAINER_NAME)" bash -c "php artisan optimize:clear"
-	$(docker_compose_bin) exec -T --user=www "$(APP_CONTAINER_NAME)" bash -c "php system/clear-cache.php"
+	$(docker_compose_bin) exec -T "$(APP_CONTAINER_NAME)" bash -c "composer dumpautoload"
+	$(docker_compose_bin) exec -T "$(APP_CONTAINER_NAME)" bash -c "php artisan optimize:clear"
+	$(docker_compose_bin) exec -T "$(APP_CONTAINER_NAME)" bash -c "php system/clear-cache.php"
