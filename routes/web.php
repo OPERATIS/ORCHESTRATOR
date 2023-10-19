@@ -53,7 +53,10 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('chats/list', [ChatsController::class, 'list'])->name('chatsList');
     Route::any('chats/create', [ChatsController::class, 'create'])->name('chatsCreate');
     Route::get('chats/{chatId}', [ChatsController::class, 'show'])->name('chatShow');
+    Route::post('chats/{chatId}/delete', [ChatsController::class, 'delete'])->name('chatDelete');
+    Route::post('chats/{chatId}/edit', [ChatsController::class, 'edit'])->name('chatEdit');
     Route::post('chats/{chatId}/send-message', [ChatsController::class, 'sendMessage'])->name('chatSendMessage');
+    Route::post('chats/{chatId}/edit-message/{messageId}', [ChatsController::class, 'editMessage'])->name('chatEditMessage');
     Route::get('chats/{chatId}/messages', [ChatsController::class, 'messages'])->name('chatMessages');
 
     Route::get('alerts', [AlertsController::class, 'index'])->name('alerts');

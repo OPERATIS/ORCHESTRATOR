@@ -40,13 +40,78 @@ class ChatsController extends Controller
         }
     }
 
+    /**
+     * @param int $chatId
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function delete(int $chatId, Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        $chat = Chat::where('id', $chatId)
+            ->user($user->id)
+            ->first();
+
+        if ($chat) {
+            $chat->delete();
+            return response()->json([
+                'status' => true,
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+            ]);
+        }
+    }
+
+    /**
+     * @param int $chatId
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function edit(int $chatId, Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        $validatorSendMessage = Validator::make($request->all(), [
+            'title' => 'required',
+        ]);
+
+        if ($validatorSendMessage->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validatorSendMessage->errors()
+            ]);
+        }
+
+        $chat = Chat::where('id', $chatId)
+            ->user($user->id)
+            ->first();
+
+        if ($chat) {
+            $title = $request->get('title');
+            $chat->title = $title;
+            $chat->save();
+            return response()->json([
+                'status' => true,
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+            ]);
+        }
+    }
+
     public function show(int $chatId)
     {
         /** @var User $user */
         $user = Auth::user();
 
         $chat = Chat::where('id', $chatId)
-            ->where('user_id', $user->id)
+            ->user($user->id)
             ->with(['messages', 'alert'])
             ->first();
 
@@ -97,7 +162,11 @@ class ChatsController extends Controller
      */
     public function messages(int $chatId): JsonResponse
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         $chat = Chat::where('id', $chatId)
+            ->user($user->id)
             ->with(['messages'])
             ->first();
 
@@ -114,6 +183,9 @@ class ChatsController extends Controller
      */
     public function sendMessage(int $chatId, Request $request): JsonResponse
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         $validatorSendMessage = Validator::make($request->all(), [
             'content' => 'required',
         ]);
@@ -127,13 +199,23 @@ class ChatsController extends Controller
 
         $content = $request->get('content');
 
-        $chatMessage = new ChatMessage();
-        $chatMessage->chat_id = $chatId;
-        $chatMessage->role = 'user';
+        // Logic for update
+        $messageId = $request->get('messageId');
+        if ($messageId) {
+            $chatMessage = ChatMessage::where('id', $messageId)->first();
+        } // Logic for create
+        else {
+            $chatMessage = new ChatMessage();
+            $chatMessage->chat_id = $chatId;
+            $chatMessage->role = 'user';
+        }
+
         $chatMessage->content = $content;
         $chatMessage->save();
+        $chatMessageSendId = $chatMessage->id;
 
         $chat = Chat::where('id', $chatId)
+            ->user($user->id)
             ->with(['messages'])
             ->first();
 
@@ -173,10 +255,24 @@ class ChatsController extends Controller
         return response()->json([
             'status' => true,
             'message' => [
+                'send_id' => $chatMessageSendId->id,
                 'role' => $chatMessage->role,
-                'content' => $chatMessage->content
+                'content' => $chatMessage->content,
+                'receive_id' => $chatMessage->id
             ]
         ]);
+    }
+
+    /**
+     * @param int $chatId
+     * @param int $messageId
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function editMessage(int $chatId, int $messageId, Request $request): JsonResponse
+    {
+        $request->merge(['messageId' => $messageId]);
+        return $this->sendMessage($chatId, $request);
     }
 
     /**
@@ -226,6 +322,7 @@ class ChatsController extends Controller
                 ->first();
 
             $chat = Chat::where('alert_id', $alert->id)
+                ->user($user->id)
                 ->first();
 
             if (!$chat) {
