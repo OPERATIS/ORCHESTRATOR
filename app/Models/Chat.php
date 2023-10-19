@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,5 +28,15 @@ class Chat extends Model
     public function alert(): BelongsTo
     {
         return $this->belongsTo(Alert::class);
+    }
+
+    /**
+     * @param Builder $query
+     * @param $userId
+     * @return Builder
+     */
+    public function scopeUser(Builder $query, $userId): Builder
+    {
+        return $query->where('user_id', $userId);
     }
 }
