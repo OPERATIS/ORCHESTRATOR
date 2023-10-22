@@ -23,6 +23,7 @@
                                    type="text"
                                    v-model="email"
                                    @input="error.email = null"
+                                   @keyup.enter="login()"
                             >
                             <div v-if="error && error.email" class="error">{{ error.email }}</div>
                         </div>
@@ -42,6 +43,7 @@
                                    v-model="password"
                                    autocomplete="true"
                                    @input="error.password = null"
+                                   @keyup.enter="login()"
                             >
                             <div v-if="error && error.password" class="error">{{ error.password }}</div>
                         </div>
@@ -103,6 +105,7 @@
                                    type="email"
                                    v-model="email"
                                    @input="error.email = null"
+                                   @keyup.enter="registration()"
                             >
                             <div v-if="error && error.email" class="error">{{ error.email }}</div>
                         </div>
@@ -121,6 +124,7 @@
                                    type="password"
                                    v-model="password"
                                    @input="error.password = null"
+                                   @keyup.enter="registration()"
                             >
                             <div v-if="error && error.password" class="error">{{ error.password }}</div>
                         </div>
@@ -139,6 +143,7 @@
                                    type="password"
                                    v-model="password_confirmation"
                                    @input="error.password_confirmation = null"
+                                   @keyup.enter="registration()"
                             >
                             <div v-if="error && error.password_confirmation" class="error">{{ error.password_confirmation }}</div>
                         </div>
@@ -193,6 +198,7 @@
                                    type="email"
                                    v-model="email"
                                    @input="error.email = null"
+                                   @keyup.enter="forgotPassword()"
                             >
                             <div v-if="error && error.email" class="error">{{ error.email }}</div>
                         </div>

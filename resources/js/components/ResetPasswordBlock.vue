@@ -22,6 +22,7 @@
                                type="password"
                                v-model="password"
                                @input="error.password = null"
+                               @keyup.enter="resetPassword()"
                         >
                         <div v-if="error && error.password" class="error">{{ error.password }}</div>
                     </div>
@@ -40,6 +41,7 @@
                                type="password"
                                v-model="password_confirmation"
                                @input="error.password_confirmation = null"
+                               @keyup.enter="resetPassword()"
                         >
                         <div v-if="error && error.password_confirmation" class="error">{{ error.password_confirmation }}</div>
                     </div>
