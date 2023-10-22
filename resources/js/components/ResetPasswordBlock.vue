@@ -12,7 +12,7 @@
                                 'error': error && error.password
                              }"
                     >
-                        <label for="user_password" class="label">Password</label>
+                        <label for="user_password" class="label">New Password</label>
                         <input id="user_password"
                                v-bind:class="{
                                     'fill': password
@@ -31,7 +31,7 @@
                                 'error': error && error.password_confirmation
                              }"
                     >
-                        <label for="user_password_confirm" class="label">Confirm Password</label>
+                        <label for="user_password_confirm" class="label">Repeat Password</label>
                         <input id="user_password_confirm"
                                v-bind:class="{
                                     'fill': password_confirmation
@@ -46,15 +46,23 @@
                         <div v-if="error && error.password_confirmation" class="error">{{ error.password_confirmation }}</div>
                     </div>
                 </div>
-                <div class="mt-11">
+                <div class="mt-10">
                     <button class="btn lg btn_default w-full"
                             v-bind:class="{
                                 'disabled': !password || !password_confirmation
                             }"
                             @click="resetPassword()"
                     >
-                        Reset password
+                        Reset Password
                     </button>
+                </div>
+                <div class="mt-4 text-xs flex justify-center text-dark">
+                    I remembered my password
+                    <a href="/login"
+                       class="font-bold ml-3 text-green_2 hover:opacity-75 cursor-pointer"
+                    >
+                        Sign In
+                    </a>
                 </div>
             </div>
         </div>

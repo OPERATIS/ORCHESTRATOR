@@ -91,14 +91,31 @@
 <!--                                     src="/icons/chat-gpt.svg"-->
 <!--                                     alt="chat gpt"-->
 <!--                                >-->
-<!--                                <div class="text-sm text-black" v-html="item"></div>-->
+<!--                                <div class="text-sm text-black" v-html="item.text"></div>-->
 <!--                            </div>-->
-                            <div class="flex items-start p-4 mt-4">
-                                <img class="h-8 w-8 mr-4"
-                                     src="/img/profile_icon.png"
-                                     alt="profile icon"
-                                >
-                                <div class="text-sm text-black" v-html="item"></div>
+                            <div class="flex items-start p-4 mt-4 user-msg">
+                                <img class="h-8 w-8 mr-4" src="/img/profile_icon.png" alt="profile icon">
+                                <div class="flex w-full" v-if="!item.editing" >
+                                    <div class="text-sm text-black" v-html="item.text"></div>
+                                    <div class="ml-auto flex-shrink-0">
+                                        <div class="user-msg_edit flex items-center cursor-pointer"
+                                             @click="editMessage(index)"
+                                        >
+                                            <img class="h-6 w-6 ml-6"
+                                                 src="/icons/pencil-simple.svg"
+                                                 alt="pencil simple"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-full flex flex-col pr-12" v-else>
+                                    <textarea ref="textarea" rows="1" @input="adjustTextareaHeight(index)" @mounted="adjustTextareaHeight(index)" class="textarea-msg resize-none text-sm text-black m-0 border-0 bg-transparent p-0 focus:ring-0 focus-visible:ring-0" v-model="item.editedMessage"></textarea>
+                                    <div class="text-center space-x-3 flex justify-center mt-5">
+                                        <button class="btn btn_default !rounded-lg md font-medium" @click="saveChanges(index)">Save Changes</button>
+                                        <button class="btn font-medium rounded-lg border border-black border-opacity-40 hover:border-opacity-80 text-gray_1 text-opacity-80" @click="cancelEdit(index)">Cancel</button>
+                                    </div>
+
+                                </div>
                             </div>
                         </template>
                     </div>
@@ -217,6 +234,7 @@ export default {
                 .then(({data}) => {
                     this.chatId = data.chat.id;
                     this.title = data.chat.title;
+                    this.chatMessages = data.chat.messages;
                     this.systemMessage = data.systemMessage;
                 })
                 .catch(({response}) => {
@@ -303,7 +321,7 @@ export default {
                 this.userMessage = "";
 
                 // temp test
-                this.chatMessages.push(message);
+                this.chatMessages.push({ text: message, editing: false, editedMessage: ""});
                 this.scrollToBottom();
             }
 
@@ -334,7 +352,27 @@ export default {
                 const scrollTo = document.body.scrollHeight - (window.innerHeight - 120);
                 window.scrollTo(0, scrollTo);
             }, 1);
-        }
+        },
+
+        editMessage(index) {
+            this.chatMessages[index].editing = true;
+            this.chatMessages[index].editedMessage = this.chatMessages[index].text;
+            this.$nextTick(() => {
+                this.adjustTextareaHeight(index);
+            });
+        },
+        saveChanges(index) {
+            this.chatMessages[index].text = this.chatMessages[index].editedMessage;
+            this.chatMessages[index].editing = false;
+        },
+        cancelEdit(index) {
+            this.chatMessages[index].editing = false;
+        },
+        adjustTextareaHeight(index) {
+            const textarea = this.$refs.textarea[index];
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        },
     },
     mounted() {
         this.checkUrl();
@@ -357,5 +395,10 @@ export default {
             transform: translateY(0);
             opacity: 1;
         }
+    }
+    .textarea-msg {
+        display: block;
+        min-height: 20px;
+        line-height: 20px;
     }
 </style>

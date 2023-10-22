@@ -19,3 +19,17 @@
 .highcharts-credits{
     @apply hidden;
 }
+
+.user-msg_edit{
+    opacity: 0;
+    &:hover {
+        opacity: 1 !important;
+    }
+}
+.user-msg{
+    &:hover {
+        .user-msg_edit {
+            opacity: 0.8;
+        }
+    }
+}

@@ -40,7 +40,7 @@
 }
 
 .chat-textarea{
-    @apply w-full text-sm text-gray_1 rounded-2xl border-dark border-opacity-10 py-4 px-5 resize-none shadow-none;
+    @apply w-full text-sm text-gray_1 rounded-2xl border-dark border-opacity-10 py-4 px-5 pr-14 resize-none shadow-none;
     &:focus{
         outline: none;
         --tw-ring-offset-width: 0px;
