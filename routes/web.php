@@ -52,7 +52,8 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('chats', [ChatsController::class, 'index'])->name('chats');
     Route::get('chats/list', [ChatsController::class, 'list'])->name('chatsList');
     Route::any('chats/create', [ChatsController::class, 'create'])->name('chatsCreate');
-    Route::get('chats/{chatId}', [ChatsController::class, 'show'])->name('chatShow');
+//    Route::get('chats/{chatId}', [ChatsController::class, 'show'])->name('chatShow');
+    Route::get('chats/{chatId}', [ChatsController::class, 'getChatInfo'])->name('chatShow');
     Route::post('chats/{chatId}/delete', [ChatsController::class, 'delete'])->name('chatDelete');
     Route::post('chats/{chatId}/edit', [ChatsController::class, 'edit'])->name('chatEdit');
     Route::post('chats/{chatId}/send-message', [ChatsController::class, 'sendMessage'])->name('chatSendMessage');

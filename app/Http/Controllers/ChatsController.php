@@ -156,6 +156,37 @@ class ChatsController extends Controller
         ]);
     }
 
+    public function getChatInfo(int $chatId)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        $chat = Chat::where('id', $chatId)
+            ->user($user->id)
+            ->with(['messages', 'alert'])
+            ->first();
+
+        $systemMessage = null;
+        if ($chat->alert) {
+            // From notifications
+            if ($chat->alert->period === Metric::PERIOD_HOUR) {
+                $systemMessage = 'Metric ' . $chat->alert->metric . ' has ' . $chat->alert->result;
+            } elseif ($chat->alert->period === Metric::PERIOD_DAY) {
+                // TODO add text
+                $systemMessage = '???';
+            }
+        }
+
+        $messages = $this->getMessages($chat, ['updated_at', 'id']);
+
+        return response()->json([
+            'status' => true,
+            'chat' => $chat,
+            'messages' => $messages,
+            'systemMessage' => $systemMessage
+        ]);
+    }
+
     /**
      * @param int $chatId
      * @return JsonResponse

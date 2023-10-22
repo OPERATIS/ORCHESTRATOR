@@ -19,6 +19,9 @@ const colors = {
     red: withOpacity('--color-red'),
     dangers: withOpacity('--color-danger'),
     primary: withOpacity('--color-primary'),
+    primary_blue: withOpacity('--color-primary_blue'),
+    primary_green: withOpacity('--color-primary_green'),
+    primary_red: withOpacity('--color-primary_red')
 }
 
 // function generateColor(color, extended = false) {
