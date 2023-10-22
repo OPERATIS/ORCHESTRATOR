@@ -315,7 +315,6 @@ export default {
                 let data = {
                     email: this.email
                 };
-
                 axios.post('/forgot-password', data)
                     .then(({data}) => {
                         if(data.status == true){

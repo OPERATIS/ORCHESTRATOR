@@ -88,7 +88,6 @@ export default {
                         if(data.status === true){
                             window.location.href = data.redirect;
                         } else {
-                            console.log(data);
                             this.error.password = data['errors'] && data['errors']['password'] ? data['errors']['password'][0] : null;
                             this.error.password_confirmation = data['errors'] && data['errors']['password_confirmation'] ? data['errors']['password_confirmation'][0] : null;
                         }
