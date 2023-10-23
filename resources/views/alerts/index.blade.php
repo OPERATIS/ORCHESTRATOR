@@ -13,11 +13,7 @@
                     <div class="space-y-3 h-[35.1rem] max-h-[35.1rem] overflow-y-scroll pr-6">
                         @if(count($alerts))
                             @foreach ($alerts as $alert)
-                            {{--toDo add created--}}
-                            @if ($alert->chat)
-                                Chat exist
-                            @endif
-                            <div class="w-full flex items-center p-3 rounded-[0.625rem] @if(@$alert['created']) bg-primary_blue @else @if(@$alert['result'] == 'Increased') bg-primary_green @else bg-primary_red @endif @endif">
+                            <div class="w-full flex items-center p-3 rounded-[0.625rem] @if(@$alert->chat) bg-primary_blue @else @if(@$alert['result'] == 'Increased') bg-primary_green @else bg-primary_red @endif @endif">
                                 <div class="flex items-start mr-4">
                                     <div class="flex items-center justify-center w-6 h-6 rounded-md bg-white mr-2">
                                         <x-icon name="circle-wavy-warning" class="w-4 h-4"/>
@@ -69,32 +65,34 @@
                         each team member must authenticate the app to post on their behalf.
                     </div>
                     <div class="flex items-center space-x-4">
-                        <a class="flex items-center justify-center text-lg text-black font-semibold rounded-lg px-4 h-11 min-w-[10rem]" style="background: rgba(217, 228, 239, 0.60);"
+                        <a class="one-app flex items-center justify-center text-lg text-black font-semibold rounded-lg px-4 h-11 min-w-[10rem]
+                                  @if(@$connectedTelegram) !bg-primary_green @endif"
                            href="https://t.me/{{config('integrations.telegram.botName')}}?start={{base64_encode($user->id)}}"
                         >
                             <x-icon name="telegram-icon" class="w-7 h-7 mr-2"/>
                             Telegram
                         </a>
-                        <a class="flex items-center justify-center text-lg text-black font-semibold rounded-lg px-4 h-11 min-w-[10rem] @if(true) !bg-primary_green @endif" style="background: rgba(217, 228, 239, 0.60);"
+                        <a class="one-app flex items-center justify-center text-lg text-black font-semibold rounded-lg px-4 h-11 min-w-[10rem]
+                                  @if(@$connectedWhatsApp) !bg-primary_green @endif"
                            href="https://wa.me/{{config('integrations.whatsapp.displayPhoneNumber')}}?text={{urlencode(\App\Services\Notifications::getMessageForInitSubscribe() . $user->id)}}"
                         >
                             <x-icon name="whatsapp-icon" class="w-7 h-7 mr-2"/>
                             WhatsApp
                         </a>
-                        <a class="flex items-center justify-center text-lg text-black font-semibold rounded-lg px-4 h-11 min-w-[10rem]" style="background: rgba(217, 228, 239, 0.60);"
+                        <a class="one-app flex items-center justify-center text-lg text-black font-semibold rounded-lg px-4 h-11 min-w-[10rem]
+                                  @if(@$connectedSlack) !bg-primary_green @endif"
                            href="{{route('integrationsSlackLogin')}}"
                         >
                             <x-icon name="slack-icon" class="w-7 h-7 mr-2"/>
                             Slack
                         </a>
-                        <div class="flex items-center">
-                            <a class="flex items-center justify-center text-lg text-black font-semibold rounded-lg px-4 h-11 min-w-[10rem]" style="background: rgba(217, 228, 239, 0.60);"
-                               href="https://m.me/{{config('integrations.messenger.pageName')}}?text={{urlencode(\App\Services\Notifications::getMessageForInitSubscribe() . $user->id)}}"
-                            >
-                                <x-icon name="messenger-icon" class="w-7 h-7 mr-2"/>
-                                Messenger
-                            </a>
-                        </div>
+                        <a class="one-app flex items-center justify-center text-lg text-black font-semibold rounded-lg px-4 h-11 min-w-[10rem]
+                                  @if(@$connectedMessenger) !bg-primary_green @endif"
+                           href="https://m.me/{{config('integrations.messenger.pageName')}}?text={{urlencode(\App\Services\Notifications::getMessageForInitSubscribe() . $user->id)}}"
+                        >
+                            <x-icon name="messenger-icon" class="w-7 h-7 mr-2"/>
+                            Messenger
+                        </a>
                     </div>
                 </div>
             </div>

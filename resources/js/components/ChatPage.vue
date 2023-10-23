@@ -86,21 +86,20 @@
                         </template>
 
                         <template v-for="(item, index) in chatMessages" :key="index">
-
-                            <div class="flex items-start p-4 bg-primary_light mt-4">
+                            <div v-if="item.role == 'assistant'" class="flex items-start p-4 bg-primary_light mt-4">
                                 <img class="w-8 h-8 mr-4"
                                      src="/icons/chat-gpt.svg"
                                      alt="chat gpt"
                                 >
-                                <div class="text-sm text-black" v-html="item.text"></div>
+                                <div class="text-sm text-black text-wrap" v-html="item.content"></div>
                             </div>
-                            <div class="flex items-start p-4 mt-4 user-msg">
+                            <div v-else-if="item.role == 'user'" class="flex items-start p-4 mt-4 user-msg">
                                 <img class="h-8 w-8 mr-4" src="/img/profile_icon.png" alt="profile icon">
                                 <div class="flex w-full" v-if="!item.editing" >
-                                    <div class="text-sm text-black" v-html="item.content"></div>
+                                    <div class="text-sm text-black text-wrap" v-html="item.content"></div>
                                     <div class="ml-auto flex-shrink-0">
                                         <div class="user-msg_edit flex items-center cursor-pointer"
-                                             @click="editMessage(index)"
+                                             @click="editMessage(index, item.id)"
                                         >
                                             <img class="h-6 w-6 ml-6"
                                                  src="/icons/pencil-simple.svg"
@@ -110,13 +109,21 @@
                                     </div>
                                 </div>
                                 <div class="w-full flex flex-col pr-12" v-else>
-                                    <textarea ref="textarea" rows="1" @input="adjustTextareaHeight(index)" @mounted="adjustTextareaHeight(index)" class="textarea-msg resize-none text-sm text-black m-0 border-0 bg-transparent p-0 focus:ring-0 focus-visible:ring-0" v-model="item.editedMessage"></textarea>
+                                    <textarea :ref="'textarea_'+index" rows="1" @input="adjustTextareaHeight(index)" class="textarea-msg resize-none text-sm text-black m-0 border-0 bg-transparent p-0 focus:ring-0 focus-visible:ring-0" v-model="item.editedMessage"></textarea>
                                     <div class="text-center space-x-3 flex justify-center mt-5">
-                                        <button class="btn btn_default !rounded-lg md font-medium" @click="saveChanges(index)">Save Changes</button>
+                                        <button class="btn btn_default !rounded-lg md font-medium" @click="saveChanges(index, item.id)">Save Changes</button>
                                         <button class="btn font-medium rounded-lg border border-black border-opacity-40 hover:border-opacity-80 text-gray_1 text-opacity-80" @click="cancelEdit(index)">Cancel</button>
                                     </div>
-
                                 </div>
+                            </div>
+                        </template>
+                        <template v-if="loadingMessage">
+                            <div class="flex items-start p-4 bg-primary_light mt-4">
+                                <img class="w-8 h-8 mr-4"
+                                     src="/icons/chat-gpt.svg"
+                                     alt="chat gpt"
+                                >
+                                <div class="text-sm text-black text-opacity-50 text-wrap">Loading...</div>
                             </div>
                         </template>
                     </div>
@@ -181,6 +188,7 @@ export default {
             systemMessage: '',
             userMessage: '',
             loading: false,
+            loadingMessage: false,
             suggestions: [
                 {
                     'id': 1,
@@ -202,18 +210,16 @@ export default {
     },
     methods: {
         checkUrl(){
-            const currentURL = window.location.href;
-            const urlParts = currentURL.split('?');
-            if (urlParts.length === 2) {
-                const queryParams = urlParts[1].split('&');
-                for (const param of queryParams) {
-                    const [name, value] = param.split('=');
-                    if (name === 'c'){
-                        this.loading = true;
-                        this.getChat(value);
-                        break;
-                    }
-                }
+            const currentUrl = window.location.href;
+            const url = new URL(currentUrl);
+            const pathname = url.pathname;
+            const regex = /\/chats\/(\d+)/;
+            const match = pathname.match(regex);
+
+            if (match) {
+                let chatId = match[1];
+                this.loading = true;
+                this.getChat(chatId);
             }
         },
         getChatsList(){
@@ -233,11 +239,10 @@ export default {
         getChat(chatId){
             axios.get('/chats/'+chatId)
                 .then(({data}) => {
-                    console.log(data);
                     this.chatId = data.chat.id;
                     this.title = data.chat.title;
-                    this.chatMessages = data.chat.messages;
                     this.systemMessage = data.systemMessage;
+                    this.generateChatMessages(data.messages);
                 })
                 .catch(({response}) => {
                     console.log(response.data.message);
@@ -245,7 +250,21 @@ export default {
                 })
                 .finally(() => {
                     this.loading = false;
+                    this.scrollToBottom();
                 });
+        },
+        generateChatMessages(messages){
+            this.chatMessages = messages.map(function(message) {
+                if (message.role === "user") {
+                    return {
+                        ...message,
+                        editing: false,
+                        editedMessage: ""
+                    };
+                } else {
+                    return message;
+                }
+            });
         },
         deleteChat(chatId){
             axios.post('/chats/'+chatId+'/delete')
@@ -280,22 +299,16 @@ export default {
         },
         generateUrl(chatId){
             let currentURL = window.location.href;
-            const paramsRegex = /[?&].*?(?=&|$)/g;
-            const params = currentURL.match(paramsRegex);
-            if (params) {
-                params.forEach(param => {
-                    currentURL = currentURL.replace(param, '');
-                });
-            }
-            let newURL = `${currentURL}`;
-            if (chatId){
-                const separator = currentURL.includes('?') ? '&' : '?';
-                newURL = `${currentURL}${separator}c=${chatId}`;
+            currentURL = currentURL.split('?')[0];
+            currentURL = currentURL.replace(/\/chats\/\d+/g, '/chats');
+
+            if (chatId) {
+                currentURL = `${currentURL}/${chatId}`;
                 this.chatId = chatId;
             } else {
                 this.chatId = null;
             }
-            window.history.pushState(null, null, newURL);
+            window.history.pushState(null, null, currentURL);
         },
         getMessages(chatId){
             axios.get('/chats/'+chatId+'/messages')
@@ -309,37 +322,76 @@ export default {
         sendSuggestion(id){
             const suggestion = this.suggestions.find(item => item.id === id);
             if (suggestion) {
+                this.chatId = -1;
                 this.userMessage = `${suggestion.title} ${suggestion.subtitle}`;
-
-                // add create chat and send message
-                this.chatId = 12;
                 this.sendMessage();
             }
         },
         sendMessage(){
             if(this.userMessage){
                 let message = this.userMessage;
-                message = message.replace(/\n/g, "<br>");
                 this.userMessage = "";
 
-                // temp test
-                // this.chatMessages.push({ text: message, editing: false, editedMessage: ""});
+                this.chatMessages.push({
+                    id: null,
+                    role: 'user',
+                    content: message,
+                    editing: false,
+                    editedMessage: ""
+                });
+
+                this.loadingMessage = true;
+
                 this.scrollToBottom();
 
-                axios.post('/chats/'+this.chatId+'/send-message', {
-                    'content': message
-                })
-                    .then(({data}) => {
-                        console.log(data);
-                        this.chatMessages = data.messages;
+                if (this.chatId && this.chatId !== -1){
+                    axios.post('/chats/'+this.chatId+'/send-message', {
+                        'content': message
                     })
-                    .catch(({response}) => {
-                        console.log(response.data.message);
+                        .then(({data}) => {
+                            console.log(data);
+                            this.loadingMessage = false;
+                            this.generateAnswer(data.message);
+                        })
+                        .catch(({response}) => {
+                            console.log(response.data.message);
+                        })
+                        .finally(() => {
+                            this.scrollToBottom();
+                        });
+                } else {
+                    axios.post('/chats/create', {
+                        'content': message
                     })
-                    .finally(() => {
-                        this.scrollToBottom();
-                    });
+                        .then(({data}) => {
+                            console.log(data);
+                            this.chatId = data.chat.id;
+                            this.title = data.chat.title;
+                            this.systemMessage = data.systemMessage;
+                            this.generateChatMessages(data.messages);
+                        })
+                        .catch(({response}) => {
+                            console.log(response.data.message);
+                        })
+                        .finally(() => {
+                            this.loadingMessage = false;
+                            this.scrollToBottom();
+                            this.getChatsList();
+                        });
+                }
+
             }
+        },
+        generateAnswer(data){
+            const lastIndex = this.chatMessages.slice().reverse().findIndex(item => item.id === null);
+            if (lastIndex !== -1) {
+                this.chatMessages[this.chatMessages.length - 1 - lastIndex].id = data.send_id;
+            }
+            this.chatMessages.push({
+                id: data.receive_id,
+                role: data.role,
+                content: data.content,
+            });
         },
         createNewChat(){
            this.generateUrl();
@@ -359,20 +411,39 @@ export default {
 
         editMessage(index) {
             this.chatMessages[index].editing = true;
-            this.chatMessages[index].editedMessage = this.chatMessages[index].text;
+            this.chatMessages[index].editedMessage = this.chatMessages[index].content;
             this.$nextTick(() => {
                 this.adjustTextareaHeight(index);
             });
         },
-        saveChanges(index) {
-            this.chatMessages[index].content = this.chatMessages[index].editedMessage;
+        saveChanges(index, id) {
+            let newMessage = this.chatMessages[index].editedMessage;
+            this.chatMessages[index].content = newMessage;
             this.chatMessages[index].editing = false;
+
+            this.chatMessages.splice(index + 1);
+
+            this.loadingMessage = true;
+
+            axios.post('/chats/'+this.chatId+'/edit-message/'+id, {
+                'content': newMessage
+            })
+                .then(({data}) => {
+                    this.generateAnswer(data.message);
+                })
+                .catch(({response}) => {
+                    console.log(response.data.message);
+                })
+                .finally(() => {
+                    this.scrollToBottom();
+                    this.loadingMessage = false;
+                });
         },
         cancelEdit(index) {
             this.chatMessages[index].editing = false;
         },
         adjustTextareaHeight(index) {
-            const textarea = this.$refs.textarea[index];
+            const textarea = this.$refs['textarea_'+index][0];
             textarea.style.height = 'auto';
             textarea.style.height = textarea.scrollHeight + 'px';
         },
@@ -403,5 +474,9 @@ export default {
         display: block;
         min-height: 20px;
         line-height: 20px;
+        white-space: pre-wrap;
+    }
+    .text-wrap {
+        white-space: pre-line;
     }
 </style>
