@@ -27,17 +27,10 @@ class ChatsController extends Controller
 
     public function create(Request $request)
     {
-        $chatArray = $this->getChat($request->get('alert'));
-        if ($request->isMethod('post')) {
-            return response()->json([
-                'status' => true,
-                'chat' => $chatArray
-            ]);
-        } else {
-            return redirect(route('chatShow', [
-                'chatId' => $chatArray['id']
-            ]));
-        }
+        $chatArray = $this->getChat($request->get('alert'), $request->get('content'));
+        return redirect(route('chatShow', [
+            'chatId' => $chatArray['id']
+        ]));
     }
 
     /**
@@ -105,35 +98,6 @@ class ChatsController extends Controller
         }
     }
 
-    public function show(int $chatId)
-    {
-        /** @var User $user */
-        $user = Auth::user();
-
-        $chat = Chat::where('id', $chatId)
-            ->user($user->id)
-            ->with(['messages', 'alert'])
-            ->first();
-
-        $systemMessage = null;
-        if ($chat->alert) {
-            // From notifications
-            if ($chat->alert->period === Metric::PERIOD_HOUR) {
-                $systemMessage = 'Metric ' . $chat->alert->metric . ' has ' . $chat->alert->result;
-            } elseif ($chat->alert->period === Metric::PERIOD_DAY) {
-                // TODO add text
-                $systemMessage = '???';
-            }
-        }
-
-        $messages = $this->getMessages($chat, ['updated_at', 'id']);
-        return view('chats.show')
-            ->with('chat', $chat)
-            ->with('chats', $user->chats)
-            ->with('messages', $messages)
-            ->with('systemMessage', $systemMessage);
-    }
-
     /**
      * @return JsonResponse
      */
@@ -156,35 +120,41 @@ class ChatsController extends Controller
         ]);
     }
 
-    public function getChatInfo(int $chatId)
+    public function show(int $chatId, Request $request)
     {
         /** @var User $user */
         $user = Auth::user();
 
-        $chat = Chat::where('id', $chatId)
-            ->user($user->id)
-            ->with(['messages', 'alert'])
-            ->first();
+        if ($request->isJson()) {
+            $chat = Chat::where('id', $chatId)
+                ->user($user->id)
+                ->with(['messages', 'alert'])
+                ->first();
 
-        $systemMessage = null;
-        if ($chat->alert) {
-            // From notifications
-            if ($chat->alert->period === Metric::PERIOD_HOUR) {
-                $systemMessage = 'Metric ' . $chat->alert->metric . ' has ' . $chat->alert->result;
-            } elseif ($chat->alert->period === Metric::PERIOD_DAY) {
-                // TODO add text
-                $systemMessage = '???';
+            $systemMessage = null;
+            if ($chat->alert) {
+                // From notifications
+                if ($chat->alert->period === Metric::PERIOD_HOUR) {
+                    $systemMessage = 'Metric ' . $chat->alert->metric . ' has ' . $chat->alert->result;
+                } elseif ($chat->alert->period === Metric::PERIOD_DAY) {
+                    // TODO add text
+                    $systemMessage = '???';
+                }
             }
+
+            $messages = $this->getMessages($chat, ['updated_at', 'id']);
+            unset($chat->messages);
+
+            return response()->json([
+                'status' => true,
+                'chat' => $chat,
+                'messages' => $messages,
+                'systemMessage' => $systemMessage
+            ]);
+        } else {
+            return view('chats.index')
+                ->with('chats', $user->chats);
         }
-
-        $messages = $this->getMessages($chat, ['updated_at', 'id']);
-
-        return response()->json([
-            'status' => true,
-            'chat' => $chat,
-            'messages' => $messages,
-            'systemMessage' => $systemMessage
-        ]);
     }
 
     /**
@@ -258,18 +228,35 @@ class ChatsController extends Controller
             'content' => $content,
         ];
 
-        $client = OpenAI::client(config('integrations.openai.apiKey'));
+        // Send all messages and receive answer
         try {
-            $chatResponse = $client->chat()->create([
-                'model' => 'gpt-3.5-turbo',
-                'messages' => $messages,
-            ]);
+            $chatMessage = $this->sendToAi($messages, $chat);
         } catch (\Exception $exception) {
             return response()->json([
                 'status' => true,
                 'errors' => ['The service is experiencing some problems']
             ]);
         }
+
+        return response()->json([
+            'status' => true,
+            'message' => [
+                'send_id' => $chatMessageSendId,
+                'role' => $chatMessage->role,
+                'content' => $chatMessage->content,
+                'receive_id' => $chatMessage->id
+            ]
+        ]);
+    }
+
+    protected function sendToAi($messages, $chat): ChatMessage
+    {
+        $client = OpenAI::client(config('integrations.openai.apiKey'));
+
+        $chatResponse = $client->chat()->create([
+            'model' => 'gpt-3.5-turbo',
+            'messages' => $messages,
+        ]);
 
         // Save new message
         $chatMessage = new ChatMessage();
@@ -283,15 +270,7 @@ class ChatsController extends Controller
 
         $chatMessage->save();
 
-        return response()->json([
-            'status' => true,
-            'message' => [
-                'send_id' => $chatMessageSendId,
-                'role' => $chatMessage->role,
-                'content' => $chatMessage->content,
-                'receive_id' => $chatMessage->id
-            ]
-        ]);
+        return $chatMessage;
     }
 
     /**
@@ -319,7 +298,7 @@ class ChatsController extends Controller
         $messages = [];
         foreach ($chatMessages as $chatMessage) {
             // Ignore message after edit
-            if (empty($previousUpdatedAt) && $chatMessage->updated_at >= $previousUpdatedAt) {
+            if ($chatMessage->updated_at >= $previousUpdatedAt) {
                 $currentMessage = [
                     'role' => $chatMessage->role,
                     'content' => $chatMessage->content,
@@ -339,9 +318,10 @@ class ChatsController extends Controller
 
     /**
      * @param null $alertId
+     * @param null $content
      * @return array
      */
-    protected function getChat($alertId = null): array
+    protected function getChat($alertId = null, $content = null): array
     {
         /** @var User $user */
         $user = Auth::user();
@@ -370,14 +350,29 @@ class ChatsController extends Controller
                 ]);
             }
         } else {
-            $dateTime = Carbon::now()->toDateTimeString('minute');
             $chat = Chat::create([
-                'title' => 'Chat #',
+                'title' => mb_substr($content, 0, 100),
                 'user_id' => $user->id,
             ]);
 
-            $chat->title = 'Chat #' . $chat->id . ' (' . $dateTime . ')';
-            $chat->save();
+            $chatMessage = new ChatMessage();
+            $chatMessage->chat_id = $chat->id;
+            $chatMessage->role = 'user';
+            $chatMessage->content = $content;
+            $chatMessage->save();
+
+
+            // Add last message
+            $messages[] = [
+                'role' => 'user',
+                'content' => $content,
+            ];
+
+            try {
+                $this->sendToAi($messages, $chat);
+            } catch (\Exception $exception) {
+
+            }
         }
 
         return [
