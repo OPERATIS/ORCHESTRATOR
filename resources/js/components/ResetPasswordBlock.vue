@@ -12,7 +12,7 @@
                                 'error': error && error.password
                              }"
                     >
-                        <label for="user_password" class="label">Password</label>
+                        <label for="user_password" class="label">New Password</label>
                         <input id="user_password"
                                v-bind:class="{
                                     'fill': password
@@ -22,6 +22,7 @@
                                type="password"
                                v-model="password"
                                @input="error.password = null"
+                               @keyup.enter="resetPassword()"
                         >
                         <div v-if="error && error.password" class="error">{{ error.password }}</div>
                     </div>
@@ -30,7 +31,7 @@
                                 'error': error && error.password_confirmation
                              }"
                     >
-                        <label for="user_password_confirm" class="label">Confirm Password</label>
+                        <label for="user_password_confirm" class="label">Repeat Password</label>
                         <input id="user_password_confirm"
                                v-bind:class="{
                                     'fill': password_confirmation
@@ -40,19 +41,28 @@
                                type="password"
                                v-model="password_confirmation"
                                @input="error.password_confirmation = null"
+                               @keyup.enter="resetPassword()"
                         >
                         <div v-if="error && error.password_confirmation" class="error">{{ error.password_confirmation }}</div>
                     </div>
                 </div>
-                <div class="mt-11">
+                <div class="mt-10">
                     <button class="btn lg btn_default w-full"
                             v-bind:class="{
                                 'disabled': !password || !password_confirmation
                             }"
                             @click="resetPassword()"
                     >
-                        Reset password
+                        Reset Password
                     </button>
+                </div>
+                <div class="mt-4 text-xs flex justify-center text-dark">
+                    I remembered my password
+                    <a href="/login"
+                       class="font-bold ml-3 text-green_2 hover:opacity-75 cursor-pointer"
+                    >
+                        Sign In
+                    </a>
                 </div>
             </div>
         </div>
@@ -86,7 +96,6 @@ export default {
                         if(data.status === true){
                             window.location.href = data.redirect;
                         } else {
-                            console.log(data);
                             this.error.password = data['errors'] && data['errors']['password'] ? data['errors']['password'][0] : null;
                             this.error.password_confirmation = data['errors'] && data['errors']['password_confirmation'] ? data['errors']['password_confirmation'][0] : null;
                         }

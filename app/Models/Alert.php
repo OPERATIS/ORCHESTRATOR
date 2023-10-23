@@ -6,6 +6,7 @@ use App\Services\Notifications;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Alert extends Model
 {
@@ -50,5 +51,13 @@ class Alert extends Model
     public function getMessage(): ?string
     {
         return Notifications::getMessageFromAlert($this);
+    }
+
+    /**
+     * @return HasOne
+     */
+    public function chat(): HasOne
+    {
+        return $this->hasOne(Chat::class);
     }
 }

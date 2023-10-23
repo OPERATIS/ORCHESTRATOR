@@ -47,19 +47,30 @@
                                     Recommendations
                                 </div>
                                 <div class="w-full bg-black h-px bg-opacity-20 mb-6 mt-5"></div>
-                                @if ($lastUpdateRecommendations)
-                                    <div class="text-sm text-black text-opacity-40">
-                                        Last Update {{$lastUpdateRecommendations->format('d.m.y H:i')}}
+                                @if (@$lastUpdateRecommendations || @$priorityRecommendation)
+                                    @if ($lastUpdateRecommendations)
+                                        <div class="text-sm text-black text-opacity-40">
+                                            Last Update {{$lastUpdateRecommendations->format('d.m.y H:i')}}
+                                        </div>
+                                    @endif
+                                    <div class="flex items-center text-sm text-dark mt-4">
+                                        @if ($priorityRecommendation)
+                                            {{$priorityRecommendation}}
+                                            <a href="{{route('chatsCreate', ['alert' => $lastAlertIdForRecommendation])}}">
+                                                Learn more.
+                                            </a>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="flex flex-col items-center mt-12">
+                                        <div class="flex items-center justify-center w-12 h-12 rounded-[0.625rem]" style="background: rgba(229, 236, 244, 0.75);">
+                                            <x-icon name="circle-wavy-warning" class="w-6 h-6"/>
+                                        </div>
+                                        <div class="text-sm text-black mt-4">
+                                            You have no recommendations yet
+                                        </div>
                                     </div>
                                 @endif
-                                <div class="flex items-center text-sm text-dark mt-4">
-                                    @if ($priorityRecommendation)
-                                        {{$priorityRecommendation}}
-                                        <a href="{{route('chatsCreate', ['alert' => $lastAlertIdForRecommendation])}}">
-                                            Learn more.
-                                        </a>
-                                    @endif
-                                </div>
                             </div>
                         </div>
                         <div class="relative rounded-2xl py-7 px-5 pb-10 col-span-1" style="background: #F8FBF7;">
@@ -71,39 +82,50 @@
                                     Revenue Attribution Factors
                                 </div>
                                 <div class="w-full bg-black h-px bg-opacity-20 mb-6 mt-5"></div>
-                                @if ($lastUpdateRevenueAttributionFactors)
-                                    <div class="text-sm text-black text-opacity-40">
-                                        Last Update {{$lastUpdateRevenueAttributionFactors->format('d.m.y H:i')}}
+                                @if(@$lastUpdateRevenueAttributionFactors || @$revenueAttributionFactors['positive'] || @$revenueAttributionFactors['negative'])
+                                    @if ($lastUpdateRevenueAttributionFactors)
+                                        <div class="text-sm text-black text-opacity-40">
+                                            Last Update {{$lastUpdateRevenueAttributionFactors->format('d.m.y H:i')}}
+                                        </div>
+                                    @endif
+                                    <div class="w-full flex items-start mt-6 space-x-6">
+                                        @if ($revenueAttributionFactors['positive'] ?? false)
+                                            <div class="w-full border-2 border-dark bg-primary_light p-6" style="border-radius: 8px;">
+                                                <div class="flex items-center text-sm text-black font-semibold mb-1">
+                                                    <span class="w-2.5 h-2.5 rounded-full bg-green_2 mr-2"></span>
+                                                    Top positive factors
+                                                </div>
+                                                @foreach ($revenueAttributionFactors['positive'] as $item)
+                                                    <div class="text-sm text-black text-opacity-40" style="margin-bottom: 1px;">
+                                                        {{$item}}
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                        @if ($revenueAttributionFactors['negative'] ?? false)
+                                            <div class="w-full border-2 border-dark bg-primary_light p-6" style="border-radius: 8px;">
+                                                <div class="flex items-center text-sm text-black font-semibold mb-1">
+                                                    <span class="w-2.5 h-2.5 rounded-full bg-red mr-2"></span>
+                                                    Top negative factors
+                                                </div>
+                                                @foreach ($revenueAttributionFactors['negative'] as $item)
+                                                    <div class="text-sm text-black text-opacity-40" style="margin-bottom: 1px;">
+                                                        {{$item}}
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="flex flex-col items-center mt-12">
+                                        <div class="flex items-center justify-center w-12 h-12 rounded-[0.625rem]" style="background: rgba(229, 236, 244, 0.75);">
+                                            <x-icon name="circle-wavy-warning" class="w-6 h-6"/>
+                                        </div>
+                                        <div class="text-sm text-black mt-4">
+                                            You have no attributions factors yet
+                                        </div>
                                     </div>
                                 @endif
-                                <div class="w-full flex items-start mt-6 space-x-6">
-                                    @if ($revenueAttributionFactors['positive'] ?? false)
-                                        <div class="w-full border-2 border-dark bg-primary_light p-6" style="border-radius: 8px;">
-                                            <div class="flex items-center text-sm text-black font-semibold mb-1">
-                                                <span class="w-2.5 h-2.5 rounded-full bg-green_2 mr-2"></span>
-                                                Top positive factors
-                                            </div>
-                                            @foreach ($revenueAttributionFactors['positive'] as $item)
-                                                <div class="text-sm text-black text-opacity-40" style="margin-bottom: 1px;">
-                                                    {{$item}}
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                    @if ($revenueAttributionFactors['negative'] ?? false)
-                                        <div class="w-full border-2 border-dark bg-primary_light p-6" style="border-radius: 8px;">
-                                            <div class="flex items-center text-sm text-black font-semibold mb-1">
-                                                <span class="w-2.5 h-2.5 rounded-full bg-red mr-2"></span>
-                                                Top negative factors
-                                            </div>
-                                            @foreach ($revenueAttributionFactors['negative'] as $item)
-                                                <div class="text-sm text-black text-opacity-40" style="margin-bottom: 1px;">
-                                                    {{$item}}
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -112,11 +134,3 @@
         </div>
     </div>
 @endsection
-
-
-<script>
-    import DashboardChartBlock from "../../js/components/DashboardChartBlock";
-    export default {
-        components: {DashboardChartBlock}
-    }
-</script>
