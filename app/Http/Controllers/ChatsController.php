@@ -182,7 +182,6 @@ class ChatsController extends Controller
         return response()->json([
             'status' => true,
             'chat' => $chat,
-            'messages' => $messages,
             'systemMessage' => $systemMessage
         ]);
     }
@@ -286,7 +285,7 @@ class ChatsController extends Controller
         return response()->json([
             'status' => true,
             'message' => [
-                'send_id' => $chatMessageSendId->id,
+                'send_id' => $chatMessageSendId,
                 'role' => $chatMessage->role,
                 'content' => $chatMessage->content,
                 'receive_id' => $chatMessage->id

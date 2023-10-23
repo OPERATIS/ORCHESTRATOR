@@ -13,8 +13,8 @@
                     <div class="space-y-3 h-[35.1rem] max-h-[35.1rem] overflow-y-scroll pr-6">
                         @if(count($alerts))
                             @foreach ($alerts as $alert)
-                            {{--toDo add opened--}}
-                            <div class="w-full flex items-center p-3 rounded-[0.625rem] @if(@$alert['opened']) bg-primary_blue @else @if(@$alert['result'] == 'Increased') bg-primary_green @else bg-primary_red @endif @endif">
+                            {{--toDo add created--}}
+                            <div class="w-full flex items-center p-3 rounded-[0.625rem] @if(@$alert['created']) bg-primary_blue @else @if(@$alert['result'] == 'Increased') bg-primary_green @else bg-primary_red @endif @endif">
                                 <div class="flex items-start mr-4">
                                     <div class="flex items-center justify-center w-6 h-6 rounded-md bg-white mr-2">
                                         <x-icon name="circle-wavy-warning" class="w-4 h-4"/>

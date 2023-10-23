@@ -86,17 +86,18 @@
                         </template>
 
                         <template v-for="(item, index) in chatMessages" :key="index">
-<!--                            <div class="flex items-start p-4 bg-primary_light mt-4">-->
-<!--                                <img class="w-8 h-8 mr-4"-->
-<!--                                     src="/icons/chat-gpt.svg"-->
-<!--                                     alt="chat gpt"-->
-<!--                                >-->
-<!--                                <div class="text-sm text-black" v-html="item.text"></div>-->
-<!--                            </div>-->
+
+                            <div class="flex items-start p-4 bg-primary_light mt-4">
+                                <img class="w-8 h-8 mr-4"
+                                     src="/icons/chat-gpt.svg"
+                                     alt="chat gpt"
+                                >
+                                <div class="text-sm text-black" v-html="item.text"></div>
+                            </div>
                             <div class="flex items-start p-4 mt-4 user-msg">
                                 <img class="h-8 w-8 mr-4" src="/img/profile_icon.png" alt="profile icon">
                                 <div class="flex w-full" v-if="!item.editing" >
-                                    <div class="text-sm text-black" v-html="item.text"></div>
+                                    <div class="text-sm text-black" v-html="item.content"></div>
                                     <div class="ml-auto flex-shrink-0">
                                         <div class="user-msg_edit flex items-center cursor-pointer"
                                              @click="editMessage(index)"
@@ -232,6 +233,7 @@ export default {
         getChat(chatId){
             axios.get('/chats/'+chatId)
                 .then(({data}) => {
+                    console.log(data);
                     this.chatId = data.chat.id;
                     this.title = data.chat.title;
                     this.chatMessages = data.chat.messages;
@@ -321,22 +323,23 @@ export default {
                 this.userMessage = "";
 
                 // temp test
-                this.chatMessages.push({ text: message, editing: false, editedMessage: ""});
+                // this.chatMessages.push({ text: message, editing: false, editedMessage: ""});
                 this.scrollToBottom();
-            }
 
-            // axios.post('/chats/'+this.chatId+'/send-message', {
-            //     'content': message
-            // })
-            //     .then(({data}) => {
-            //         this.chatMessages = data.messages;
-            //     })
-            //     .catch(({response}) => {
-            //         console.log(response.data.message);
-            //     })
-            //     .finally(() => {
-            //         this.scrollToBottom();
-            //     });
+                axios.post('/chats/'+this.chatId+'/send-message', {
+                    'content': message
+                })
+                    .then(({data}) => {
+                        console.log(data);
+                        this.chatMessages = data.messages;
+                    })
+                    .catch(({response}) => {
+                        console.log(response.data.message);
+                    })
+                    .finally(() => {
+                        this.scrollToBottom();
+                    });
+            }
         },
         createNewChat(){
            this.generateUrl();
@@ -362,7 +365,7 @@ export default {
             });
         },
         saveChanges(index) {
-            this.chatMessages[index].text = this.chatMessages[index].editedMessage;
+            this.chatMessages[index].content = this.chatMessages[index].editedMessage;
             this.chatMessages[index].editing = false;
         },
         cancelEdit(index) {
