@@ -15,10 +15,14 @@ const colors = {
     gray_1: withOpacity('--color-gray_1'),
     gray_3: withOpacity('--color-gray_3'),
     gray_4: withOpacity('--color-gray_4'),
+    gray_5: withOpacity('--color-gray_5'),
     blue_1: withOpacity('--color-blue_1'),
     red: withOpacity('--color-red'),
     dangers: withOpacity('--color-danger'),
     primary: withOpacity('--color-primary'),
+    primary_blue: withOpacity('--color-primary_blue'),
+    primary_green: withOpacity('--color-primary_green'),
+    primary_red: withOpacity('--color-primary_red')
 }
 
 // function generateColor(color, extended = false) {

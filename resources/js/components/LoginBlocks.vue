@@ -6,7 +6,7 @@
             <template v-if="view === 'login'" :key="'login'">
                 <div>
                     <div class="text-black_5 text-2xl">
-                        Sign in
+                        Sign In
                     </div>
                     <div class="mt-10 space-y-6">
                         <div class="input-block"
@@ -23,6 +23,7 @@
                                    type="text"
                                    v-model="email"
                                    @input="error.email = null"
+                                   @keyup.enter="login()"
                             >
                             <div v-if="error && error.email" class="error">{{ error.email }}</div>
                         </div>
@@ -42,11 +43,18 @@
                                    v-model="password"
                                    autocomplete="true"
                                    @input="error.password = null"
+                                   @keyup.enter="login()"
                             >
                             <div v-if="error && error.password" class="error">{{ error.password }}</div>
                         </div>
+                        <div class="relative !mt-0">
+                            <div @click="changeView('forgot_password')"
+                                 class="text-xs font-bold hover:opacity-75 cursor-pointer absolute right-0 mt-2" style="color: rgba(39, 174, 96, 1)">
+                                Forgot password?
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex flex-col items-center border-t border-black border-opacity-20 mt-6">
+                    <div class="flex flex-col items-center border-t border-black border-opacity-20 mt-12">
                         <div class="text-xs text-black_4 py-6">
                             Log In with:
                         </div>
@@ -58,26 +66,23 @@
                             </a>
                         </div>
                     </div>
-                    <div @click="changeView('forgot_password')"
-                         class="mt-11 text-sm underline hover:opacity-75 cursor-pointer text-black_4">
-                        Forgot password?
-                    </div>
-                    <div class="mt-3">
+                    <div class="mt-10">
                         <button class="btn lg btn_default w-full cursor-pointer"
                                 v-bind:class="{
                                 'disabled': !email || !password
                             }"
                                 @click="login()"
                         >
-                            Sign in
+                            Sign In
                         </button>
                     </div>
-                    <div class="mt-3 text-sm text-center text-black_4">
-                        Don’t have an account yet?
+                    <div class="mt-4 text-xs flex justify-center text-dark">
+                        I’m new here
                         <span @click="changeView('registration')"
-                              class="font-bold underline text-green_2 hover:opacity-75 cursor-pointer"
+                              class="font-bold ml-3 text-green_2 hover:opacity-75 cursor-pointer"
+                              style="color: rgba(39, 174, 96, 1)"
                         >
-                            Sign up
+                            Register
                         </span>
                     </div>
                 </div>
@@ -85,7 +90,7 @@
             <template v-else-if="view === 'registration'" :key="'registration'">
                 <div>
                     <div class="text-black_5 text-2xl">
-                        Sign up
+                        Create an Account
                     </div>
                     <div class="mt-10 space-y-6">
                         <div class="input-block"
@@ -103,6 +108,7 @@
                                    type="email"
                                    v-model="email"
                                    @input="error.email = null"
+                                   @keyup.enter="registration()"
                             >
                             <div v-if="error && error.email" class="error">{{ error.email }}</div>
                         </div>
@@ -121,6 +127,7 @@
                                    type="password"
                                    v-model="password"
                                    @input="error.password = null"
+                                   @keyup.enter="registration()"
                             >
                             <div v-if="error && error.password" class="error">{{ error.password }}</div>
                         </div>
@@ -139,6 +146,7 @@
                                    type="password"
                                    v-model="password_confirmation"
                                    @input="error.password_confirmation = null"
+                                   @keyup.enter="registration()"
                             >
                             <div v-if="error && error.password_confirmation" class="error">{{ error.password_confirmation }}</div>
                         </div>
@@ -160,14 +168,15 @@
                                 }"
                                 @click="registration()"
                         >
-                            Sign up
+                            Sign Up
                         </button>
                     </div>
-                    <div class="mt-3 text-sm text-center text-black_4">
-                        Already have an account?
+                    <div class="mt-4 text-xs flex justify-center text-dark">
+                        I already have an account
                         <span @click="changeView('login')"
-                              class="font-bold underline text-green_2 hover:opacity-75 cursor-pointer">
-                            Sign in
+                              class="font-bold ml-3 text-green_2 hover:opacity-75 cursor-pointer"
+                        >
+                            Log In
                         </span>
                     </div>
                 </div>
@@ -175,7 +184,7 @@
             <template v-else-if="view === 'forgot_password'" :key="'forgot_password'">
                 <div>
                     <div class="text-black_5 text-2xl">
-                        Forgot password?
+                        Request new password
                     </div>
                     <div class="mt-10 space-y-6">
                         <div class="input-block"
@@ -193,39 +202,55 @@
                                    type="email"
                                    v-model="email"
                                    @input="error.email = null"
+                                   @keyup.enter="forgotPassword()"
                             >
                             <div v-if="error && error.email" class="error">{{ error.email }}</div>
                         </div>
                     </div>
-                    <div class="mt-11">
+                    <div class="mt-10">
                         <button class="btn lg btn_default w-full"
                                 v-bind:class="{
                                 'disabled': !email
                             }"
                                 @click="forgotPassword()"
                         >
-                            Send
+                            Request new password
                         </button>
                     </div>
-                    <div class="mt-3 text-sm text-center text-black_4">
-                        Back to
+                    <div class="mt-4 text-xs flex justify-center text-dark">
+                        I remember my password
                         <span @click="changeView('login')"
-                              class="font-bold underline text-green_2 hover:opacity-75 cursor-pointer">
-                            Sign in
+                              class="font-bold ml-3 text-green_2 hover:opacity-75 cursor-pointer"
+                        >
+                            Sign In
                         </span>
                     </div>
                 </div>
             </template>
             <template v-else-if="view === 'forgot_password_sent'" :key="'forgot_password_sent'">
                 <div>
-                    <div class="text-black_5 text-center text-xl">
+                    <div class="flex items-center justify-center">
+                        <img class="h-15 w-15" src="/icons/check-circle-green.svg" alt="sent">
+                    </div>
+                    <div class="text-black_5 text-center font-medium text-xl mt-5">
                         Password reset instruction has been sent to your email.
                     </div>
-                    <button class="mt-10 btn lg btn_default w-full"
+                    <div class="text-sm font-medium text-gray_3 mt-2.5 text-center">
+                        {{email}}
+                    </div>
+                    <button class="mt-5 btn lg btn_default w-full"
                             @click="changeView('login')"
                     >
-                        Back to Sign in
+                        Sign In
                     </button>
+                    <div class="mt-4 text-xs flex justify-center text-dark">
+                        I didn’t received an email
+                        <span @click="forgotPassword()"
+                              class="font-bold ml-3 text-green_2 hover:opacity-75 cursor-pointer"
+                        >
+                            Resend
+                        </span>
+                    </div>
                 </div>
             </template>
         </transition>
@@ -251,7 +276,9 @@ export default {
     methods: {
         changeView(view){
             this.view = view;
-            this.email = null;
+            if (view !== 'forgot_password_sent') {
+                this.email = null;
+            }
             this.password = null;
             this.password_confirmation = null;
 
@@ -309,7 +336,6 @@ export default {
                 let data = {
                     email: this.email
                 };
-
                 axios.post('/forgot-password', data)
                     .then(({data}) => {
                         if(data.status == true){
