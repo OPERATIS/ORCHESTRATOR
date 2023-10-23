@@ -182,6 +182,7 @@ class ChatsController extends Controller
         return response()->json([
             'status' => true,
             'chat' => $chat,
+            'messages' => $messages,
             'systemMessage' => $systemMessage
         ]);
     }
