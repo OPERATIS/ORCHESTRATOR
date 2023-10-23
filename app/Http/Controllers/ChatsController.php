@@ -125,7 +125,7 @@ class ChatsController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        if ($request->isJson()) {
+        if ($request->ajax()) {
             $chat = Chat::where('id', $chatId)
                 ->user($user->id)
                 ->with(['messages', 'alert'])
