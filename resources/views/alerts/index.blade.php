@@ -14,6 +14,9 @@
                         @if(count($alerts))
                             @foreach ($alerts as $alert)
                             {{--toDo add created--}}
+                            @if ($alert->chat)
+                                Chat exist
+                            @endif
                             <div class="w-full flex items-center p-3 rounded-[0.625rem] @if(@$alert['created']) bg-primary_blue @else @if(@$alert['result'] == 'Increased') bg-primary_green @else bg-primary_red @endif @endif">
                                 <div class="flex items-start mr-4">
                                     <div class="flex items-center justify-center w-6 h-6 rounded-md bg-white mr-2">

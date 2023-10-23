@@ -15,6 +15,7 @@ class AlertsController extends Controller
 
         $alerts = Alert::query()
             ->forNotifications()
+            ->with(['chat'])
             ->where('user_id', $user->id)
             ->orderByDesc('created_at')
             ->limit(24)
