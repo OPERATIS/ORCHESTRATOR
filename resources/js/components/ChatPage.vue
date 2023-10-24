@@ -123,7 +123,13 @@
                                      src="/icons/chat-gpt.svg"
                                      alt="chat gpt"
                                 >
-                                <div class="text-sm text-black text-opacity-50 text-wrap">Loading...</div>
+                                <div class="text-sm text-black text-opacity-50 text-wrap">
+                                    <div class="load-message">
+                                        <div class="dot dot1"></div>
+                                        <div class="dot dot2"></div>
+                                        <div class="dot dot3"></div>
+                                    </div>
+                                </div>
                             </div>
                         </template>
                     </div>
