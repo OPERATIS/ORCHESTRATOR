@@ -425,8 +425,10 @@ export default {
             this.chatMessages.push({
                 id: data.receive_id,
                 role: data.role,
-                content: data.content,
+                content: '',
             });
+            this.typeMessage(data.content);
+
         },
         createNewChat(){
            this.generateUrl();
@@ -484,6 +486,21 @@ export default {
             textarea.style.height = 'auto';
             textarea.style.height = textarea.scrollHeight + 'px';
         },
+
+        typeMessage(message) {
+            const delay = 12;
+            let index = 0;
+
+            const typeNextCharacter = () => {
+                if (index < message.length) {
+                    this.chatMessages[this.chatMessages.length - 1].content += message.charAt(index);
+                    index++;
+                    this.scrollToBottom();
+                    setTimeout(typeNextCharacter, delay);
+                }
+            };
+            typeNextCharacter();
+        }
     },
     mounted() {
         this.checkUrl();
