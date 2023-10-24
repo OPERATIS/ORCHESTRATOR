@@ -295,6 +295,15 @@ export default {
                 })
                 .catch(({response}) => {
                     console.log(response.data.message);
+                    const customEvent = new CustomEvent('flash-message', {
+                        detail: {
+                            title: 'Something went wrong!',
+                            subtitle: 'Try it again later!',
+                            type: 'warning',
+                            time: 3000,
+                        }
+                    });
+                    window.dispatchEvent(customEvent);
                 });
         },
         generateUrl(chatId){
@@ -322,7 +331,6 @@ export default {
         sendSuggestion(id){
             const suggestion = this.suggestions.find(item => item.id === id);
             if (suggestion) {
-                this.chatId = -1;
                 this.userMessage = `${suggestion.title} ${suggestion.subtitle}`;
                 this.sendMessage();
             }
@@ -344,7 +352,7 @@ export default {
 
                 this.scrollToBottom();
 
-                if (this.chatId && this.chatId !== -1){
+                if (this.chatId){
                     axios.post('/chats/'+this.chatId+'/send-message', {
                         'content': message
                     })
@@ -354,12 +362,23 @@ export default {
                             this.generateAnswer(data.message);
                         })
                         .catch(({response}) => {
+                            const customEvent = new CustomEvent('flash-message', {
+                                detail: {
+                                    title: 'Something went wrong!',
+                                    subtitle: 'Try it again later!',
+                                    type: 'warning',
+                                    time: 3000,
+                                }
+                            });
+                            window.dispatchEvent(customEvent);
                             console.log(response.data.message);
+
                         })
                         .finally(() => {
                             this.scrollToBottom();
                         });
                 } else {
+                    this.chatId = -1;
                     axios.post('/chats/create', {
                         'content': message
                     })
@@ -369,9 +388,19 @@ export default {
                             this.title = data.chat.title;
                             this.systemMessage = data.systemMessage;
                             this.generateChatMessages(data.messages);
+                            this.generateUrl(this.chatId);
                         })
                         .catch(({response}) => {
                             console.log(response.data.message);
+                            const customEvent = new CustomEvent('flash-message', {
+                                detail: {
+                                    title: 'Something went wrong!',
+                                    subtitle: 'Try it again later!',
+                                    type: 'warning',
+                                    time: 3000,
+                                }
+                            });
+                            window.dispatchEvent(customEvent);
                         })
                         .finally(() => {
                             this.loadingMessage = false;
@@ -395,6 +424,8 @@ export default {
         },
         createNewChat(){
            this.generateUrl();
+           this.chatMessages = [];
+           this.title = "";
         },
         handleKeyDown(event) {
             if (event.key === "Enter" && !event.shiftKey) {
