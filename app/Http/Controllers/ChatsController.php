@@ -293,12 +293,12 @@ class ChatsController extends Controller
     protected function getMessages(Chat $chat, array $additionalFields = []): array
     {
         // Search previous message
-        $chatMessages = $chat->messages->sortBy('created_at');
-        $previousUpdatedAt = null;
+        $chatMessages = $chat->messages->sortBy('id');
+        $previousUpdatedAt = '1970-01-01';
         $messages = [];
         foreach ($chatMessages as $chatMessage) {
             // Ignore message after edit
-            if ($chatMessage->updated_at >= $previousUpdatedAt) {
+            if (Carbon::parse($chatMessage->updated_at)->timestamp >= Carbon::parse($previousUpdatedAt)->timestamp) {
                 $currentMessage = [
                     'role' => $chatMessage->role,
                     'content' => $chatMessage->content,
@@ -309,8 +309,8 @@ class ChatsController extends Controller
                 }
 
                 $messages[] = $currentMessage;
+                $previousUpdatedAt = $chatMessage->updated_at;
             }
-            $previousUpdatedAt = $chatMessage->updated_at;
         }
 
         return $messages;
