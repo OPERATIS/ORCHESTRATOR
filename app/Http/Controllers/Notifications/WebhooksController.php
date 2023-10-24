@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Notifications;
 
+use App\Http\Controllers\Controller;
 use App\Models\MeUser;
 use App\Models\TgUser;
 use App\Models\WaUser;

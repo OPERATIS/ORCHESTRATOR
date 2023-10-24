@@ -12,7 +12,7 @@ use App\Http\Controllers\Integrations\SlackController;
 use App\Http\Controllers\IntegrationsController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\WebhooksController;
+use App\Http\Controllers\Notifications\WebhooksController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
