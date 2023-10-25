@@ -16,12 +16,19 @@ class ProfileController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
+        $user->load('subscriptions');
+        $subscription = $user->subscriptions->sortByDesc('id')->first();
 
         return view('profile.index')
-            ->with('user', $user);
+            ->with('user', $user)
+            ->with('subscription', $subscription);
     }
 
-    public function update(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
     {
         /** @var User $user */
         $user = Auth::user();

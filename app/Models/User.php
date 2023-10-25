@@ -85,4 +85,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(Chat::class);
     }
+
+    /**
+     * @return HasMany
+     */
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class)
+            ->orderBy('id', 'desc');
+    }
 }
