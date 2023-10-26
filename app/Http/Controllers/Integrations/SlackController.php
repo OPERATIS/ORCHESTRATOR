@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Integrations;
 
 use App\Models\SlUser;
 use App\Models\User;
+use App\Services\Notifications;
 use App\Services\Slack;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
@@ -54,9 +55,8 @@ class SlackController extends BaseController
 
                 if (Carbon::parse($slUser->created_at)->seconds(0)->toDateTimeString() === Carbon::now()->seconds(0)->toDateTimeString()) {
                     $slack = new Slack();
-                    // TODO add text
                     try {
-                        $slack->chatPostMessage($slUser->access_token, $slUser->authed_user_id, 'add text');
+                        $slack->chatPostMessage($slUser->access_token, $slUser->authed_user_id, Notifications::getMessageAfterSubscribe());
                         // TODO add text
                         Session::flash('success-message', 'Connect slack added/updated');
                     } catch (GuzzleException $e) {
