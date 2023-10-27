@@ -137,7 +137,7 @@
                 </template>
                 <template v-else-if="!loading">
                     <div>
-                        <div class="flex items-center justify-center opacity-30 mt-3">
+                        <div class="flex items-center justify-center opacity-30 mt-6">
                             <img class="h-12" src="/img/logo.svg" alt="logo">
                         </div>
                     </div>
