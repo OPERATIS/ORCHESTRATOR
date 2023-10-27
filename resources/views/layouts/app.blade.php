@@ -28,7 +28,7 @@
             @include('layouts._menu')
         </div>
 
-        <div class="content lg:pl-[13.25rem]">
+        <div class="content pl-[13.25rem]">
             @yield('content')
         </div>
     </div>

@@ -22,7 +22,7 @@
                         Select Metric
                     </li>
                     <li v-for="(metric,index) in metrics" :key="metric"
-                        class="flex items-center text-sm text-dark uppercase pb-1.5"
+                        class="flex items-center text-sm text-dark uppercase pb-1.5 transition duration-200 hover:opacity-75"
                         :class="{ 'border-t border-dark border-opacity-10 py-1.5': index !== 0 }"
                         style="line-height: 18px;"
                         @click="selectMetric(metric)"

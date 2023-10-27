@@ -1,4 +1,4 @@
-<div class="flex flex-col px-4 pt-12 pt-5 pb-7 lg:min-h-screen border-r border-black border-opacity-10">
+<div class="flex flex-col px-4 pt-12 pt-5 pb-7 min-h-screen border-r border-black border-opacity-10">
     <div class="flex-1">
         <div class="w-full flex items-center py-1 px-2">
             <img class="h-6 w-6" src="/img/profile_icon.png" alt="logo">
@@ -16,11 +16,11 @@
                         style="box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.15); border-radius: 10px; transform: translateX(-30%);"
 
                     >
-                        <li class="flex items-center text-sm text-dark pb-1.5" style="line-height: 18px;">
+                        <li class="flex items-center text-sm text-dark pb-1.5 hover:opacity-75" style="line-height: 18px;">
                             <x-icon name="user-icon" class="w-5 h-5 text-black mr-1"/>
                             <a href="{{ route('profile') }}">Profile Settings</a>
                         </li>
-                        <li class="flex items-center text-sm text-dark pt-1.5 border-t border-dark border-opacity-10" style="line-height: 18px;">
+                        <li class="flex items-center text-sm text-dark pt-1.5 border-t border-dark border-opacity-10 hover:opacity-75" style="line-height: 18px;">
                             <x-icon name="logout-icon" class="w-5 h-5 text-black mr-1"/>
                             <a href="{{ route('logout') }}">Log Out</a>
                         </li>

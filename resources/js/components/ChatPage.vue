@@ -1,8 +1,8 @@
 <template>
-    <div class="relative flex max-w-[76.75rem] p-6 pb-0 flex-1">
+    <div class="relative flex p-6 pb-0 flex-1">
         <!--menu-->
         <div class="sticky top-6 w-[13.5rem] bg-primary_light rounded-2xl py-5 px-3 h-full flex flex-col"
-             style="height: calc(100vh - 120px);">
+             style="height: calc(100vh - 44px);">
             <div class="flex items-center justify-center text-sm text-green_2 cursor-pointer hover:text-opacity-80"
                  @click="createNewChat()">
                 <img class="w-6 h-6 mr-2"
@@ -16,7 +16,7 @@
             </div>
             <template v-if="chatsList && chatsList.length">
                 <div class="flex-col mt-1.5 flex-1 overflow-y-auto -mx-3">
-                    <div class="flex items-center h-8 text-sm text-gray_1 px-3 cursor-pointer"
+                    <div class="flex items-center h-8 text-sm text-gray_1 px-3 cursor-pointer hover:bg-primary_blue transition duration-200"
                          v-for="chat in chatsList"
                          :key="chat.id"
                          @click="selectChat(chat.id)"
@@ -41,11 +41,12 @@
                 </div>
             </template>
         </div>
-        <div class="relative w-full flex flex-col flex-1">
-            <div class="flex flex-col w-full ml-6 mt-3 pb-6 flex-1">
+        <div class="relative w-full flex flex-col flex-1 max-w-[76.75rem] mx-auto">
+            <div class="flex flex-col ml-6 mt-3 pb-6 flex-1">
                 <template v-if="chatId && !loading">
                     <!--header-->
-                    <div class="w-full flex items-center">
+                    <div class="w-full flex items-center pb-3 pt-9 -mt-9 sticky top-0 bg-white z-10 border-primary_light border-opacity-50"
+                    :class="{'border-b': chatMessages.length > 6}">
                         <div class="flex items-center text-2xl text-black font-semibold">
                             <img class="mr-2.5"
                                  src="/icons/chats-circle.svg"
@@ -72,7 +73,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="pt-3">
+                    <div>
                         <template v-if="systemMessage">
                             <div class="flex items-start p-4 bg-primary_light mt-4">
                                 <img class="w-8 h-8 mr-4"
@@ -143,7 +144,7 @@
                 </template>
             </div>
             <!-- message & suggestions-->
-            <div class="sticky bottom-0 ml-6 pb-8 bg-white w-full">
+            <div class="sticky bottom-0 ml-6 pb-8 bg-white">
                 <template v-if="!chatId && !loading">
                     <div class="grid grid-cols-3 gap-5 mb-5">
                         <div v-for="one in suggestions"
