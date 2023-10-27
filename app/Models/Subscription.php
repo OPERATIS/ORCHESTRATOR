@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Stripe\Subscription as StripeSubscription;
 
 class Subscription extends Model
@@ -36,5 +37,10 @@ class Subscription extends Model
     public function getIsProblem(): bool
     {
         return !in_array($this->status, [StripeSubscription::STATUS_ACTIVE, StripeSubscription::STATUS_CANCELED]);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
