@@ -198,18 +198,18 @@ export default {
             suggestions: [
                 {
                     'id': 1,
-                    'title': 'Explain RFM segmentation',
-                    'subtitle': 'Learn more about this information'
+                    'title': 'Tell me what is',
+                    'subtitle': 'my CAR metric value?'
                 },
                 {
                     'id': 2,
-                    'title': 'Explain RFM segmentation',
-                    'subtitle': 'Learn more about this information'
+                    'title': 'Tell me what metrics',
+                    'subtitle': 'should I collect in Google Analytics?'
                 },
                 {
                     'id': 3,
-                    'title': 'Explain RFM segmentation',
-                    'subtitle': 'Learn more about this information'
+                    'title': 'Tell me what is',
+                    'subtitle': 'TCCP and how it influences revenue?'
                 }
             ]
         };
