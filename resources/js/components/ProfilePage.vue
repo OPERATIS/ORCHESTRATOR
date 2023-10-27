@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-[76.75rem] px-9 py-6">
+    <div class="max-w-[84rem] mx-auto px-7 py-6">
         <div class="flex items-center">
             <div class="h-10 w-[20rem] flex justify-center items-center text-black_2 cursor-pointer border-b-4 border-transparent"
                  :class="{ '!border-green_2 text-black_5': tab === 'profile' }"

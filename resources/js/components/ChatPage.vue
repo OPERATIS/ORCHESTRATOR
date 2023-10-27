@@ -41,7 +41,7 @@
                 </div>
             </template>
         </div>
-        <div class="relative w-full flex flex-col flex-1 max-w-[76.75rem] mx-auto">
+        <div class="relative w-full flex flex-col flex-1 max-w-[84rem] mx-auto">
             <div class="flex flex-col ml-6 mt-3 pb-6 flex-1">
                 <template v-if="chatId && !loading">
                     <!--header-->
