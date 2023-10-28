@@ -1,10 +1,13 @@
 @extends('layouts.app')
 @section('content')
     <div>
-        <div class="h-[4.25rem] flex items-center px-7 text-sm text-gray_1 border-b border-black border-opacity-10">
-            Alerts
+        {{--max-w-[84rem]--}}
+        <div class="h-[4.25rem] flex items-center text-sm text-gray_1 border-b border-black border-opacity-10">
+            <div class="max-w-[84rem] w-full px-7 mx-auto">
+                Alerts
+            </div>
         </div>
-        <div class="max-w-[76.75rem]">
+        <div class="max-w-[84rem] mx-auto">
             <div class="px-7 py-6">
                 <div class="bg-primary_light p-6 pr-0" style="border-radius: 10px;">
                     <div class="text-sm text-black font-semibold mb-4">
@@ -34,7 +37,7 @@
                                 </div>
                                 <div class="ml-auto pr-5">
                                     <a href="{{route('chatsCreate', ['alert' => $alert->id])}}"
-                                       class="flex items-center font-extrabold text-sm text-green_2"
+                                       class="flex items-center font-extrabold text-sm text-green_2 transition duration-200 hover:opacity-75"
                                     >
                                         <x-icon name="chats-circle-icon" class="text-green_1 w-5 h-5 mr-3"/>
                                         <span class="underline">More details</span>

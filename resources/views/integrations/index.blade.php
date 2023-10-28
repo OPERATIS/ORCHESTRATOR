@@ -1,11 +1,13 @@
 @extends('layouts.app')
 @section('content')
     <div>
-        <div class="h-[4.25rem] flex items-center px-7 text-sm text-gray_1 border-b border-black border-opacity-10">
-            Integrations
+        <div class="h-[4.25rem] flex items-center text-sm text-gray_1 border-b border-black border-opacity-10">
+            <div class="max-w-[84rem] w-full px-7 mx-auto">
+                Integrations
+            </div>
         </div>
-        <div class="max-w-[76.75rem]">
-            <div class="p-9">
+        <div class="max-w-[84rem] mx-auto">
+            <div class="p-9 px-7">
                 <div class="ml-5 mt-1 text-2xl text-black font-semibold">
                     Marketing
                 </div>
