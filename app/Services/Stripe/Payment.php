@@ -4,6 +4,7 @@ namespace App\Services\Stripe;
 
 use App\Models\Subscription;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Stripe\Checkout\Session;
 use Stripe\Exception\ApiErrorException;
@@ -132,5 +133,43 @@ final class Payment
         ];
 
         return $lineItems;
+    }
+
+    /**
+     * @param null $stripeId
+     * @return array
+     */
+    public function getTransactions($stripeId = null): array
+    {
+        $prepared = [];
+        if ($stripeId) {
+            try {
+                $invoices = $this->stripeClient->invoices->all([
+                    'limit' => 100,
+                    'customer' => $stripeId,
+                    'status' => 'paid',
+                ]);
+
+                foreach ($invoices->data as $invoice) {
+                    $currentItem = [];
+                    $currentItem['invoice_pdf'] = $invoice->invoice_pdf;
+                    $currentItem['created'] = Carbon::parse($invoice->created)->toDateTimeString();
+                    $currentItem['total'] = $invoice->total / 100;
+
+                    foreach ($invoice->lines['data'] as $item) {
+                        $currentItem['items'][] = [
+                            'amount' => $item->amount / 100,
+                            'description' => $item->description,
+                        ];
+                    }
+
+                    $prepared[] = $currentItem;
+                }
+            } catch (\Exception $exception) {
+
+            }
+        }
+
+        return $prepared;
     }
 }
