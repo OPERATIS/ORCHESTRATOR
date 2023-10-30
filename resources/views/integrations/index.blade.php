@@ -9,7 +9,7 @@
         <div class="max-w-[84rem] mx-auto">
             <div class="p-9 px-7">
                 <div class="ml-5 mt-1 text-2xl text-black font-semibold">
-                    Marketing
+                    Data Source
                 </div>
                 <div class="mt-10 grid grid-cols-2 gap-6">
                     {{--Shopify--}}
@@ -18,13 +18,27 @@
                             <div>
                                 <img class="h-15 h-auto" src="/img/integrations/shopping.png" alt="shopify">
                             </div>
-                            <div class="flex flex-col">
-                                <div class="text-xl font-bold font-semibold text-black" style="line-height: 18px;">
-                                    Shopify
+                            <div class="w-full flex items-center">
+                                <div class="flex flex-col">
+                                    <div class="text-xl font-bold font-semibold text-black" style="line-height: 18px;">
+                                        Shopify
+                                    </div>
+                                    <div class="text-sm text-black mt-2" style="line-height: 18px;">
+                                        E-commerce platform
+                                    </div>
                                 </div>
-                                <div class="text-sm text-black mt-2" style="line-height: 18px;">
-                                    E-commerce platform
-                                </div>
+                                @if ($shopify ?? null)
+                                    <div class="ml-auto">
+                                        <div class="w-max flex text-sm text-black font-semibold px-4 py-2.5 bg-primary_green rounded-[0.625rem] ml-auto"
+                                             style="line-height: 14px;"
+                                        >
+                                            Connected
+                                        </div>
+                                        <div class="text-xs text-default text-opacity-50 pt-1.5">
+                                            {{$shopify->created_at->format('Y-m-d, H:i')}}
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                         <div class="mt-5">
@@ -36,12 +50,6 @@
                                 <button type="submit" class="w-full btn md btn_connect">
                                     Connect
                                 </button>
-{{--                                <button type="submit">--}}
-{{--                                    Shopify--}}
-{{--                                </button>--}}
-                                @if ($shopify ?? null)
-                                    {{$shopify->created_at}}
-                                @endif
                             </form>
                         </div>
                     </div>
@@ -51,13 +59,27 @@
                             <div>
                                 <img class="h-15 h-auto" src="/img/integrations/google_analytics.png" alt="google analytics">
                             </div>
-                            <div class="flex flex-col">
-                                <div class="text-xl font-bold font-semibold text-black" style="line-height: 18px;">
-                                    Google Analytics
+                            <div class="w-full flex items-center">
+                                <div class="flex flex-col">
+                                    <div class="text-xl font-bold font-semibold text-black" style="line-height: 18px;">
+                                        Google Analytics
+                                    </div>
+                                    <div class="text-sm text-black mt-2" style="line-height: 18px;">
+                                        Analytics platform
+                                    </div>
                                 </div>
-                                <div class="text-sm text-black mt-2" style="line-height: 18px;">
-                                    Analytics platform
-                                </div>
+                                @if ($googleAnalytics ?? null)
+                                    <div class="ml-auto">
+                                        <div class="w-max flex text-sm text-black font-semibold px-4 py-2.5 bg-primary_green rounded-[0.625rem] ml-auto"
+                                             style="line-height: 14px;"
+                                        >
+                                            Connected
+                                        </div>
+                                        <div class="text-xs text-default text-opacity-50 pt-1.5">
+                                            {{$googleAnalytics->created_at->format('Y-m-d, H:i')}}
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                         <div class="mt-5">
@@ -66,9 +88,6 @@
                             >
                                 Connect
                             </a>
-                            @if ($googleAnalytics ?? null)
-                                {{$googleAnalytics->created_at}}
-                            @endif
                         </div>
                     </div>
                     {{--Google Ads--}}
@@ -77,13 +96,27 @@
                             <div>
                                 <img class="h-15 h-auto" src="/img/integrations/google_ads.png" alt="google ads">
                             </div>
-                            <div class="flex flex-col">
-                                <div class="text-xl font-bold font-semibold text-black" style="line-height: 18px;">
-                                    Google Ads
+                            <div class="w-full flex items-center">
+                                <div class="flex flex-col">
+                                    <div class="text-xl font-bold font-semibold text-black" style="line-height: 18px;">
+                                        Google Ads
+                                    </div>
+                                    <div class="text-sm text-black mt-2" style="line-height: 18px;">
+                                        Online advertising platform
+                                    </div>
                                 </div>
-                                <div class="text-sm text-black mt-2" style="line-height: 18px;">
-                                    Online advertising platform
-                                </div>
+                                @if ($googleAdwords ?? null)
+                                    <div class="ml-auto">
+                                        <div class="w-max flex text-sm text-black font-semibold px-4 py-2.5 bg-primary_green rounded-[0.625rem] ml-auto"
+                                             style="line-height: 14px;"
+                                        >
+                                            Connected
+                                        </div>
+                                        <div class="text-xs text-default text-opacity-50 pt-1.5">
+                                            {{$googleAdwords->created_at->format('Y-m-d, H:i')}}
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                         <div class="mt-5">
@@ -92,9 +125,6 @@
                             >
                                 Connect
                             </a>
-                            @if ($googleAdwords ?? null)
-                                {{$googleAdwords->created_at}}
-                            @endif
                         </div>
                     </div>
                     {{--Facebook Ads--}}
@@ -103,13 +133,27 @@
                             <div>
                                 <img class="h-15 h-auto" src="/img/integrations/meta_ads.png" alt="meta ads">
                             </div>
-                            <div class="flex flex-col">
-                                <div class="text-xl font-bold font-semibold text-black" style="line-height: 18px;">
-                                    Meta Ads
+                            <div class="w-full flex items-center">
+                                <div class="flex flex-col">
+                                    <div class="text-xl font-bold font-semibold text-black" style="line-height: 18px;">
+                                        Meta Ads
+                                    </div>
+                                    <div class="text-sm text-black mt-2" style="line-height: 18px;">
+                                        Online advertising platform
+                                    </div>
                                 </div>
-                                <div class="text-sm text-black mt-2" style="line-height: 18px;">
-                                    Online advertising platform
-                                </div>
+                                @if ($facebook ?? null)
+                                    <div class="ml-auto">
+                                        <div class="w-max flex text-sm text-black font-semibold px-4 py-2.5 bg-primary_green rounded-[0.625rem] ml-auto"
+                                             style="line-height: 14px;"
+                                        >
+                                            Connected
+                                        </div>
+                                        <div class="text-xs text-default text-opacity-50 pt-1.5">
+                                            {{$facebook->created_at->format('Y-m-d, H:i')}}
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                         <div class="mt-5">
@@ -118,9 +162,6 @@
                             >
                                 Connect
                             </a>
-                            @if ($facebook ?? null)
-                                {{$facebook->created_at}}
-                            @endif
                         </div>
                     </div>
                 </div>
