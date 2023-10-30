@@ -13,20 +13,20 @@ class Metric extends Model
     public const PERIOD_HOUR = '1_hour';
     public const PERIOD_DAY = '1_day';
 
-    public const METRICS = ['l', 'c', 'p', 'q', 'ltv'];
+    public const METRICS = ['l', 'c', 'p', 'q', 'car'];
 
     public const L = 'l';
     public const C = 'c';
     public const P = 'p';
     public const Q = 'q';
-    public const LTV = 'ltv';
+    public const CAR = 'car';
 
     public const NAMES = [
         self::L => 'Leads',
         self::C => 'Conversion Rate',
         self::P => 'Average Check',
         self::Q => 'Average Quantity of Orders per Client',
-        self::LTV => 'Average lifetime value per successful client',
+        self::CAR => 'Cart Abandonment Rate',
     ];
 
     protected $guarded = [];
@@ -39,7 +39,7 @@ class Metric extends Model
         'c' => 'float',
         'p' => 'float',
         'q' => 'float',
-        'ltv' => 'float',
+        'car' => 'float',
         'map' => 'json',
         'pmd' => 'json'
     ];
