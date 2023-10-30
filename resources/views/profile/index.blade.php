@@ -40,6 +40,21 @@
             @else
                 <a href="{{route('paymentCreate')}}">Buy</a>
             @endif
+
+            @if ($transactions)
+                @foreach ($transactions as $transaction)
+                    <a href="{{$transaction['invoice_pdf']}}">PDF</a>
+                    Created at {{$transaction['created']}}
+                    Total {{$transaction['total']}}
+                    <br>
+                    @foreach ($transaction['items'] as $item)
+                        {{$item['amount']}}
+                        {{$item['description']}}
+                        <br>
+                    @endforeach
+                    <br>
+                @endforeach
+            @endif
         </div>
     </div>
 @endsection
