@@ -42,17 +42,23 @@
                             </div>
                         </div>
                         <div class="mt-5">
-                            <form method='POST' action="{{route('integrationsShopifyLogin')}}">
-                                {{ csrf_field() }}
-                                <label class="hidden">
-                                    <input name="shop" value="test-orchestrator.myshopify.com" placeholder="test-orchestrator.myshopify.com">
-                                </label>
-                                <button type="submit" class="w-full btn md btn_connect">
-                                    Connect
-                                </button>
-                            </form>
+                            <button type="submit" class="w-full btn md btn_connect"
+                                    @click="openModal('modal_shopify')"
+                            >
+                                Connect
+                            </button>
+{{--                            <form method='POST' action="{{route('integrationsShopifyLogin')}}">--}}
+{{--                                {{ csrf_field() }}--}}
+{{--                                <label class="hidden">--}}
+{{--                                    <input name="shop" value="test-orchestrator.myshopify.com" placeholder="test-orchestrator.myshopify.com">--}}
+{{--                                </label>--}}
+{{--                                <button type="submit" class="w-full btn md btn_connect">--}}
+{{--                                    Connect--}}
+{{--                                </button>--}}
+{{--                            </form>--}}
                         </div>
                     </div>
+
                     {{--Google Analytics--}}
                     <div class="col-span-1 bg-primary_light px-6 pt-8 pb-10" style="border-radius: 10px;">
                         <div class="flex items-center space-x-4">
@@ -82,12 +88,19 @@
                                 @endif
                             </div>
                         </div>
+{{--                        <div class="mt-5">--}}
+{{--                            <a href="{{route('integrationsGoogleLogin', ['service' => 'analytics'])}}"--}}
+{{--                                class="w-full btn md btn_connect"--}}
+{{--                            >--}}
+{{--                                Connect--}}
+{{--                            </a>--}}
+{{--                        </div>--}}
                         <div class="mt-5">
-                            <a href="{{route('integrationsGoogleLogin', ['service' => 'analytics'])}}"
-                                class="w-full btn md btn_connect"
+                            <button class="w-full btn md btn_connect"
+                                    @click="openModal('modal_google_analytics')"
                             >
-                                Connect
-                            </a>
+                                Configure
+                            </button>
                         </div>
                     </div>
                     {{--Google Ads--}}
@@ -179,5 +192,61 @@
             @endif
         </div>
     </div>
+
+    <modal-component ref="modal_shopify" :max-width="'635px'">
+        <div class="modal-slot">
+            <div class="flex flex-col">
+                <div class="text-black_5 text-2xl">Connect your Shopify Account</div>
+                <div class="text-green_2 mt-3 font-semibold">Important</div>
+                <div class="text-sm text-black_5">
+                    Copy and paste the URL you see in your <a class="text-green_2 underline" href="https://admin.shopify.com/" target="_blank">Shopify Admin</a> under <br/>
+                    "Online Store" › "Domains". <br/>
+                    You can also find the name of your store directly in the shopify admin URL. <br/>
+                    Extract "mystorename" from <span class="text-green_2 underline">https://admin.shopify.com/store / mystorename </span>.
+                </div>
+                <div class="mt-10">
+                    <form method='POST' action="{{route('integrationsShopifyLogin')}}">
+                        {{ csrf_field() }}
+                        <div class="input-block">
+                            <label for="shopify_url" class="label">MyShopify URL</label>
+                            <input id="shopify_url"
+                                   placeholder="Link"
+                                   class="input !pr-40"
+                                   type="text"
+                                   name="shop"
+                            >
+                            <button type="submit" class="absolute w-max top-1.5 right-1.5 w-full btn md btn_connect2">
+                                Connect
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </modal-component>
+
+    <modal-component ref="modal_google_analytics" :max-width="'460px'">
+        <div class="modal-slot">
+            <div class="flex flex-col">
+                <div class="text-black_5 text-2xl text-center">
+                    Chose Accounts for <br/>
+                    Google Analytics
+                </div>
+                <div class="flex flex-col mt-6">
+                    <div class="flex items-center border border-black border-opacity-10 px-4" style="height: 50px; border-radius: 5px;">
+                        <label class="custom-checkbox mr-5">
+                            <input id="shopify1" type="checkbox" class="checkbox">
+                            <span class="checkmark"></span>
+                        </label>
+                        <label for="shopify1" class="text-sm text-black cursor-pointer">UA - ovo.ua</label>
+                    </div>
+                </div>
+                <button class="btn btn_default lg mt-10">
+                    Save
+                </button>
+            </div>
+        </div>
+    </modal-component>
+
 @endsection
 
