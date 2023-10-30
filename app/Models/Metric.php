@@ -40,6 +40,8 @@ class Metric extends Model
         'p' => 'float',
         'q' => 'float',
         'ltv' => 'float',
+        'map' => 'json',
+        'pmd' => 'json'
     ];
 
     /**

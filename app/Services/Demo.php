@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Checkout;
+use App\Models\CheckoutLineItem;
 use App\Models\Integration;
 use App\Models\FbStat;
 use App\Models\GaStat;
 use App\Models\Order;
+use App\Models\OrderLineItem;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -122,6 +125,18 @@ class Demo
 
     public static function createOrders($startPeriod, $endPeriod)
     {
+        // Delete order line items
+        OrderLineItem::where('integration_id', Order::DEMO_INTEGRATION_ID)
+            ->whereIn('order_id', Order::select('id')
+                ->where('integration_id', Order::DEMO_INTEGRATION_ID)
+                ->where('order_created_at', '>=', $startPeriod)
+                ->where('order_created_at', '<=', $endPeriod)
+                ->get()
+                ->toArray()
+            )
+            ->delete();
+
+        // Delete orders
         Order::where('integration_id', Order::DEMO_INTEGRATION_ID)
             ->where('order_created_at', '>=', $startPeriod)
             ->where('order_created_at', '<=', $endPeriod)
@@ -131,11 +146,27 @@ class Demo
         for ($i = 0; $i < $count; $i++) {
             $orderId = time() + $i;
             $price = rand(100, 500);
-            Order::create([
+
+            $discountCodes = [];
+            if (rand(0, 10000) < 1000) {
+                $discountCodes[] = json_encode(['code' => 'code']);
+            }
+
+            // Payment
+            $paymentGatewayNames = [];
+            if (rand(0, 100) < 10) {
+                $paymentGatewayNames[] = 'cash';
+            } elseif (rand(0, 100) < 10) {
+                $paymentGatewayNames[] = 'card';
+            } else {
+                $paymentGatewayNames[] = 'paypal';
+            }
+
+            $localOrder = Order::create([
                 'integration_id' => Order::DEMO_INTEGRATION_ID,
                 'order_id' => $orderId,
                 'order_created_at' => Carbon::parse($startPeriod)->addSeconds(rand(0, 300)),
-                'financial_status' => rand(0, 100000) < 100 ? 'refunded' : '',
+                'financial_status' => rand(0, 100000) < 100 ? 'refunded' : 'paid',
                 'order_number' => $orderId,
                 'total_price' => $price,
                 'customer_id' => rand(0, 100000),
@@ -148,7 +179,87 @@ class Demo
                 'reference' => null,
                 'referring_site' => null,
                 'ads' => rand(0, 1),
+                'canceled_at' => rand(0, 1) ? Carbon::parse($startPeriod)->addSeconds(rand(0, 300)) : null,
+                'total_discounts' => rand(0, 100) < 10 ? 1 : 0,
+                'discount_codes' => $discountCodes,
+                'payment_gateway_names' => $paymentGatewayNames,
             ]);
+
+            $countLineItem = rand(0, $localOrder->count_line_items);
+            for ($j = 0; $j < $countLineItem; $j++) {
+                $productId = rand(0, 100);
+                $price = rand(1, 100);
+                OrderLineItem::create([
+                    'integration_id' => Order::DEMO_INTEGRATION_ID,
+                    'order_id' => $localOrder->id,
+                    'order_line_item_id' => uniqid(),
+                    'product_id' => $productId,
+                    'variant_id' => $productId,
+                    'price' => $price,
+                    'line_price' => $price,
+                    'quantity' => rand(1, 10),
+                    'gift_card' => rand(0, 1)
+                ]);
+            }
+        }
+
+        self::createCheckouts($startPeriod, $endPeriod);
+    }
+
+    public static function createCheckouts($startPeriod, $endPeriod)
+    {
+        // Delete checkout line items
+        CheckoutLineItem::where('integration_id', Order::DEMO_INTEGRATION_ID)
+            ->whereIn('checkout_id', Checkout::select('id')
+                ->where('integration_id', Order::DEMO_INTEGRATION_ID)
+                ->where('checkout_created_at', '>=', $startPeriod)
+                ->where('checkout_created_at', '<=', $endPeriod)
+                ->get()
+                ->toArray()
+            )->delete();
+
+        // Delete checkouts
+        Checkout::where('integration_id', Order::DEMO_INTEGRATION_ID)
+            ->where('checkout_created_at', '>=', $startPeriod)
+            ->where('checkout_created_at', '<=', $endPeriod)
+            ->delete();
+
+        $count = rand(0, 300);
+        for ($i = 0; $i < $count; $i++) {
+            $price = rand(100, 500);
+
+            $giftCards = [];
+            if (rand(0, 1000) < 100) {
+                $giftCards[] = json_encode(['code' => 'code']);
+            }
+
+            $localCheckout = Checkout::create([
+                'integration_id' => Order::DEMO_INTEGRATION_ID,
+                'token' => uniqid(),
+                'order_id' => $checkout->order_id ?? null,
+                'checkout_created_at' => Carbon::parse($startPeriod)->addSeconds(rand(0, 300)),
+                'checkout_completed_at' => null,
+                'customer_id' => rand(0, 100000),
+                'total_price' => $price,
+                'gift_cards' => $giftCards
+            ]);
+
+            $countLineItem = rand(0, 5);
+            for ($j = 0; $j < $countLineItem; $j++) {
+                $productId = rand(0, 100);
+                $price = rand(1, 100);
+                CheckoutLineItem::create([
+                    'integration_id' => Order::DEMO_INTEGRATION_ID,
+                    'checkout_id' => $localCheckout->id,
+                    'checkout_line_item_id' => uniqid(),
+                    'product_id' => $productId,
+                    'variant_id' => $productId,
+                    'price' => $price,
+                    'line_price' => $price,
+                    'quantity' => rand(1, 10),
+                    'gift_card' => rand(0, 1)
+                ]);
+            }
         }
     }
 }

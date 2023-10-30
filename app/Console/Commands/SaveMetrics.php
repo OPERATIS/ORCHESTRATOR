@@ -3,11 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Models\Analysis;
+use App\Models\Checkout;
+use App\Models\CheckoutLineItem;
 use App\Models\Integration;
 use App\Models\FbStat;
 use App\Models\GaStat;
 use App\Models\Metric;
 use App\Models\Order;
+use App\Models\OrderLineItem;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
@@ -84,7 +87,22 @@ class SaveMetrics extends Command
                     'c1' => 0,
                     'c' => 0,
                     'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
+                    'updated_at' => Carbon::now(),
+                    'map' => [],
+                    'cpd' => 0,
+                    'ccr' => 0,
+                    'car' => 0,
+                    'grccr' => 0,
+                    'aov' => 0,
+                    'dur' => 0,
+                    'mppr' => 0,
+                    'rr' => 0,
+                    'ct' => 0,
+                    'ccur' => 0,
+                    'pmd' => [],
+                    'cv' => 0,
+                    'gcur' => 0,
+                    'ttv' => 0
                 ];
             }
         }
@@ -92,7 +110,6 @@ class SaveMetrics extends Command
         // Facebook
         $fbMetrics = FbStat::selectRaw("
             sum(impressions) as REACH,
-            sum(clicks) as L,
             integration_id
         ")
             ->where('end_period', '>', $startPeriod)
@@ -107,14 +124,12 @@ class SaveMetrics extends Command
             $userId = $integrationIds[$fbMetric->integration_id] ?? null;
             if ($userId) {
                 $preparedMetrics[$userId]['reach'] = $fbMetric->reach;
-                $preparedMetrics[$userId]['l'] = $fbMetric->l;
             }
         }
 
         // Google
         $gaMetrics = GaStat::selectRaw("
             sum(pageviews) as REACH,
-            sum(ad_clicks) as L,
             integration_id
         ")
             ->where('end_period', '>', $startPeriod)
@@ -129,16 +144,21 @@ class SaveMetrics extends Command
             $userId = $integrationIds[$gaMetric->integration_id] ?? null;
             if ($userId) {
                 $preparedMetrics[$userId]['reach'] += $gaMetric->reach;
-                $preparedMetrics[$userId]['l'] += $gaMetric->l;
             }
         }
 
         // Order
         $orderMetrics = Order::selectRaw("
-            sum(total_line_items_price) as P,
+            sum(total_line_items_price) as totalLineItemsPrice,
+            sum(total_price) as totalPrice,
+            sum(total_discounts) as totalDiscounts,
+            count(CASE WHEN total_discounts > 0 THEN 1 END) as countOrdersWithDiscounts,
+            count(CASE WHEN count_line_items > 1 THEN 1 END) as countOrdersWithMoreThanOneProduct,
+            count(CASE WHEN JSONB_ARRAY_LENGTH(discount_codes) > 0 THEN 1 END) as countOrdersWithDiscountCodes,
             sum(count_line_items) as sumD,
             count(*) as countOrders,
             count(DISTINCT(customer_id)) + count(DISTINCT CASE WHEN customer_id IS NULL THEN 1 END) as countCustomers,
+            array_agg(payment_gateway_names) as payment_gateway_names,
             count(DISTINCT CASE WHEN ads THEN customer_id END) as AdsCLs,
             integration_id
         ")
@@ -150,23 +170,95 @@ class SaveMetrics extends Command
             ->groupBy(['integration_id'])
             ->get();
 
+        $ordersPaid = Order::selectRaw("
+            count(*) as countOrders,
+            sum(total_price) as totalPrice,
+            integration_id
+        ")
+            ->where('order_created_at', '>', $startPeriod)
+            ->where('order_created_at', '<=', $endPeriod)
+            ->where('financial_status', 'paid')
+            ->when($type === 'demo', function ($query) {
+                return $query->where('integration_id', Order::DEMO_INTEGRATION_ID);
+            })
+            ->groupBy(['integration_id'])
+            ->get();
+
+        $checkouts = Checkout::selectRaw("
+            count(*) as countCheckouts,
+            count(CASE WHEN customer_id IS NULL THEN 1 END) as guest,
+            count(CASE WHEN customer_id IS NOT NULL THEN 1 END) as registered,
+            avg(CASE WHEN checkout_created_at IS NOT NULL AND checkout_completed_at IS NOT NULL THEN EXTRACT(SECONDS FROM checkout_completed_at - checkout_created_at) END) as checkoutTime,
+            count(CASE WHEN JSONB_ARRAY_LENGTH(gift_cards) > 0 THEN 1 END) as countCheckoutsWithGiftCards,
+            integration_id
+        ")
+            ->where('checkout_created_at', '>', $startPeriod)
+            ->where('checkout_created_at', '<=', $endPeriod)
+            ->when($type === 'demo', function ($query) {
+                return $query->where('integration_id', Order::DEMO_INTEGRATION_ID);
+            })
+            ->groupBy(['integration_id'])
+            ->get();
+
         foreach ($orderMetrics as $orderMetric) {
             $userId = $integrationIds[$orderMetric->integration_id] ?? null;
             if ($userId) {
-                $preparedMetrics[$userId]['p'] = $orderMetric->p;
-                $preparedMetrics[$userId]['pu'] = $orderMetric->sumd ? ($orderMetric->p / $orderMetric->sumd) : 0;
+                $preparedMetrics[$userId]['p'] = $orderMetric->totallineitemsprice / $orderMetric->countorders;
+                $preparedMetrics[$userId]['pu'] = $orderMetric->sumd ? ($orderMetric->totallineitemsprice / $orderMetric->sumd) : 0;
                 $preparedMetrics[$userId]['d'] = $orderMetric->countorders ? ($orderMetric->sumd / $orderMetric->countorders) : 0;
                 $preparedMetrics[$userId]['q1'] = $orderMetric->countcustomers ? ($orderMetric->countorders / $orderMetric->countcustomers) : 0;
                 $preparedMetrics[$userId]['count_customers'] = $orderMetric->countcustomers;
                 $preparedMetrics[$userId]['cls'] = $orderMetric->countcustomers;
                 $preparedMetrics[$userId]['ads_cls'] = $orderMetric->adscls;
                 $preparedMetrics[$userId]['returns'] = 0;
+
+                // New
+                $checkout = $checkouts->where('integration_id', $orderMetric->integration_id)->first();
+                $orderPaid = $ordersPaid->where('integration_id', $orderMetric->integration_id)->first();
+                if ($checkout) {
+                    $preparedMetrics[$userId]['l'] = $checkout->countcheckouts;
+                }
+
                 $preparedMetrics[$userId]['c1'] = $preparedMetrics[$userId]['reach'] ? $preparedMetrics[$userId]['l'] / $preparedMetrics[$userId]['reach'] : 0;
-                $preparedMetrics[$userId]['c'] = $preparedMetrics[$userId]['l'] ? $preparedMetrics[$userId]['cls'] / $preparedMetrics[$userId]['l'] : 0;
+                $preparedMetrics[$userId]['c'] = $preparedMetrics[$userId]['l'] ? ($orderPaid->countorders ?? 0) / $preparedMetrics[$userId]['l'] : 0;
                 // Recalculate
                 $preparedMetrics[$userId]['q'] = $orderMetric->countcustomers ? ($orderMetric->countorders / $orderMetric->countcustomers) : 0;
                 $preparedMetrics[$userId]['ltv'] = $preparedMetrics[$userId]['p'] * $preparedMetrics[$userId]['q'];
                 $preparedMetrics[$userId]['r'] = $preparedMetrics[$userId]['cls'] * $preparedMetrics[$userId]['ltv'];
+                // New
+                $preparedMetrics[$userId]['cpd'] = $orderMetric->countorders ? ($orderMetric->sumd / $orderMetric->countorders) : 0;
+                if ($checkout && $orderPaid) {
+                    $preparedMetrics[$userId]['ccr'] = $checkout->countcheckouts ? ($orderPaid->countorders / $checkout->countcheckouts) : 0;
+                    $preparedMetrics[$userId]['car'] = 1 - ($checkout->countcheckouts ? ($orderPaid->countorders / $checkout->countcheckouts) : 0);
+                }
+
+                if ($checkout) {
+                    $preparedMetrics[$userId]['grccr'] = $checkout->registered ? $checkout->guest / $checkout->registered : 0;
+                    $preparedMetrics[$userId]['ct'] = $checkout->checkouttime;
+                    $preparedMetrics[$userId]['gcur'] = $checkout->countcheckouts ? $checkout->countcheckoutswithgiftcards / $checkout->countcheckouts : 0;
+                }
+
+                $preparedMetrics[$userId]['aov'] = $orderMetric->countorders ? $orderMetric->totalprice / $orderMetric->countorders : 0;
+                $preparedMetrics[$userId]['dur'] = $orderMetric->countorders ? $orderMetric->countorderswithdiscounts / $orderMetric->countorders : 0;
+                $preparedMetrics[$userId]['mppr'] = $orderMetric->countorders ? $orderMetric->countorderswithmorethanoneproduct / $orderMetric->countorders : 0;
+                $preparedMetrics[$userId]['ccur'] = $orderMetric->countorders ? $orderMetric->countorderswithdiscountcodes / $orderMetric->countorders : 0;
+
+                $paymentGatewayNames = json_decode($orderMetric->paymentgatewaynames);
+                $prepared = [];
+                if (is_array($paymentGatewayNames)) {
+                    foreach ($paymentGatewayNames as $paymentGatewayName) {
+                        if (is_array($paymentGatewayName)) {
+                            foreach ($paymentGatewayName as $item) {
+                                $prepared[$item] = ($prepared[$item] ?? 0) + 1;
+                            }
+                        }
+                    }
+                }
+                $preparedMetrics[$userId]['pmd'] = $prepared;
+
+                if ($orderPaid) {
+                    $preparedMetrics[$userId]['ttv'] = $orderPaid->totalprice;
+                }
             }
         }
 
@@ -181,18 +273,123 @@ class SaveMetrics extends Command
             ->groupBy(['integration_id'])
             ->get();
 
-        foreach ($orderMetricsReturns as $orderMetric) {
-            $userId = $integrationIds[$orderMetric->integration_id] ?? null;
+        foreach ($orderMetricsReturns as $orderMetricReturn) {
+            $userId = $integrationIds[$orderMetricReturn->integration_id] ?? null;
             if ($userId) {
-                $preparedMetrics[$userId]['returns'] = $preparedMetrics[$userId]['count_customers'] ? ($orderMetric->countorders / $preparedMetrics[$userId]['count_customers']) : 0;
+                $preparedMetrics[$userId]['returns'] = $preparedMetrics[$userId]['count_customers'] ? ($orderMetricReturn->countorders / $preparedMetrics[$userId]['count_customers']) : 0;
                 // Recalculate if found returns
                 $preparedMetrics[$userId]['q'] = $preparedMetrics[$userId]['q1'] - $preparedMetrics[$userId]['returns'];
                 $preparedMetrics[$userId]['ltv'] = $preparedMetrics[$userId]['p'] * $preparedMetrics[$userId]['q'];
                 $preparedMetrics[$userId]['r'] = $preparedMetrics[$userId]['cls'] * $preparedMetrics[$userId]['ltv'];
+                // New
+                $orderPaid = $ordersPaid->where('integration_id', $orderMetricReturn->integration_id)->first();
+                if ($orderPaid) {
+                    $preparedMetrics[$userId]['rr'] = $orderPaid->countorders > 0 ? $orderMetricReturn->countorders / $orderPaid->countorders : 0;
+                }
             }
         }
 
-        Metric::insert($preparedMetrics);
+        // Order and line items
+        $orderIds = Order::query()
+            ->where('order_created_at', '>', $startPeriod)
+            ->where('order_created_at', '<=', $endPeriod)
+            ->when($type === 'demo', function ($query) {
+                return $query->where('integration_id', Order::DEMO_INTEGRATION_ID);
+            })
+            ->pluck('id')
+            ->toArray();
+
+        $orderLineItems = OrderLineItem::selectRaw("
+            product_id,
+            count(*) as countProducts,
+            integration_id
+        ")
+            ->whereIn('order_id', $orderIds)
+            ->groupBy(['product_id', 'integration_id'])
+            ->get();
+
+        // Checkout and line items
+        $checkoutIds = Checkout::query()
+            ->where('checkout_created_at', '>', $startPeriod)
+            ->where('checkout_created_at', '<=', $endPeriod)
+            ->when($type === 'demo', function ($query) {
+                return $query->where('integration_id', Order::DEMO_INTEGRATION_ID);
+            })
+            ->pluck('id')
+            ->toArray();
+
+        $checkoutLineItems = CheckoutLineItem::selectRaw("
+            product_id,
+            count(*) as countProducts,
+            integration_id
+        ")
+            ->whereIn('checkout_id', $checkoutIds)
+            ->groupBy(['product_id', 'integration_id'])
+            ->get();
+
+        $collectOrderLineItems = collect($orderLineItems);
+
+        $products = [];
+        foreach ($checkoutLineItems as $checkoutLineItem) {
+            $userId = $integrationIds[$checkoutLineItem->integration_id] ?? null;
+            if ($userId) {
+                $trySearch = $collectOrderLineItems->where('product_id', $checkoutLineItem->product_id)
+                    ->where('integration_id', $checkoutLineItem->integration_id)
+                    ->first();
+
+                if (!$trySearch || ($trySearch->countProducts !== $checkoutLineItem->countProducts)) {
+                    $products[$userId][$checkoutLineItem->product_id] = $checkoutLineItem->countProducts - $trySearch->countProducts;
+                }
+            }
+        }
+
+        foreach ($products as $userId => $productsUser) {
+            // Problem products
+            if (count($productsUser)) {
+                rsort($productsUser);
+                $productId = array_key_first($productsUser);
+                $prepared = [];
+                $count = 0;
+                foreach ($productsUser as $product) {
+                    if ($count < 5) {
+                        $prepared[] = $product;
+                    }
+                    $count++;
+                }
+                $preparedMetrics[$userId]['map'] = $prepared;
+            }
+        }
+
+        // Checkout and line items
+        $checkoutIds = Checkout::query()
+            ->where('checkout_created_at', '>', $startPeriod)
+            ->where('checkout_created_at', '<=', $endPeriod)
+            ->whereNull('checkout_completed_at')
+            ->when($type === 'demo', function ($query) {
+                return $query->where('integration_id', Order::DEMO_INTEGRATION_ID);
+            })
+            ->pluck('id')
+            ->toArray();
+
+        $checkoutLineItems = CheckoutLineItem::selectRaw("
+            sum(line_price) as linePrice,
+            count(DISTINCT(checkout_id)) as countCheckouts,
+            integration_id
+        ")
+            ->whereIn('checkout_id', $checkoutIds)
+            ->groupBy(['integration_id'])
+            ->get();
+
+        foreach ($checkoutLineItems as $checkoutLineItem) {
+            $userId = $integrationIds[$checkoutLineItem->integration_id] ?? null;
+            if ($userId) {
+                $preparedMetrics[$userId]['cv'] = $checkoutLineItem->countcheckouts > 0 ? $checkoutLineItem->lineprice / $checkoutLineItem->countcheckouts : 0;
+            }
+        }
+
+        foreach ($preparedMetrics as $preparedMetric) {
+            Metric::create($preparedMetric);
+        }
 
         // Search alerts
         if ($period === Metric::PERIOD_HOUR) {
