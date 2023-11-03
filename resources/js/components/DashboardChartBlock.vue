@@ -72,7 +72,7 @@ export default {
     data(){
         return {
             isOpenDropdown: false,
-            metrics:  ['l', 'c', 'p', 'q', 'ltv'],
+            metrics:  ['l', 'c', 'p', 'q', 'car'],
             selectedMetric: 'l',
             chartOptions: {
                 series: [{

@@ -28,7 +28,7 @@ class DemoStats extends Command
         $this->info('Connections created');
 
         // Generate old data
-        $start = Carbon::parse('2023-08-01 00:00:00')->startOfMonth();
+        $start = Carbon::parse('2023-10-01 00:00:00')->startOfMonth();
         $end = Carbon::now()->endOfDay();
 
         do {

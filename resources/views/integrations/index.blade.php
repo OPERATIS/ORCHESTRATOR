@@ -31,7 +31,7 @@
                             <form method='POST' action="{{route('integrationsShopifyLogin')}}">
                                 {{ csrf_field() }}
                                 <label class="hidden">
-                                    <input name="shop" value="test-orchestrator.myshopify.com" placeholder="test-orchestrator.myshopify.com">
+                                    <input name="shop" value="test-with-data-orchestrator.myshopify.com" placeholder="test-with-data-orchestrator.myshopify.com">
                                 </label>
                                 <button type="submit" class="w-full btn md btn_connect">
                                     Connect

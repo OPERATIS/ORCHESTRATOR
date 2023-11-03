@@ -5,19 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Order extends Model
+class Checkout extends Model
 {
     use HasFactory;
 
-    public const DEMO_INTEGRATION_ID = 6;
-
     protected $guarded = [];
     public $dates = [
-        'order_created_at',
-        'canceled_at'
+        'checkout_created_at',
+        'checkout_completed_at'
     ];
     public $casts = [
-        'discount_codes' => 'json',
-        'payment_gateway_names' => 'json',
+        'gift_cards' => 'json',
     ];
 }

@@ -95,7 +95,8 @@ class AuthController extends Controller
                 'redirect' => url('dashboard')
             ]);
         } else {
-            return view('auth.registration');
+            // TODO change tab
+            return view('auth.login');
         }
     }
 
@@ -149,7 +150,8 @@ class AuthController extends Controller
                 }
             }
         } else {
-            return view('auth.forgot-password');
+            // TODO change tab
+            return view('auth.login');
         }
     }
 
