@@ -126,6 +126,30 @@
                 </div>
             </div>
 
+            Example: integrations/google
+            {"status":true,"info":[]}
+            {"status":true,"info":{"type":"ga_profiles","id":4,"name":"site.com","actual":null,"created_at":null}}
+
+            Example: integrations/shopify
+            {"status":true,"info":{"type":"integrations","id":6,"app_user_slug":"test-with-data-orchestrator.myshopify.com","created_at":"2023-10-15T10:05:07.000000Z"}}
+
+            POST
+            <form method="POST" action="{{route('integrationsUpdatePlatform', 'google')}}">
+                {{ csrf_field() }}
+                {{-- id=4 --}}
+                <input value="ga_profiles" name="platform[4][type]">
+                <input type="checkbox" checked name="platform[4][actual]">
+                <button type="submit">SUBMIT</button>
+            </form>
+
+            <form method="POST" action="{{route('integrationsUpdatePlatform', 'shopify')}}">
+                {{ csrf_field() }}
+                {{-- id=6 --}}
+                <input value="integrations" name="platform[6][type]">
+                <input type="checkbox" checked name="platform[6][delete]">
+                <button type="submit">SUBMIT</button>
+            </form>
+
             @if ($gaProfiles ?? null)
                 @foreach ($gaProfiles as $googleProfile)
                     {{$googleProfile->name}}
