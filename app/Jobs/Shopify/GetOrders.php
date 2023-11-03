@@ -64,6 +64,11 @@ class GetOrders implements ShouldQueue
                             'refunds',
                             'reference',
                             'referring_site',
+                            'canceled_at',
+                            'total_discounts',
+                            'discount_codes',
+                            'payment_gateway_names',
+                            'transactions'
                         ])
                     ]);
                 } else {
@@ -104,10 +109,10 @@ class GetOrders implements ShouldQueue
                         'reference' => $order->reference,
                         'referring_site' => $order->referring_site,
                         'ads' => $ads,
-                        'canceled_at' => $order->canceled_at,
-                        'total_discounts' => $order->total_discounts,
-                        'discount_codes' => $order->discount_codes,
-                        'payment_gateway_names' => $order->payment_gateway_names,
+                        'canceled_at' => $order->canceled_at ?? null,
+                        'total_discounts' => $order->total_discounts ?? null,
+                        'discount_codes' => $order->discount_codes ?? null,
+                        'payment_gateway_names' => $order->payment_gateway_names ?? null,
                     ]);
 
                     // Delete old records
@@ -132,7 +137,6 @@ class GetOrders implements ShouldQueue
                             'product_id' => $lineItem->product_id,
                             'variant_id' => $lineItem->variant_id,
                             'price' => $lineItem->price,
-                            'line_price' => $lineItem->line_price,
                             'quantity' => $lineItem->quantity,
                             'gift_card' => $lineItem->gift_card
                         ]);

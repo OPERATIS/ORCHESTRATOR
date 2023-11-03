@@ -196,7 +196,6 @@ class Demo
                     'product_id' => $productId,
                     'variant_id' => $productId,
                     'price' => $price,
-                    'line_price' => $price,
                     'quantity' => rand(1, 10),
                     'gift_card' => rand(0, 1)
                 ]);
@@ -238,8 +237,8 @@ class Demo
                 'token' => uniqid(),
                 'order_id' => $checkout->order_id ?? null,
                 'checkout_created_at' => Carbon::parse($startPeriod)->addSeconds(rand(0, 300)),
-                'checkout_completed_at' => null,
-                'customer_id' => rand(0, 100000),
+                'checkout_completed_at' =>  rand(0, 10) > 3 ? null : Carbon::parse($startPeriod)->addSeconds(rand(300, 900)),
+                'customer_id' => rand(0, 10) > 3 ? rand(0, 100000) : null,
                 'total_price' => $price,
                 'gift_cards' => $giftCards
             ]);

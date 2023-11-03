@@ -88,21 +88,24 @@ class SaveMetrics extends Command
                     'c' => 0,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
-                    'map' => [],
-                    'cpd' => 0,
-                    'ccr' => 0,
+                    'l_map' => [],
+                    'l_cpd' => 0,
+                    'l_ccr' => 0,
                     'car' => 0,
-                    'grccr' => 0,
-                    'aov' => 0,
-                    'dur' => 0,
-                    'mppr' => 0,
-                    'rr' => 0,
-                    'ct' => 0,
-                    'ccur' => 0,
-                    'pmd' => [],
-                    'cv' => 0,
-                    'gcur' => 0,
-                    'ttv' => 0
+                    'c_car' => 0,
+                    'c_grccr' => 0,
+                    'p_aov' => 0,
+                    'p_dur' => 0,
+                    'p_mppr' => 0,
+                    'q_rr' => 0,
+                    'car_ct' => 0,
+                    'p_ccur' => 0,
+                    'c_pmd' => [],
+                    'p_cv' => 0,
+                    'q_gcur' => 0,
+                    'car_ttv' => 0,
+                    'car_pmu' => [],
+                    'car_fpr' => 0
                 ];
             }
         }
@@ -158,7 +161,7 @@ class SaveMetrics extends Command
             sum(count_line_items) as sumD,
             count(*) as countOrders,
             count(DISTINCT(customer_id)) + count(DISTINCT CASE WHEN customer_id IS NULL THEN 1 END) as countCustomers,
-            array_agg(payment_gateway_names) as payment_gateway_names,
+            jsonb_agg(payment_gateway_names) as paymentGatewayNames,
             count(DISTINCT CASE WHEN ads THEN customer_id END) as AdsCLs,
             integration_id
         ")
@@ -226,22 +229,23 @@ class SaveMetrics extends Command
                 $preparedMetrics[$userId]['ltv'] = $preparedMetrics[$userId]['p'] * $preparedMetrics[$userId]['q'];
                 $preparedMetrics[$userId]['r'] = $preparedMetrics[$userId]['cls'] * $preparedMetrics[$userId]['ltv'];
                 // New
-                $preparedMetrics[$userId]['cpd'] = $orderMetric->countorders ? ($orderMetric->sumd / $orderMetric->countorders) : 0;
+                $preparedMetrics[$userId]['l_cpd'] = $orderMetric->countorders ? ($orderMetric->sumd / $orderMetric->countorders) : 0;
                 if ($checkout && $orderPaid) {
-                    $preparedMetrics[$userId]['ccr'] = $checkout->countcheckouts ? ($orderPaid->countorders / $checkout->countcheckouts) : 0;
+                    $preparedMetrics[$userId]['l_ccr'] = $checkout->countcheckouts ? ($orderPaid->countorders / $checkout->countcheckouts) : 0;
                     $preparedMetrics[$userId]['car'] = 1 - ($checkout->countcheckouts ? ($orderPaid->countorders / $checkout->countcheckouts) : 0);
+                    $preparedMetrics[$userId]['c_car'] = 1 - ($checkout->countcheckouts ? ($orderPaid->countorders / $checkout->countcheckouts) : 0);
                 }
 
                 if ($checkout) {
-                    $preparedMetrics[$userId]['grccr'] = $checkout->registered ? $checkout->guest / $checkout->registered : 0;
-                    $preparedMetrics[$userId]['ct'] = $checkout->checkouttime;
-                    $preparedMetrics[$userId]['gcur'] = $checkout->countcheckouts ? $checkout->countcheckoutswithgiftcards / $checkout->countcheckouts : 0;
+                    $preparedMetrics[$userId]['c_grccr'] = $checkout->registered ? $checkout->guest / $checkout->registered : 0;
+                    $preparedMetrics[$userId]['car_ct'] = $checkout->checkouttime;
+                    $preparedMetrics[$userId]['q_gcur'] = $checkout->countcheckouts ? $checkout->countcheckoutswithgiftcards / $checkout->countcheckouts : 0;
                 }
 
-                $preparedMetrics[$userId]['aov'] = $orderMetric->countorders ? $orderMetric->totalprice / $orderMetric->countorders : 0;
-                $preparedMetrics[$userId]['dur'] = $orderMetric->countorders ? $orderMetric->countorderswithdiscounts / $orderMetric->countorders : 0;
-                $preparedMetrics[$userId]['mppr'] = $orderMetric->countorders ? $orderMetric->countorderswithmorethanoneproduct / $orderMetric->countorders : 0;
-                $preparedMetrics[$userId]['ccur'] = $orderMetric->countorders ? $orderMetric->countorderswithdiscountcodes / $orderMetric->countorders : 0;
+                $preparedMetrics[$userId]['p_aov'] = $orderMetric->countorders ? $orderMetric->totalprice / $orderMetric->countorders : 0;
+                $preparedMetrics[$userId]['p_dur'] = $orderMetric->countorders ? $orderMetric->countorderswithdiscounts / $orderMetric->countorders : 0;
+                $preparedMetrics[$userId]['p_mppr'] = $orderMetric->countorders ? $orderMetric->countorderswithmorethanoneproduct / $orderMetric->countorders : 0;
+                $preparedMetrics[$userId]['p_ccur'] = $orderMetric->countorders ? $orderMetric->countorderswithdiscountcodes / $orderMetric->countorders : 0;
 
                 $paymentGatewayNames = json_decode($orderMetric->paymentgatewaynames);
                 $prepared = [];
@@ -254,10 +258,11 @@ class SaveMetrics extends Command
                         }
                     }
                 }
-                $preparedMetrics[$userId]['pmd'] = $prepared;
+                $preparedMetrics[$userId]['c_pmd'] = $prepared;
+                $preparedMetrics[$userId]['car_pmu'] = $prepared;
 
                 if ($orderPaid) {
-                    $preparedMetrics[$userId]['ttv'] = $orderPaid->totalprice;
+                    $preparedMetrics[$userId]['car_ttv'] = $orderPaid->totalprice;
                 }
             }
         }
@@ -284,7 +289,7 @@ class SaveMetrics extends Command
                 // New
                 $orderPaid = $ordersPaid->where('integration_id', $orderMetricReturn->integration_id)->first();
                 if ($orderPaid) {
-                    $preparedMetrics[$userId]['rr'] = $orderPaid->countorders > 0 ? $orderMetricReturn->countorders / $orderPaid->countorders : 0;
+                    $preparedMetrics[$userId]['q_rr'] = $orderPaid->countorders > 0 ? $orderMetricReturn->countorders / $orderPaid->countorders : 0;
                 }
             }
         }
@@ -337,8 +342,9 @@ class SaveMetrics extends Command
                     ->where('integration_id', $checkoutLineItem->integration_id)
                     ->first();
 
-                if (!$trySearch || ($trySearch->countProducts !== $checkoutLineItem->countProducts)) {
-                    $products[$userId][$checkoutLineItem->product_id] = $checkoutLineItem->countProducts - $trySearch->countProducts;
+                if (!$trySearch || ($trySearch->countproducts !== $checkoutLineItem->countproducts)) {
+                    $products[$userId][$checkoutLineItem->product_id] = $checkoutLineItem->countproducts - ($trySearch->countproducts ?? 0);
+                    $products[$userId][$checkoutLineItem->product_id] = $products[$userId][$checkoutLineItem->product_id] > 0 ? $products[$userId][$checkoutLineItem->product_id] : 0;
                 }
             }
         }
@@ -346,17 +352,16 @@ class SaveMetrics extends Command
         foreach ($products as $userId => $productsUser) {
             // Problem products
             if (count($productsUser)) {
-                rsort($productsUser);
-                $productId = array_key_first($productsUser);
+                arsort($productsUser);
                 $prepared = [];
                 $count = 0;
-                foreach ($productsUser as $product) {
+                foreach ($productsUser as $productId => $value) {
                     if ($count < 5) {
-                        $prepared[] = $product;
+                        $prepared[] = $productId;
                     }
                     $count++;
                 }
-                $preparedMetrics[$userId]['map'] = $prepared;
+                $preparedMetrics[$userId]['l_map'] = $prepared;
             }
         }
 
@@ -383,7 +388,7 @@ class SaveMetrics extends Command
         foreach ($checkoutLineItems as $checkoutLineItem) {
             $userId = $integrationIds[$checkoutLineItem->integration_id] ?? null;
             if ($userId) {
-                $preparedMetrics[$userId]['cv'] = $checkoutLineItem->countcheckouts > 0 ? $checkoutLineItem->lineprice / $checkoutLineItem->countcheckouts : 0;
+                $preparedMetrics[$userId]['p_cv'] = $checkoutLineItem->countcheckouts > 0 ? $checkoutLineItem->lineprice / $checkoutLineItem->countcheckouts : 0;
             }
         }
 

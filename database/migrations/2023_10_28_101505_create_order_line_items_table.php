@@ -22,7 +22,6 @@ class CreateOrderLineItemsTable extends Migration
             $table->unsignedBigInteger('product_id')->index();
             $table->unsignedBigInteger('variant_id')->index();
             $table->float('price');
-            $table->float('line_price');
             $table->float('quantity')->nullable();
             $table->boolean('gift_card');
             $table->timestamps();

@@ -14,21 +14,24 @@ class AddNewColumnsToMetricsTable extends Migration
     public function up()
     {
         Schema::table('metrics', function (Blueprint $table) {
-            $table->jsonb('map')->nullable();
-            $table->float('cpd')->default(0);
-            $table->float('ccr')->default(0);
-            $table->float('car')->default(0);
-            $table->float('grccr')->default(0);
-            $table->float('aov')->default(0);
-            $table->float('dur')->default(0);
-            $table->float('mppr')->default(0);
-            $table->float('rr')->default(0);
-            $table->float('ct')->nullable();
-            $table->float('ccur')->default(0);
-            $table->jsonb('pmd')->nullable();
-            $table->float('cv')->default(0);
-            $table->float('gcur')->default(0);
-            $table->float('ttv')->default(0);
+            $table->jsonb('l_map')->nullable();
+            $table->float('l_cpd')->nullable();
+            $table->float('l_ccr')->nullable();
+            $table->float('car')->nullable();
+            $table->float('c_car')->nullable();
+            $table->float('c_grccr')->nullable();
+            $table->float('p_aov')->nullable();
+            $table->float('p_dur')->nullable();
+            $table->float('p_mppr')->nullable();
+            $table->float('q_rr')->nullable();
+            $table->float('car_ct')->nullable();
+            $table->float('p_ccur')->nullable();
+            $table->jsonb('c_pmd')->nullable();
+            $table->float('p_cv')->nullable();
+            $table->float('q_gcur')->nullable();
+            $table->float('car_ttv')->nullable();
+            $table->jsonb('car_pmu')->nullable();
+            $table->float('car_fpr')->nullable();
         });
     }
 
@@ -40,21 +43,24 @@ class AddNewColumnsToMetricsTable extends Migration
     public function down()
     {
         Schema::table('metrics', function (Blueprint $table) {
-            $table->dropColumn('map');
-            $table->dropColumn('cpd');
-            $table->dropColumn('ccr');
+            $table->dropColumn('l_map');
+            $table->dropColumn('l_cpd');
+            $table->dropColumn('l_ccr');
             $table->dropColumn('car');
-            $table->dropColumn('grccr');
-            $table->dropColumn('aov');
-            $table->dropColumn('dur');
-            $table->dropColumn('mppr');
-            $table->dropColumn('rr');
-            $table->dropColumn('ct');
-            $table->dropColumn('ccur');
-            $table->dropColumn('pmd');
-            $table->dropColumn('cv');
-            $table->dropColumn('gcur');
-            $table->dropColumn('ttv');
+            $table->dropColumn('c_car');
+            $table->dropColumn('c_grccr');
+            $table->dropColumn('p_aov');
+            $table->dropColumn('p_dur');
+            $table->dropColumn('p_mppr');
+            $table->dropColumn('q_rr');
+            $table->dropColumn('car_ct');
+            $table->dropColumn('p_ccur');
+            $table->dropColumn('c_pmd');
+            $table->dropColumn('p_cv');
+            $table->dropColumn('q_gcur');
+            $table->dropColumn('car_ttv');
+            $table->dropColumn('car_pmu');
+            $table->dropColumn('car_fpr');
         });
     }
 }
