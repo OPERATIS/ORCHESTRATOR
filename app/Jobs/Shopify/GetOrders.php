@@ -4,6 +4,7 @@ namespace App\Jobs\Shopify;
 
 use App\Models\Integration;
 use App\Models\Order;
+use App\Models\OrderLineItem;
 use App\Services\Log as LogService;
 use App\Services\Shopify;
 use Carbon\Carbon;
@@ -42,7 +43,6 @@ class GetOrders implements ShouldQueue
 
         $attempt = 0;
         $pageInfo = null;
-        $orders = [];
         do {
             try {
                 $client = new Rest($shopify->app_user_slug, $shopify->access_token);
@@ -64,6 +64,11 @@ class GetOrders implements ShouldQueue
                             'refunds',
                             'reference',
                             'referring_site',
+                            'canceled_at',
+                            'total_discounts',
+                            'discount_codes',
+                            'payment_gateway_names',
+                            'transactions'
                         ])
                     ]);
                 } else {
@@ -74,8 +79,7 @@ class GetOrders implements ShouldQueue
                 $serializedPageInfo = serialize($pageInfo);
                 $pageInfo = unserialize($serializedPageInfo);
 
-
-                $responseOrders = json_decode($response->getBody()->getContents());
+                $responseOrders = json_decode($response->getBody());
                 foreach ($responseOrders->orders as $order) {
                     $totalRefundLineItemsPrice = 0;
                     foreach ($order->refunds->refund_line_items ?? [] as $one) {
@@ -89,30 +93,61 @@ class GetOrders implements ShouldQueue
                         $ads = true;
                     }
 
-                    Order::updateOrCreate([
-                        "integration_id" => $shopify->id,
-                        "order_id" => $order->id,
-                        "order_number" => $order->order_number,
+                    $localOrder = Order::updateOrCreate([
+                        'integration_id' => $shopify->id,
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number,
                     ], [
-                        "order_created_at" => Carbon::parse($order->created_at)->setTimezone(0),
-                        "financial_status" => $order->financial_status,
-                        "total_price" => $order->total_price,
-                        "customer_id" => $order->customer->id ?? null,
-                        "total_line_items_price" => $order->total_line_items_price,
-                        "count_line_items" => count($order->line_items ?? []),
-                        "total_refund_line_items_price" => $totalRefundLineItemsPrice,
-                        "count_refund_line_items" => count($order->refunds->refund_line_items ?? []),
-                        "reference" => $order->reference,
-                        "referring_site" => $order->referring_site,
-                        "ads" => $ads
+                        'order_created_at' => Carbon::parse($order->created_at)->setTimezone(0),
+                        'financial_status' => $order->financial_status,
+                        'total_price' => $order->total_price,
+                        'customer_id' => $order->customer->id ?? null,
+                        'total_line_items_price' => $order->total_line_items_price,
+                        'count_line_items' => count($order->line_items ?? []),
+                        'total_refund_line_items_price' => $totalRefundLineItemsPrice,
+                        'count_refund_line_items' => count($order->refunds->refund_line_items ?? []),
+                        'reference' => $order->reference,
+                        'referring_site' => $order->referring_site,
+                        'ads' => $ads,
+                        'canceled_at' => $order->canceled_at ?? null,
+                        'total_discounts' => $order->total_discounts ?? null,
+                        'discount_codes' => $order->discount_codes ?? null,
+                        'payment_gateway_names' => $order->payment_gateway_names ?? null,
                     ]);
+
+                    // Delete old records
+                    $orderLineItemIds = [];
+                    foreach ($order->line_items as $lineItem) {
+                        $orderLineItemIds[] = $lineItem->id;
+                    }
+
+                    if (count($orderLineItemIds)) {
+                        OrderLineItem::query()
+                            ->where('order_id', $localOrder->id)
+                            ->whereNotIn('order_line_item_id', $orderLineItemIds)
+                            ->delete();
+                    }
+
+                    foreach ($order->line_items as $lineItem) {
+                        OrderLineItem::updateOrCreate([
+                            'integration_id' => $shopify->id,
+                            'order_id' => $localOrder->id,
+                            'order_line_item_id' => $lineItem->id
+                        ], [
+                            'product_id' => $lineItem->product_id,
+                            'variant_id' => $lineItem->variant_id,
+                            'price' => $lineItem->price,
+                            'quantity' => $lineItem->quantity,
+                            'gift_card' => $lineItem->gift_card
+                        ]);
+                    }
                 }
 
                 $attempt = 0;
-                $logService->addSuccess('get');
+                $logService->addSuccess('GetOrders');
             } catch (\Exception $exception) {
                 $attempt++;
-                $logService->addError('get', $exception->getMessage());
+                $logService->addError('GetOrders', $exception->getMessage());
             }
         } while ($pageInfo && $pageInfo->hasNextPage() && $attempt < 3);
     }

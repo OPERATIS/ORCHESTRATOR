@@ -1,10 +1,12 @@
 @extends('layouts.app')
 @section('content')
     <div>
-        <div class="h-[4.25rem] flex items-center px-7 text-sm text-gray_1 border-b border-black border-opacity-10">
-            Dashboard
+        <div class="h-[4.25rem] flex items-center text-sm text-gray_1 border-b border-black border-opacity-10">
+            <div class="max-w-[84rem] w-full px-7 mx-auto">
+                Dashboard
+            </div>
         </div>
-        <div class="max-w-[76.75rem]">
+        <div class="max-w-[84rem] mx-auto">
             <div class="px-7 py-8">
                 <div class="flex items-center w-full items-center gap-3">
                     @foreach($metricsActualData as $metricKey => $metricActualData)

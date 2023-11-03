@@ -1,11 +1,13 @@
 @extends('layouts.app')
 @section('content')
     <div>
-        <div class="h-[4.25rem] flex items-center px-7 text-sm text-gray_1 border-b border-black border-opacity-10">
-            Integrations
+        <div class="h-[4.25rem] flex items-center text-sm text-gray_1 border-b border-black border-opacity-10">
+            <div class="max-w-[84rem] w-full px-7 mx-auto">
+                Integrations
+            </div>
         </div>
-        <div class="max-w-[76.75rem]">
-            <div class="p-9">
+        <div class="max-w-[84rem] mx-auto">
+            <div class="p-9 px-7">
                 <div class="ml-5 mt-1 text-2xl text-black font-semibold">
                     Marketing
                 </div>
@@ -29,7 +31,7 @@
                             <form method='POST' action="{{route('integrationsShopifyLogin')}}">
                                 {{ csrf_field() }}
                                 <label class="hidden">
-                                    <input name="shop" value="test-orchestrator.myshopify.com" placeholder="test-orchestrator.myshopify.com">
+                                    <input name="shop" value="test-with-data-orchestrator.myshopify.com" placeholder="test-with-data-orchestrator.myshopify.com">
                                 </label>
                                 <button type="submit" class="w-full btn md btn_connect">
                                     Connect
@@ -123,6 +125,30 @@
                     </div>
                 </div>
             </div>
+
+            Example: integrations/google
+            {"status":true,"info":[]}
+            {"status":true,"info":{"type":"ga_profiles","id":4,"name":"site.com","actual":null,"created_at":null}}
+
+            Example: integrations/shopify
+            {"status":true,"info":{"type":"integrations","id":6,"app_user_slug":"test-with-data-orchestrator.myshopify.com","created_at":"2023-10-15T10:05:07.000000Z"}}
+
+            POST
+            <form method="POST" action="{{route('integrationsUpdatePlatform', 'google')}}">
+                {{ csrf_field() }}
+                {{-- id=4 --}}
+                <input value="ga_profiles" name="platform[4][type]">
+                <input type="checkbox" checked name="platform[4][actual]">
+                <button type="submit">SUBMIT</button>
+            </form>
+
+            <form method="POST" action="{{route('integrationsUpdatePlatform', 'shopify')}}">
+                {{ csrf_field() }}
+                {{-- id=6 --}}
+                <input value="integrations" name="platform[6][type]">
+                <input type="checkbox" checked name="platform[6][delete]">
+                <button type="submit">SUBMIT</button>
+            </form>
 
             @if ($gaProfiles ?? null)
                 @foreach ($gaProfiles as $googleProfile)

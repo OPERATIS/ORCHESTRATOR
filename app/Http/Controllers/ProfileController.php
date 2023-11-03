@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\Stripe\Payment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,12 +17,24 @@ class ProfileController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
+        $user->load('subscriptions');
+        $subscription = $user->subscriptions->sortByDesc('id')->first();
+
+        /** @var Payment $payment */
+        $payment = app()->make(Payment::class);
+        $transactions = $payment->getTransactions($user->stripe_id);
 
         return view('profile.index')
-            ->with('user', $user);
+            ->with('user', $user)
+            ->with('subscription', $subscription)
+            ->with('transactions', $transactions);
     }
 
-    public function update(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function update(Request $request): JsonResponse
     {
         /** @var User $user */
         $user = Auth::user();

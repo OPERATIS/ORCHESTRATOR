@@ -12,7 +12,9 @@ use App\Http\Controllers\Integrations\SlackController;
 use App\Http\Controllers\IntegrationsController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\WebhooksController;
+use App\Http\Controllers\Notifications\WebhooksController as NotificationsWebhooksController;
+use App\Http\Controllers\Stripe\PaymentController;
+use App\Http\Controllers\Stripe\WebhooksController as StripeWebhooksController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
@@ -28,7 +30,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [PagesController::class, 'index'])->name('landing');
-Route::get('thank-you', [PagesController::class, 'thankYou'])->name('thank.you');
+Route::get('thank-you', [PagesController::class, 'thankYou'])->name('thankYou');
 // temp
 Route::get('404', [PagesController::class, 'error404'])->name('error404');
 Route::get('500', [PagesController::class, 'error500'])->name('error500');
@@ -62,10 +64,17 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('alerts', [AlertsController::class, 'index'])->name('alerts');
 
     Route::get('integrations', [IntegrationsController::class, 'index'])->name('integrations');
+    Route::get('integrations/{platform}', [IntegrationsController::class, 'getPlatform'])->name('integrationsGetPlatform');
+    Route::post('integrations/{platform}', [IntegrationsController::class, 'updatePlatform'])->name('integrationsUpdatePlatform');
 
     Route::get('profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('profile/update', [ProfileController::class, 'update'])->name('profileUpdate');
     Route::any('profile/check', [ProfileController::class, 'checkPassword'])->name('checkPassword');
+
+    Route::get('payment/create', [PaymentController::class, 'create'])->name('paymentCreate');
+    Route::get('payment/cancel-subscription/{subscriptionId}', [PaymentController::class, 'cancelSubscription'])->name('paymentCancelSubscription');
+    Route::get('payment/cancel-subscription-now/{subscriptionId}', [PaymentController::class, 'cancelSubscriptionNow'])->name('paymentCancelSubscriptionNow');
+    Route::get('payment/resume-subscription/{subscriptionId}', [PaymentController::class, 'resumeSubscription'])->name('paymentResumeSubscription');
 });
 
 Route::any('login', [AuthController::class, 'login'])->name('login');
@@ -76,6 +85,8 @@ Route::any('reset-password/{token}', [AuthController::class, 'resetPassword'])->
 Route::any('google/login', [AuthController::class, 'googleLogin'])->name('googleLogin');
 Route::any('google/callback', [AuthController::class, 'googleCallback'])->name('googleCallback');
 
-Route::any('webhooks/whatsapp', [WebhooksController::class, 'whatsapp']);
-Route::any('webhooks/messenger', [WebhooksController::class, 'messenger']);
-Route::post('webhooks/telegram', [WebhooksController::class, 'telegram']);
+Route::any('webhooks/whatsapp', [NotificationsWebhooksController::class, 'whatsapp']);
+Route::any('webhooks/messenger', [NotificationsWebhooksController::class, 'messenger']);
+Route::post('webhooks/telegram', [NotificationsWebhooksController::class, 'telegram']);
+
+Route::post('webhooks/stripe', [StripeWebhooksController::class, 'callback']);
