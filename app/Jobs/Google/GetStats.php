@@ -103,10 +103,10 @@ class GetStats implements ShouldQueue
                             );
                             $attempt = 0;
                             $status = true;
-                            $logService->addSuccess('get', $profileId);
+                            $logService->addSuccess('GetStats', $profileId);
                         } catch (\Exception $exception) {
                             $attempt++;
-                            $logService->addError('get', $exception->getMessage(), $profileId);
+                            $logService->addError('GetStats', $exception->getMessage(), $profileId);
                         }
                     } while (!$status && $attempt < 3);
 

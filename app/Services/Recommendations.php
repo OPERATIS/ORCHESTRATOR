@@ -15,11 +15,11 @@ class Recommendations
         $rules = [
             'c' => [
                 Alert::INCREASED => [
-                    'a' => 'Investigate reasons for unsystematic increase in C and continue in such a way.',
+                    'a' => 'Investigate reasons for anomalous increase in C (Conversion) and continue in such a way.',
                     'b' => 'Go to l'
                 ],
                 Alert::DECREASED => [
-                    'a' => 'Investigate reasons for unsystematic decrease in C and improve it (via refining sales process, enhancing user experience, etc.)',
+                    'a' => 'Investigate reasons for anomalous decrease in C (Conversion) and improve it.',
                     'b' => 'Go to l',
                 ],
                 Alert::UNCHANGED => [
@@ -29,11 +29,11 @@ class Recommendations
             ],
             'l' => [
                 Alert::INCREASED => [
-                    'a' => 'Investigate the reasons for unsystematic increase in L and continue in such a way.',
+                    'a' => 'Investigate the reasons for anomalous increase in L (Leads) and continue in such a way.',
                     'b' => 'Go to p'
                 ],
                 Alert::DECREASED => [
-                    'a' => 'Investigate the reasons for unsystematic decrease in L and improve it (via marketing, targeting, etc.).',
+                    'a' => 'Investigate the reasons for anomalous decrease in L (Leads) and improve it.',
                     'b' => 'Go to p'
                 ],
                 Alert::UNCHANGED => [
@@ -43,11 +43,11 @@ class Recommendations
             ],
             'p' => [
                 Alert::INCREASED => [
-                    'a' => 'Investigate the reasons for unsystematic increase in P and continue in such a way.',
+                    'a' => 'Investigate the reasons for anomalous increase in P (Average Check) and continue in such a way.',
                     'b' => 'Go to q'
                 ],
                 Alert::DECREASED => [
-                    'a' => 'Investigate the reasons for unsystematic decrease in P and improve it (via pricing strategy, product quality, etc.)',
+                    'a' => 'Investigate the reasons for anomalous decrease in P (Average Check) and improve it.',
                     'b' => 'Go to q'
                 ],
                 Alert::UNCHANGED => [
@@ -57,13 +57,27 @@ class Recommendations
             ],
             'q' => [
                 Alert::INCREASED => [
-                    'a' => 'Investigate the reasons for unsystematic increase in Q and continue in such a way.',
+                    'a' => 'Investigate the reasons for anomalous increase in Q (Average Quantity of Orders per Client) and continue in such a way.',
+                    'b' => 'Go to car',
                 ],
                 Alert::DECREASED => [
-                    'a' => 'Investigate the reasons for unsystematic decrease in Q and improve it (via customer retention, bundle discounts, etc.)'
+                    'a' => 'Investigate the reasons for anomalous decrease in Q (Average Quantity of Orders per Client) and improve it.',
+                    'b' => 'Go to car',
                 ],
                 Alert::UNCHANGED => [
-                    'a' => 'Value of metric Q (Average Purchases Number) was just fine during the last 24 hours, but there is always room for improvement.'
+                    'b' => 'Value of metric Q (Average Quantity of Orders per Client) was just fine during the last 24 hours, but there is always room for improvement.',
+                    'a' => 'Go to car',
+                ]
+            ],
+            'car' => [
+                Alert::INCREASED => [
+                    'a' => 'Investigate the reasons for anomalous increase in Q (Average Quantity of Orders per Client) and continue in such a way.',
+                ],
+                Alert::DECREASED => [
+                    'a' => 'Investigate the reasons for anomalous decrease in Q (Average Quantity of Orders per Client) and improve it.'
+                ],
+                Alert::UNCHANGED => [
+                    'a' => 'Value of metric Q (Average Quantity of Orders per Client) was just fine during the last 24 hours, but there is always room for improvement.'
                 ]
             ]
         ];

@@ -4,7 +4,7 @@ namespace App\Services;
 
 class SixSigma
 {
-    public const METRICS = ['c', 'l', 'p', 'q'];
+    public const METRICS = ['l', 'c', 'p', 'q'];
 
     /**
      * @param $arrays

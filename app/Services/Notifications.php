@@ -27,9 +27,9 @@ class Notifications
     {
         $message = null;
         if ($alert->result === Alert::INCREASED) {
-            $message = 'There is anomalous increase in ' . strtoupper($alert->metric) . ' (' . Metric::NAMES[$alert->metric] . ') metric value during last hour.';
+            $message = 'There is an anomalous increase in ' . strtoupper($alert->metric) . ' (' . Metric::NAMES[$alert->metric] . ') metric value during last hour.';
         } elseif ($alert->result === Alert::DECREASED) {
-            $message = 'There is anomalous decrease in ' . strtoupper($alert->metric) . ' (' . Metric::NAMES[$alert->metric] . ') metric value during last hour.';
+            $message = 'There is an anomalous decrease in ' . strtoupper($alert->metric) . ' (' . Metric::NAMES[$alert->metric] . ') metric value during last hour.';
         }
 
         return $message;
