@@ -27,7 +27,7 @@
                                         E-commerce platform
                                     </div>
                                 </div>
-                                @if ($shopify ?? null)
+                                @if (@$shopifyFirstConnectedAt ?? null)
                                     <div class="ml-auto">
                                         <div class="w-max flex text-sm text-black font-semibold px-4 py-2.5 bg-primary_green rounded-[0.625rem] ml-auto"
                                              style="line-height: 14px;"
@@ -35,7 +35,7 @@
                                             Connected
                                         </div>
                                         <div class="text-xs text-default text-opacity-50 pt-1.5">
-                                            {{$shopify->created_at->format('Y-m-d, H:i')}}
+                                            {{$shopifyFirstConnectedAt->format('Y-m-d, H:i')}}
                                         </div>
                                     </div>
                                 @endif
@@ -74,7 +74,7 @@
                                         Analytics platform
                                     </div>
                                 </div>
-                                @if ($googleAnalytics ?? null)
+                                @if ($googleAnalyticsFirstConnectedAt ?? null)
                                     <div class="ml-auto">
                                         <div class="w-max flex text-sm text-black font-semibold px-4 py-2.5 bg-primary_green rounded-[0.625rem] ml-auto"
                                              style="line-height: 14px;"
@@ -82,7 +82,7 @@
                                             Connected
                                         </div>
                                         <div class="text-xs text-default text-opacity-50 pt-1.5">
-                                            {{$googleAnalytics->created_at->format('Y-m-d, H:i')}}
+                                            {{$googleAnalyticsFirstConnectedAt->format('Y-m-d, H:i')}}
                                         </div>
                                     </div>
                                 @endif
@@ -118,7 +118,7 @@
                                         Online advertising platform
                                     </div>
                                 </div>
-                                @if ($googleAdwords ?? null)
+                                @if ($googleAdwordsFirstConnectedAt ?? null)
                                     <div class="ml-auto">
                                         <div class="w-max flex text-sm text-black font-semibold px-4 py-2.5 bg-primary_green rounded-[0.625rem] ml-auto"
                                              style="line-height: 14px;"
@@ -126,7 +126,7 @@
                                             Connected
                                         </div>
                                         <div class="text-xs text-default text-opacity-50 pt-1.5">
-                                            {{$googleAdwords->created_at->format('Y-m-d, H:i')}}
+                                            {{$googleAdwordsFirstConnectedAt->format('Y-m-d, H:i')}}
                                         </div>
                                     </div>
                                 @endif
@@ -155,7 +155,7 @@
                                         Online advertising platform
                                     </div>
                                 </div>
-                                @if ($facebook ?? null)
+                                @if ($facebookFirstConnectedAt ?? null)
                                     <div class="ml-auto">
                                         <div class="w-max flex text-sm text-black font-semibold px-4 py-2.5 bg-primary_green rounded-[0.625rem] ml-auto"
                                              style="line-height: 14px;"
@@ -163,7 +163,7 @@
                                             Connected
                                         </div>
                                         <div class="text-xs text-default text-opacity-50 pt-1.5">
-                                            {{$facebook->created_at->format('Y-m-d, H:i')}}
+                                            {{$facebookFirstConnectedAt->format('Y-m-d, H:i')}}
                                         </div>
                                     </div>
                                 @endif
@@ -220,29 +220,13 @@
         </div>
     </modal-component>
 
-    Example: integrations/google
-    {"status":true,"info":[]}
-    {"status":true,"info":{"type":"ga_profiles","id":4,"name":"site.com","actual":null,"created_at":null}}
-
-    Example: integrations/shopify
-    {"status":true,"info":{"type":"integrations","id":6,"app_user_slug":"test-with-data-orchestrator.myshopify.com","created_at":"2023-10-15T10:05:07.000000Z"}}
-
-    POST
-    <form method="POST" action="{{route('integrationsUpdatePlatform', 'google')}}">
-        {{ csrf_field() }}
-        {{-- id=4 --}}
-        <input value="ga_profiles" name="platform[4][type]">
-        <input type="checkbox" checked name="platform[4][actual]">
-        <button type="submit">SUBMIT</button>
-    </form>
-
-    <form method="POST" action="{{route('integrationsUpdatePlatform', 'shopify')}}">
-        {{ csrf_field() }}
-        {{-- id=6 --}}
-        <input value="integrations" name="platform[6][type]">
-        <input type="checkbox" checked name="platform[6][delete]">
-        <button type="submit">SUBMIT</button>
-    </form>
+    accounts
+    - id
+    - delete
+    - actual
+    - profiles
+    - id
+    - actual
 
 @endsection
 
