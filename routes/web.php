@@ -64,8 +64,8 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('alerts', [AlertsController::class, 'index'])->name('alerts');
 
     Route::get('integrations', [IntegrationsController::class, 'index'])->name('integrations');
-    Route::get('integrations/{platform}', [IntegrationsController::class, 'getPlatform'])->name('integrationsGetPlatform');
-    Route::post('integrations/{platform}', [IntegrationsController::class, 'updatePlatform'])->name('integrationsUpdatePlatform');
+    Route::get('integrations/{platform}', [IntegrationsController::class, 'getAccounts'])->name('integrationsGetAccounts');
+    Route::post('integrations/{platform}', [IntegrationsController::class, 'updateAccounts'])->name('integrationsUpdateAccounts');
 
     Route::get('profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('profile/update', [ProfileController::class, 'update'])->name('profileUpdate');
