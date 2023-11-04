@@ -179,17 +179,6 @@
                     </div>
                 </div>
             </div>
-
-            @if ($gaProfiles ?? null)
-                @foreach ($gaProfiles as $googleProfile)
-                    {{$googleProfile->name}}
-                    <br>
-                    {{$googleProfile->timezone}}
-                    <br>
-                    {{$googleProfile->actual}}
-                    <br>
-                @endforeach
-            @endif
         </div>
     </div>
 
@@ -227,24 +216,7 @@
 
     <modal-component ref="modal_google_analytics" :max-width="'460px'">
         <div class="modal-slot">
-            <div class="flex flex-col">
-                <div class="text-black_5 text-2xl text-center">
-                    Chose Accounts for <br/>
-                    Google Analytics
-                </div>
-                <div class="flex flex-col mt-6">
-                    <div class="flex items-center border border-black border-opacity-10 px-4" style="height: 50px; border-radius: 5px;">
-                        <label class="custom-checkbox mr-5">
-                            <input id="shopify1" type="checkbox" class="checkbox">
-                            <span class="checkmark"></span>
-                        </label>
-                        <label for="shopify1" class="text-sm text-black cursor-pointer">UA - ovo.ua</label>
-                    </div>
-                </div>
-                <button class="btn btn_default lg mt-10">
-                    Save
-                </button>
-            </div>
+            <google-modal :profiles="{{$gaProfiles}}"></google-modal>
         </div>
     </modal-component>
 
@@ -271,17 +243,6 @@
         <input type="checkbox" checked name="platform[6][delete]">
         <button type="submit">SUBMIT</button>
     </form>
-
-    @if ($gaProfiles ?? null)
-        @foreach ($gaProfiles as $googleProfile)
-            {{$googleProfile->name}}
-            <br>
-            {{$googleProfile->timezone}}
-            <br>
-            {{$googleProfile->actual}}
-            <br>
-        @endforeach
-    @endif
 
 @endsection
 

@@ -35,6 +35,10 @@ class IntegrationsController extends Controller
             }
 
             $gaProfiles = GaProfile::where('integration_id', $google->id)->get();
+
+            foreach ($gaProfiles as &$profile) {
+                $profile->type = 'ga_profiles';
+            }
         }
 
         return view('integrations.index')
@@ -69,7 +73,7 @@ class IntegrationsController extends Controller
                 $gaProfiles = GaProfile::whereIn('integration_id', $integrationIds)->get();
 
                 foreach ($gaProfiles as $gaProfile) {
-                    $prepared = [
+                    $prepared[] = [
                         'type' => 'ga_profiles',
                         'id' => $gaProfile->id,
                         'name' => $gaProfile->name,
@@ -79,7 +83,7 @@ class IntegrationsController extends Controller
                 };
             } else {
                 foreach ($integrations as $integration) {
-                    $prepared = [
+                    $prepared[] = [
                         'type' => 'integrations',
                         'id' => $integration->id,
                         'app_user_slug' => $integration->app_user_slug,
@@ -106,19 +110,10 @@ class IntegrationsController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        $platforms = $request->get('platform', []);
-        foreach ($platforms as $id => $currentPlatform) {
-            if ($currentPlatform['type'] === 'integrations') {
-                $integration = Integration::where('user_id', $user->id)
-                    ->where('platform', $platform)
-                    ->where('id', $id)
-                    ->first();
-
-                if ($integration) {
-                    $integration->deleted_at = isset($currentPlatform['delete']) ? Carbon::now() : null;
-                    $integration->save();
-                }
-            } elseif ($currentPlatform['type'] === 'ga_profiles') {
+        $platforms = $request->get('platforms', []);
+        foreach ($platforms as $currentPlatform) {
+            $id = $currentPlatform['id'];
+            if ($currentPlatform['type'] === 'ga_profiles') {
                 $gaProfile = GaProfile::where('id', $id)
                     ->first();
 
@@ -130,6 +125,16 @@ class IntegrationsController extends Controller
                 if ($gaProfile && $integration) {
                     $gaProfile->actual = $currentPlatform['actual'] ?? false;
                     $gaProfile->save();
+                }
+            } else {
+                $integration = Integration::where('user_id', $user->id)
+                    ->where('platform', $platform)
+                    ->where('id', $id)
+                    ->first();
+
+                if ($integration) {
+                    $integration->deleted_at = isset($currentPlatform['delete']) ? Carbon::now() : null;
+                    $integration->save();
                 }
             }
         }
