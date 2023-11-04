@@ -20,37 +20,85 @@ class IntegrationsController extends Controller
         $user = Auth::user();
 
         $integrations = Integration::where('user_id', $user->id)->get();
-        $shopify = $integrations->where('platform', 'shopify')->first();
-        $facebook = $integrations->where('platform', 'facebook')->first();
-        $google = $integrations->where('platform', 'google')->first();
+        $shopifyAccounts = $this->prepareAccounts($integrations->where('platform', 'shopify'));
+        $shopifyFirstConnectedAt = null;
+        foreach ($shopifyAccounts as $shopifyAccount) {
+            if (empty($shopifyFirstConnectedAt) || Carbon::parse($shopifyFirstConnectedAt) < Carbon::parse($shopifyAccount->created_at)) {
+                $shopifyFirstConnectedAt = $shopifyAccount->created_at;
+            }
+        }
 
-        if ($google) {
-            $scope = explode(',', $google->scope);
-            if (in_array(Analytics::ANALYTICS, $scope)) {
-                $googleAnalytics = $google;
+        $facebookAccounts = $this->prepareAccounts($integrations->where('platform', 'facebook'));
+        $facebookFirstConnectedAt = null;
+        foreach ($facebookAccounts as $facebookAccount) {
+            if (empty($facebookFirstConnectedAt) || Carbon::parse($facebookFirstConnectedAt) < Carbon::parse($facebookAccount->created_at)) {
+                $facebookFirstConnectedAt = $facebookAccount->created_at;
+            }
+        }
+
+        $googleAccounts = $this->prepareAccounts($integrations->where('platform', 'google'));
+        $googleAnalyticsFirstConnectedAt = null;
+        $googleAdwordsFirstConnectedAt = null;
+        foreach ($googleAccounts as &$googleAccount) {
+            if (isset($googleAccount->analytics)) {
+                if (empty($googleAnalyticsFirstConnectedAt) || Carbon::parse($googleAnalyticsFirstConnectedAt) < Carbon::parse($googleAccount->created_at)) {
+                    $googleAnalyticsFirstConnectedAt = $googleAccount->created_at;
+                }
             }
 
-            if (in_array(Localservices::ADWORDS, $scope)) {
-                $googleAdwords = $google;
+            if (isset($googleAccount->adwords)) {
+                if (empty($googleAdwordsFirstConnectedAt) || Carbon::parse($googleAdwordsFirstConnectedAt) < Carbon::parse($googleAccount->created_at)) {
+                    $googleAdwordsFirstConnectedAt = $googleAccount->created_at;
+                }
             }
-
-            $gaProfiles = GaProfile::where('integration_id', $google->id)->get();
         }
 
         return view('integrations.index')
             ->with('user', $user)
-            ->with('shopify', $shopify ?? null)
-            ->with('facebook', $facebook ?? null)
-            ->with('googleAnalytics', $googleAnalytics ?? null)
-            ->with('googleAdwords', $googleAdwords ?? null)
-            ->with('gaProfiles', $gaProfiles ?? null);
+            ->with('shopifyAccounts', $shopifyAccounts)
+            ->with('facebookAccounts', $facebookAccounts)
+            ->with('googleAccounts', $googleAccounts)
+            ->with('shopifyFirstConnectedAt', $shopifyFirstConnectedAt)
+            ->with('facebookFirstConnectedAt', $facebookFirstConnectedAt)
+            ->with('googleAnalyticsFirstConnectedAt', $googleAnalyticsFirstConnectedAt)
+            ->with('googleAdwordsFirstConnectedAt', $googleAdwordsFirstConnectedAt);
+    }
+
+    /**
+     * @param $integrations
+     * @return mixed
+     */
+    protected function prepareAccounts($integrations)
+    {
+        foreach ($integrations as &$integration) {
+            // Return platforms for google
+            if ($integration->platform === 'google') {
+                $scope = explode(',', $integration->scope);
+                if (in_array(Analytics::ANALYTICS, $scope)) {
+                    $integration->analytics = true;
+                }
+
+                if (in_array(Localservices::ADWORDS, $scope)) {
+                    $integration->adwords = true;
+                }
+
+                $gaProfiles = GaProfile::where('integration_id', $integration->id)->get();
+                $integration->profiles = $gaProfiles;
+            }
+            unset($integration->access_token);
+            unset($integration->refresh_token);
+            unset($integration->expires_in);
+            unset($integration->scope);
+        }
+
+        return $integrations;
     }
 
     /**
      * @param $platform
      * @return JsonResponse
      */
-    public function getPlatform($platform): JsonResponse
+    public function getAccounts($platform): JsonResponse
     {
         /** @var User $user */
         $user = Auth::user();
@@ -60,39 +108,12 @@ class IntegrationsController extends Controller
                 ->where('platform', $platform)
                 ->get();
 
-            $integrationIds = [];
-            foreach ($integrations as $integration) {
-                $integrationIds[] = $integration->id;
-            }
-
-            if ($platform === 'google') {
-                $gaProfiles = GaProfile::whereIn('integration_id', $integrationIds)->get();
-
-                foreach ($gaProfiles as $gaProfile) {
-                    $prepared = [
-                        'type' => 'ga_profiles',
-                        'id' => $gaProfile->id,
-                        'name' => $gaProfile->name,
-                        'actual' => $gaProfile->actual,
-                        'created_at' => $gaProfile->created_at,
-                    ];
-                };
-            } else {
-                foreach ($integrations as $integration) {
-                    $prepared = [
-                        'type' => 'integrations',
-                        'id' => $integration->id,
-                        'app_user_slug' => $integration->app_user_slug,
-                        'created_at' => $integration->created_at,
-                        'deleted_at' => $integration->deleted_at
-                    ];
-                }
-            }
+            $accounts = $this->prepareAccounts($integrations);
         }
 
         return response()->json([
             'status' => true,
-            'info' => $prepared ?? []
+            'info' => $accounts ?? []
         ]);
     }
 
@@ -101,35 +122,33 @@ class IntegrationsController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function updatePlatform($platform, Request $request): JsonResponse
+    public function updateAccounts($platform, Request $request): JsonResponse
     {
         /** @var User $user */
         $user = Auth::user();
 
-        $platforms = $request->get('platform', []);
-        foreach ($platforms as $id => $currentPlatform) {
-            if ($currentPlatform['type'] === 'integrations') {
-                $integration = Integration::where('user_id', $user->id)
-                    ->where('platform', $platform)
-                    ->where('id', $id)
-                    ->first();
+        $accounts = $request->get('accounts', []);
+        foreach ($accounts as $account) {
+            $integration = Integration::where('user_id', $user->id)
+                ->where('platform', $platform)
+                ->where('id', $account['id'])
+                ->first();
 
-                if ($integration) {
-                    $integration->deleted_at = isset($currentPlatform['delete']) ? Carbon::now() : null;
-                    $integration->save();
-                }
-            } elseif ($currentPlatform['type'] === 'ga_profiles') {
-                $gaProfile = GaProfile::where('id', $id)
-                    ->first();
+            if ($integration) {
+                $integration->actual = $account['actual'] ?? false;
+                $integration->deleted_at = isset($account['delete']) ? Carbon::now() : null;
+                $integration->save();
 
-                $integration = Integration::where('id', $gaProfile->integration_id)
-                    ->where('platform', $platform)
-                    ->where('user_id', $user->id)
-                    ->first();
+                if ($platform === 'google') {
+                    foreach ($account['profiles'] as $profile) {
+                        $gaProfile = GaProfile::where('id', $profile['id'])
+                            ->first();
 
-                if ($gaProfile && $integration) {
-                    $gaProfile->actual = $currentPlatform['actual'] ?? false;
-                    $gaProfile->save();
+                        if ($gaProfile) {
+                            $gaProfile->actual = $profile['actual'] ?? false;
+                            $gaProfile->save();
+                        }
+                    }
                 }
             }
         }
