@@ -32,7 +32,7 @@
                     </div>
                 </div>
             </template>
-            <template v-else>
+            <template v-else-if="chatsListLoading">
                 <div class="h-8 flex items-center mt-1.5"
                      v-for="n in 4" :key="n"
                 >
@@ -76,22 +76,29 @@
                     <div>
                         <template v-for="(item, index) in chatMessages" :key="index">
                             <template v-if="item.role == 'inner-system'">
-                                <div class="flex items-start p-4 bg-primary_light mt-4">
-                                    <img class="w-8 h-8 mr-4"
-                                         src="/icons/chat-gpt.svg"
-                                         alt="chat gpt"
-                                    >
-                                    <div class="text-sm text-black text-wrap" v-html="item.content"></div>
-                                    <template v-if="showMoreDetails">
-                                        <div @click="showMore()">
-                                            More details
+                                <div class="p-4 bg-primary_light mt-4">
+                                    <div class="flex items-start">
+                                        <img class="w-8 h-8 mr-4"
+                                             src="/logo.png"
+                                             alt="chat gpt"
+                                        >
+                                        <div class="flex flex-col">
+                                            <div class="text-sm text-black text-wrap" v-html="item.content"></div>
+                                            <template v-if="showMoreDetails">
+                                                <div class="w-max font text-sm font-bold underline text-green_2 mt-2 cursor-pointer hover:opacity-75"
+                                                     @click="showMoreDetailsMsg()"
+                                                >
+                                                    More details
+                                                </div>
+                                            </template>
                                         </div>
-                                    </template>
+
+                                    </div>
                                 </div>
                             </template>
                             <div v-else-if="item.role == 'assistant'" class="flex items-start p-4 bg-primary_light mt-4">
                                 <img class="w-8 h-8 mr-4"
-                                     src="/icons/chat-gpt.svg"
+                                     src="/logo.png"
                                      alt="chat gpt"
                                 >
                                 <div class="text-sm text-black text-wrap" v-html="item.content"></div>
@@ -123,7 +130,7 @@
                         <template v-if="loadingMessage">
                             <div class="flex items-start p-4 bg-primary_light mt-4">
                                 <img class="w-8 h-8 mr-4"
-                                     src="/icons/chat-gpt.svg"
+                                     src="/logo.png"
                                      alt="chat gpt"
                                 >
                                 <div class="text-sm text-black text-opacity-50 text-wrap">
@@ -140,7 +147,7 @@
                 <template v-else-if="!loading">
                     <div>
                         <div class="flex items-center justify-center opacity-30 mt-6">
-                            <img class="h-12" src="/img/logo.svg" alt="logo">
+                            <img class="h-12" src="/logo.png" alt="logo">
                         </div>
                     </div>
                 </template>
@@ -198,6 +205,7 @@ export default {
             userMessage: '',
             loading: false,
             loadingMessage: false,
+            chatsListLoading: false,
             suggestions: [
                 {
                     'id': 1,
@@ -232,12 +240,16 @@ export default {
             }
         },
         getChatsList(){
+            this.chatsListLoading = true;
             axios.get('/chats/list')
                 .then(({data}) => {
                     this.chatsList = data.chats;
                 })
                 .catch(({response}) => {
                     console.log(response.data.message);
+                })
+                .finally(() => {
+                    this.chatsListLoading = false;
                 });
         },
         selectChat(chatId){
@@ -248,7 +260,6 @@ export default {
         getChat(chatId){
             axios.get('/chats/'+chatId)
                 .then(({data}) => {
-                    console.log(data);
                     this.chatId = data.chat.id;
                     this.title = data.chat.title;
                     this.showMoreDetails = data.showMoreDetails;
@@ -359,6 +370,7 @@ export default {
                 });
 
                 this.loadingMessage = true;
+                this.showMoreDetails = false;
 
                 this.scrollToBottom();
 
@@ -367,11 +379,11 @@ export default {
                         'content': message
                     })
                         .then(({data}) => {
-                            console.log(data);
                             this.loadingMessage = false;
                             this.generateAnswer(data.message);
                         })
                         .catch(({response}) => {
+                            console.log(response.data.message);
                             const customEvent = new CustomEvent('flash-message', {
                                 detail: {
                                     title: 'Something went wrong!',
@@ -381,8 +393,6 @@ export default {
                                 }
                             });
                             window.dispatchEvent(customEvent);
-                            console.log(response.data.message);
-
                         })
                         .finally(() => {
                             this.scrollToBottom();
@@ -393,10 +403,9 @@ export default {
                         'content': message
                     })
                         .then(({data}) => {
-                            console.log(data);
                             this.chatId = data.chat.id;
                             this.title = data.chat.title;
-                            this.systemMessage = data.systemMessage;
+                            this.showMoreDetails = data.showMoreDetails;
                             this.generateChatMessages(data.messages);
                             this.generateUrl(this.chatId);
                         })
@@ -426,13 +435,14 @@ export default {
             if (lastIndex !== -1) {
                 this.chatMessages[this.chatMessages.length - 1 - lastIndex].id = data.send_id;
             }
+
             this.chatMessages.push({
                 id: data.receive_id,
                 role: data.role,
                 content: '',
             });
-            this.typeMessage(data.content);
 
+            this.typeMessage(data.content);
         },
         createNewChat(){
            this.generateUrl();
@@ -490,7 +500,6 @@ export default {
             textarea.style.height = 'auto';
             textarea.style.height = textarea.scrollHeight + 'px';
         },
-
         typeMessage(message) {
             const delay = 12;
             let index = 0;
@@ -505,15 +514,16 @@ export default {
             };
             typeNextCharacter();
         },
-        showMore(){
+        showMoreDetailsMsg(){
             this.loadingMessage = true;
+            this.showMoreDetails = false;
+
             axios.post('/chats/'+this.chatId+'/more-details')
                 .then(({data}) => {
-                    console.log(data);
-                    this.loadingMessage = false;
                     this.generateAnswer(data.message);
                 })
                 .catch(({response}) => {
+                    console.log(response.data.message);
                     const customEvent = new CustomEvent('flash-message', {
                         detail: {
                             title: 'Something went wrong!',
@@ -523,10 +533,9 @@ export default {
                         }
                     });
                     window.dispatchEvent(customEvent);
-                    console.log(response.data.message);
-
                 })
                 .finally(() => {
+                    this.loadingMessage = false;
                     this.scrollToBottom();
                 });
         }

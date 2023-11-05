@@ -5,22 +5,31 @@
             Google Analytics/Ads
         </div>
         <div class="flex flex-col mt-6">
-            <template v-for="(account, index) in accountsData" :key="index">
-                <div @click="deleteAccount()">
-                    delete
+            <template v-if="isEmptyData">
+                <div class="text-center">
+                    No profiles data
                 </div>
-                <template v-for="item in account.profiles">
-                    <div class="flex items-center border border-black border-opacity-10 px-4 mb-3.5" style="height: 50px; border-radius: 5px;">
-                        <label class="custom-checkbox mr-5">
-                            <input :id="'google_'+item.id" type="checkbox" v-model="item.actual" class="checkbox">
-                            <span class="checkmark"></span>
-                        </label>
-                        <label :for="'google_'+item.id" class="text-sm text-black cursor-pointer">{{item.name}}</label>
+            </template>
+            <template v-else v-for="(account, index) in accountsData" :key="index">
+                <div class="w-full" :class="{'opacity-50': loading, 'hidden': account.delete}">
+                    <div class="mb-2 text-right ml-auto" @click="deleteAccount(account.id)">
+                        Delete account
                     </div>
-                </template>
+                    <template v-for="(item, index) in account.profiles">
+                        <div class="flex items-center border border-black border-opacity-10 px-4 mb-3.5"
+                             style="height: 50px; border-radius: 5px;"
+                        >
+                            <label class="custom-checkbox mr-5">
+                                <input :id="'google_'+item.id" class="checkbox" type="checkbox" v-model="item.actual">
+                                <span class="checkmark"></span>
+                            </label>
+                            <label :for="'google_'+item.id" class="w-full text-sm text-black cursor-pointer">{{item.name}}</label>
+                        </div>
+                    </template>
+                </div>
             </template>
         </div>
-        <button class="btn btn_default lg mt-10" @click="update()">
+        <button class="btn btn_default lg mt-[1.625rem]" @click="update()">
             Save
         </button>
     </div>
@@ -34,18 +43,22 @@ export default {
     },
     data() {
         return {
-            accountsData: {}
+            accountsData: {},
+            loading: false
         };
+    },
+    computed: {
+        isEmptyData() {
+            return Object.keys(this.accountsData).length === 0;
+        }
     },
     methods: {
         update(){
-            console.log(this.accountsData);
             let data = {
                 accounts: this.accountsData
             }
             axios.post('/integrations/google', data)
-                .then(({data}) => {
-                    console.log(data);
+                .then(() => {
                     const customEvent = new CustomEvent('flash-message', {
                         detail: {
                             title: 'Account data updated!',
@@ -70,20 +83,29 @@ export default {
                     window.dispatchEvent(customEvent);
                 });
         },
-        deleteAccount(){
-            this.accountsData[0]['delete'] = true;
+        getAccountsData(){
+            axios.get('/integrations/google')
+                .then(({data}) => {
+                    this.accountsData = data.info;
+                })
+                .catch(({response}) => {
+                    console.log(response.data.message);
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
+        },
+        deleteAccount(id){
+            let index = this.accountsData.findIndex(obj => obj.id === id);
+            if (index !== -1) {
+                this.accountsData[index]['delete'] = true;
+            }
         }
     },
     mounted(){
         this.accountsData = this.accounts;
-        axios.get('/integrations/google')
-            .then(({data}) => {
-                console.log(data);
-                this.accountsData = data.info;
-            })
-            .catch(({response}) => {
-                console.log(response.data.message);
-            });
+        this.loading = true;
+        this.getAccountsData();
     }
 }
 </script>

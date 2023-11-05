@@ -21,13 +21,13 @@ class ProfileController extends Controller
         $subscription = $user->subscriptions->sortByDesc('id')->first();
 
         /** @var Payment $payment */
-        $payment = app()->make(Payment::class);
-        $transactions = $payment->getTransactions($user->stripe_id);
+//        $payment = app()->make(Payment::class);
+//        $transactions = $payment->getTransactions($user->stripe_id);
 
         return view('profile.index')
             ->with('user', $user)
             ->with('subscription', $subscription)
-            ->with('transactions', $transactions);
+            ->with('transactions', $transactions ?? []);
     }
 
     /**

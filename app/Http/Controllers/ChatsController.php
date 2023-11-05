@@ -140,7 +140,7 @@ class ChatsController extends Controller
                 'status' => true,
                 'chat' => $chat,
                 'messages' => $messages,
-                'showMoreDetails' => count($messages) <= 3
+                'showMoreDetails' => count($messages) < 3
             ]);
         } else {
             return view('chats.index')
