@@ -82,9 +82,11 @@
                                          alt="chat gpt"
                                     >
                                     <div class="text-sm text-black text-wrap" v-html="item.content"></div>
-                                    <div v-if="showMoreDetails" @click="showMore()">
-                                        More details
-                                    </div>
+                                    <template v-if="showMoreDetails">
+                                        <div @click="showMore()">
+                                            More details
+                                        </div>
+                                    </template>
                                 </div>
                             </template>
                             <div v-else-if="item.role == 'assistant'" class="flex items-start p-4 bg-primary_light mt-4">
@@ -192,7 +194,7 @@ export default {
             chatId: null,
             title: '',
             chatMessages: [],
-            showMoreDetails: '',
+            showMoreDetails: false,
             userMessage: '',
             loading: false,
             loadingMessage: false,
@@ -505,7 +507,7 @@ export default {
         },
         showMore(){
             this.loadingMessage = true;
-            axios.post('/chats/'+this.chatId+'/more-details/')
+            axios.post('/chats/'+this.chatId+'/more-details')
                 .then(({data}) => {
                     console.log(data);
                     this.loadingMessage = false;
