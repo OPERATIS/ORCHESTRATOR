@@ -83,7 +83,7 @@
                                     >
                                     <div class="text-sm text-black text-wrap" v-html="item.content"></div>
                                     <template v-if="showMoreDetails">
-                                        <div @click="showMore()">
+                                        <div @click="showMoreDetails()">
                                             More details
                                         </div>
                                     </template>
@@ -505,12 +505,11 @@ export default {
             };
             typeNextCharacter();
         },
-        showMore(){
+        showMoreDetails(){
             this.loadingMessage = true;
             axios.post('/chats/'+this.chatId+'/more-details')
                 .then(({data}) => {
                     console.log(data);
-                    this.loadingMessage = false;
                     this.generateAnswer(data.message);
                 })
                 .catch(({response}) => {
@@ -527,6 +526,7 @@ export default {
 
                 })
                 .finally(() => {
+                    this.loadingMessage = false;
                     this.scrollToBottom();
                 });
         }
