@@ -5,16 +5,14 @@
             Shopify
         </div>
         <div class="flex flex-col mt-6">
-            <template v-for="(account, index) in accounts" :key="index">
-                <template v-for="item in account.profiles">
-                    <div class="flex items-center border border-black border-opacity-10 px-4 mb-3.5" style="height: 50px; border-radius: 5px;">
-                        <label class="custom-checkbox mr-5">
-                            <input :id="'shopify_'+item.id" type="checkbox" v-model="item.actual" class="checkbox">
-                            <span class="checkmark"></span>
-                        </label>
-                        <label :for="'shopify_'+item.id" class="text-sm text-black cursor-pointer">{{item.name}}</label>
-                    </div>
-                </template>
+            <template v-for="(item, index) in accounts" :key="index">
+                <div class="flex items-center border border-black border-opacity-10 px-4 mb-3.5" style="height: 50px; border-radius: 5px;">
+                    <label class="custom-checkbox mr-5">
+                        <input :id="'shopify_'+item.id" type="checkbox" v-model="item.actual" class="checkbox">
+                        <span class="checkmark"></span>
+                    </label>
+                    <label :for="'shopify_'+item.id" class="text-sm text-black cursor-pointer">{{item.app_user_slug}}</label>
+                </div>
             </template>
         </div>
         <button class="btn btn_default lg mt-10" @click="update()">
@@ -46,6 +44,9 @@ export default {
                     console.log(response.data.message);
                 });
         }
+    },
+    mounted(){
+        console.log(this.accounts);
     }
 }
 </script>

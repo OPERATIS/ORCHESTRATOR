@@ -88,19 +88,19 @@
                             </div>
                         </div>
                         <div class="mt-5">
-{{--                            @if($googleAnalyticsFirstConnectedAt)--}}
+                            @if($googleAnalyticsFirstConnectedAt)
                                 <button class="w-full btn md btn_connect"
                                         @click="openModal('modal_google')"
                                 >
                                     Configure
                                 </button>
-{{--                            @else--}}
-{{--                                <a href="{{route('integrationsGoogleLogin', ['service' => 'analytics'])}}"--}}
-{{--                                   class="w-full btn md btn_connect"--}}
-{{--                                >--}}
-{{--                                    Connect--}}
-{{--                                </a>--}}
-{{--                            @endif--}}
+                            @else
+                                <a href="{{route('integrationsGoogleLogin', ['service' => 'analytics'])}}"
+                                   class="w-full btn md btn_connect"
+                                >
+                                    Connect
+                                </a>
+                            @endif
                         </div>
                     </div>
                     {{--Google Ads--}}
