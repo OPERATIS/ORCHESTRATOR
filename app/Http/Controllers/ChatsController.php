@@ -49,6 +49,7 @@ class ChatsController extends Controller
             ->first();
 
         if ($chat) {
+            ChatMessage::where('chat_id', $chat->id)->delete();
             $chat->delete();
             return response()->json([
                 'status' => true,
