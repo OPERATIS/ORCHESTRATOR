@@ -21,7 +21,10 @@ createApp({
     },
     data() {
         return {
-            isOpenMenuDropdown: false
+            isOpenMenuDropdown: false,
+            // for shopify modal only
+            shopifyUrl: '',
+            showShopifyErrorMessage: false
         }
     },
     methods: {
@@ -47,6 +50,15 @@ createApp({
                     }
                 });
             });
+        },
+        // for shopify modal only
+        submitShopifyForm() {
+            if (this.shopifyUrl.endsWith('.myshopify.com')) {
+                const formElement = document.getElementById('shopifyForm');
+                formElement.submit();
+            } else {
+                this.showShopifyErrorMessage = true;
+            }
         }
     }
 }).use(vueClickOutsideElement)

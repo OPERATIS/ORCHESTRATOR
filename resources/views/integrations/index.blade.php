@@ -217,7 +217,7 @@
                         Extract "mystorename" from <span class="text-green_2 underline">https://admin.shopify.com/store / mystorename </span>.
                     </div>
                     <div class="mt-10">
-                        <form method='POST' action="{{route('integrationsShopifyLogin')}}">
+                        <form id="shopifyForm" @submit.prevent="submitShopifyForm" method='POST' action="{{route('integrationsShopifyLogin')}}">
                             {{ csrf_field() }}
                             <div class="input-block">
                                 <label for="shopify_url" class="label">MyShopify URL</label>
@@ -226,7 +226,9 @@
                                        class="input !pr-40"
                                        type="text"
                                        name="shop"
+                                       v-model="shopifyUrl"
                                 >
+                                <div v-if="showShopifyErrorMessage" class="error">URL should end with '.myshopify.com'</div>
                                 <button type="submit" class="absolute w-max top-1.5 right-1.5 w-full btn md btn_connect2">
                                     Connect
                                 </button>
@@ -237,8 +239,6 @@
             </div>
         </modal-component>
     @endif
-
-    {{-- toDo general component if modals will have the same view --}}
 
     <modal-component ref="modal_google" :max-width="'460px'">
         <div class="modal-slot">
