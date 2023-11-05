@@ -506,10 +506,10 @@ class ChatsController extends Controller
 
                     $prepared = [];
                     foreach ($metric->{$subMetric} as $paymentSystem => $count) {
-                        $prepared[] = $paymentSystem . ' is ' . ($count / $sum * 100) . '%';
+                        $prepared[] = $paymentSystem . ' is ' . round(($count / $sum * 100), 2) . '%';
                     }
 
-                    $template[] = 'Popular payments systems: ' . implode(',', $prepared);
+                    $template[] = 'Popular payments systems: ' . implode(', ', $prepared);
                 } elseif ($subMetric == 'l_map') {
                     $template[] = 'List of Most Abandoned Products: ' . implode(',', $metric->{$subMetric});
                 }
