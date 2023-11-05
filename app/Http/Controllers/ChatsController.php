@@ -324,7 +324,7 @@ class ChatsController extends Controller
         $previousUpdatedAt = '1970-01-01';
         $messages = [];
         foreach ($chatMessages as $chatMessage) {
-            if (($type === 'front' && (is_null($chatMessage->show) || $chatMessage->show)) || ($type === 'ai' && $chatMessage->role !== 'inner-system')) {
+            if (($type === 'front' && $chatMessage->show) || ($type === 'ai' && $chatMessage->role !== 'inner-system')) {
                 // Ignore message after edit
                 if (Carbon::parse($chatMessage->updated_at)->timestamp >= Carbon::parse($previousUpdatedAt)->timestamp) {
                     $currentMessage = [
