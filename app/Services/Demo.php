@@ -142,7 +142,7 @@ class Demo
             ->where('order_created_at', '<=', $endPeriod)
             ->delete();
 
-        $count = rand(0, 10);
+        $count = rand(0, 25);
         for ($i = 0; $i < $count; $i++) {
             $orderId = time() + $i;
             $price = rand(100, 500);
@@ -223,7 +223,7 @@ class Demo
             ->where('checkout_created_at', '<=', $endPeriod)
             ->delete();
 
-        $count = rand(0, 30);
+        $count = rand(0, 50);
         for ($i = 0; $i < $count; $i++) {
             $price = rand(100, 500);
 
