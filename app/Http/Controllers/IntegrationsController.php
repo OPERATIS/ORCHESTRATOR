@@ -82,7 +82,7 @@ class IntegrationsController extends Controller
                     $integration->adwords = true;
                 }
 
-                $gaProfiles = GaProfile::where('integration_id', $integration->id)->get();
+                $gaProfiles = GaProfile::where('integration_id', $integration->id)->orderBy('id')->get();
                 $integration->profiles = $gaProfiles;
             }
             unset($integration->access_token);
