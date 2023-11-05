@@ -441,7 +441,7 @@ export default {
 
             console.log(this.chatMessages);
             this.chatMessages.push({
-                id: data.receive_id,
+                id: data.receive_id || data.id,
                 role: data.role,
                 content: '',
             });
