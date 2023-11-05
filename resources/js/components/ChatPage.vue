@@ -373,7 +373,6 @@ export default {
 
                 this.loadingMessage = true;
                 this.showMoreDetails = false;
-
                 this.scrollToBottom();
 
                 if (this.chatId){
@@ -408,7 +407,7 @@ export default {
                             this.chatId = data.chat.id;
                             this.title = data.chat.title;
                             this.showMoreDetails = data.showMoreDetails;
-                            this.generateChatMessages(data.messages);
+                            this.generateAnswer(data.messages[1]);
                             this.generateUrl(this.chatId);
                         })
                         .catch(({response}) => {
@@ -475,7 +474,6 @@ export default {
             let newMessage = this.chatMessages[index].editedMessage;
             this.chatMessages[index].content = newMessage;
             this.chatMessages[index].editing = false;
-
             this.chatMessages.splice(index + 1);
 
             this.loadingMessage = true;
