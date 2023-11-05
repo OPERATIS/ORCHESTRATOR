@@ -404,6 +404,7 @@ export default {
                         'content': message
                     })
                         .then(({data}) => {
+                            console.log('req', data);
                             this.chatId = data.chat.id;
                             this.title = data.chat.title;
                             this.showMoreDetails = data.showMoreDetails;
@@ -432,11 +433,13 @@ export default {
             }
         },
         generateAnswer(data){
+            console.log('log', this.chatMessages, data);
             const lastIndex = this.chatMessages.slice().reverse().findIndex(item => item.id === null);
             if (lastIndex !== -1) {
                 this.chatMessages[this.chatMessages.length - 1 - lastIndex].id = data.send_id;
             }
 
+            console.log(this.chatMessages);
             this.chatMessages.push({
                 id: data.receive_id,
                 role: data.role,
