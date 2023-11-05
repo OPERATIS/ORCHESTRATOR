@@ -74,20 +74,20 @@
                         </div>
                     </div>
                     <div>
-                        <template v-if="systemMessage">
-                            <div class="flex items-start p-4 bg-primary_light mt-4">
-                                <img class="w-8 h-8 mr-4"
-                                     src="/icons/chat-gpt.svg"
-                                     alt="chat gpt"
-                                >
-                                <div class="text-sm text-black">
-                                    {{ systemMessage }}
-                                </div>
-                            </div>
-                        </template>
-
                         <template v-for="(item, index) in chatMessages" :key="index">
-                            <div v-if="item.role == 'assistant'" class="flex items-start p-4 bg-primary_light mt-4">
+                            <template v-if="item.role == 'inner-system'">
+                                <div class="flex items-start p-4 bg-primary_light mt-4">
+                                    <img class="w-8 h-8 mr-4"
+                                         src="/icons/chat-gpt.svg"
+                                         alt="chat gpt"
+                                    >
+                                    <div class="text-sm text-black text-wrap" v-html="item.content"></div>
+                                    <div v-if="showMoreDetails" @click="showMore()">
+                                        More details
+                                    </div>
+                                </div>
+                            </template>
+                            <div v-else-if="item.role == 'assistant'" class="flex items-start p-4 bg-primary_light mt-4">
                                 <img class="w-8 h-8 mr-4"
                                      src="/icons/chat-gpt.svg"
                                      alt="chat gpt"
@@ -192,7 +192,7 @@ export default {
             chatId: null,
             title: '',
             chatMessages: [],
-            systemMessage: '',
+            showMoreDetails: '',
             userMessage: '',
             loading: false,
             loadingMessage: false,
@@ -246,9 +246,10 @@ export default {
         getChat(chatId){
             axios.get('/chats/'+chatId)
                 .then(({data}) => {
+                    console.log(data);
                     this.chatId = data.chat.id;
                     this.title = data.chat.title;
-                    this.systemMessage = data.systemMessage;
+                    this.showMoreDetails = data.showMoreDetails;
                     this.generateChatMessages(data.messages);
                 })
                 .catch(({response}) => {
@@ -501,6 +502,31 @@ export default {
                 }
             };
             typeNextCharacter();
+        },
+        showMore(){
+            this.loadingMessage = true;
+            axios.post('/chats/'+this.chatId+'/more-details/')
+                .then(({data}) => {
+                    console.log(data);
+                    this.loadingMessage = false;
+                    this.generateAnswer(data.message);
+                })
+                .catch(({response}) => {
+                    const customEvent = new CustomEvent('flash-message', {
+                        detail: {
+                            title: 'Something went wrong!',
+                            subtitle: 'Try it again later!',
+                            type: 'warning',
+                            time: 3000,
+                        }
+                    });
+                    window.dispatchEvent(customEvent);
+                    console.log(response.data.message);
+
+                })
+                .finally(() => {
+                    this.scrollToBottom();
+                });
         }
     },
     mounted() {

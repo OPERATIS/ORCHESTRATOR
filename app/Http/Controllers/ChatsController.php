@@ -139,7 +139,7 @@ class ChatsController extends Controller
                 'status' => true,
                 'chat' => $chat,
                 'messages' => $messages,
-                'showMoreDetails' => count($messages) > 3
+                'showMoreDetails' => count($messages) <= 3
             ]);
         } else {
             return view('chats.index')
@@ -324,7 +324,7 @@ class ChatsController extends Controller
         $previousUpdatedAt = '1970-01-01';
         $messages = [];
         foreach ($chatMessages as $chatMessage) {
-            if (($type === 'front' && $chatMessage->show) || ($type === 'ai' && $chatMessage->role !== 'inner-system')) {
+//            if (($type === 'front' && $chatMessage->show) || ($type === 'ai' && $chatMessage->role !== 'inner-system')) {
                 // Ignore message after edit
                 if (Carbon::parse($chatMessage->updated_at)->timestamp >= Carbon::parse($previousUpdatedAt)->timestamp) {
                     $currentMessage = [
@@ -339,7 +339,7 @@ class ChatsController extends Controller
                     $messages[] = $currentMessage;
                     $previousUpdatedAt = $chatMessage->updated_at;
                 }
-            }
+//            }
         }
 
         return $messages;

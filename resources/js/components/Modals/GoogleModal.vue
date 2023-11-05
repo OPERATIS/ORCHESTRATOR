@@ -6,6 +6,9 @@
         </div>
         <div class="flex flex-col mt-6">
             <template v-for="(account, index) in accountsData" :key="index">
+                <div @click="deleteAccount()">
+                    delete
+                </div>
                 <template v-for="item in account.profiles">
                     <div class="flex items-center border border-black border-opacity-10 px-4 mb-3.5" style="height: 50px; border-radius: 5px;">
                         <label class="custom-checkbox mr-5">
@@ -36,6 +39,7 @@ export default {
     },
     methods: {
         update(){
+            console.log(this.accountsData);
             let data = {
                 accounts: this.accountsData
             }
@@ -65,6 +69,9 @@ export default {
                     });
                     window.dispatchEvent(customEvent);
                 });
+        },
+        deleteAccount(){
+            this.accountsData[0]['delete'] = true;
         }
     },
     mounted(){
