@@ -55,6 +55,7 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('chats/list', [ChatsController::class, 'list'])->name('chatsList');
     Route::any('chats/create', [ChatsController::class, 'create'])->name('chatsCreate');
     Route::get('chats/{chatId}', [ChatsController::class, 'show'])->name('chatShow');
+    Route::post('chats/{chatId}/more-details', [ChatsController::class, 'moreDetails'])->name('chatMoreDetails');
     Route::post('chats/{chatId}/delete', [ChatsController::class, 'delete'])->name('chatDelete');
     Route::post('chats/{chatId}/edit', [ChatsController::class, 'edit'])->name('chatEdit');
     Route::post('chats/{chatId}/send-message', [ChatsController::class, 'sendMessage'])->name('chatSendMessage');
@@ -64,6 +65,8 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('alerts', [AlertsController::class, 'index'])->name('alerts');
 
     Route::get('integrations', [IntegrationsController::class, 'index'])->name('integrations');
+    Route::get('integrations/{platform}', [IntegrationsController::class, 'getAccounts'])->name('integrationsGetAccounts');
+    Route::post('integrations/{platform}', [IntegrationsController::class, 'updateAccounts'])->name('integrationsUpdateAccounts');
 
     Route::get('profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('profile/update', [ProfileController::class, 'update'])->name('profileUpdate');

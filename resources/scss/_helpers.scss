@@ -70,3 +70,66 @@
         transform: scale(1);
     }
 }
+
+.modal {
+    @apply hidden justify-center items-center fixed left-0 top-0 w-full h-full;
+    z-index: 9999;
+    background: rgba(34, 34, 34, 0.40);
+    &.active{
+        @apply flex;
+        .modal-slot{
+            @apply block;
+        }
+    }
+    &-content {
+        @apply w-full relative bg-white py-9 px-11;
+        border: 1px solid #DDE2E5;
+        border-radius: 20px;
+    }
+    &-slot{
+        @apply hidden;
+    }
+}
+
+.close-modal {
+    @apply cursor-pointer absolute right-5 top-5;
+    &:hover,
+    &:focus{
+        @apply opacity-75;
+    }
+}
+
+[v-cloak] {
+    display: none;
+}
+
+
+.custom-checkbox {
+    @apply w-6 h-6 block relative border border-black border-opacity-10 cursor-pointer;
+    border-radius: 8px;
+    input {
+        @apply absolute opacity-0 cursor-pointer;
+        &:checked ~ .checkmark {
+            background: rgba(39, 174, 96, 1);
+        }
+        &:checked ~ .checkmark:after {
+            display: block;
+            left: 8px;
+            top: 4px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+    }
+
+}
+.checkmark {
+    @apply absolute top-px left-px h-5 w-5 rounded-md;
+    &:after {
+        content: '';
+        position: absolute;
+        display: none;
+    }
+}
