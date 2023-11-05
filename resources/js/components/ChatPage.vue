@@ -32,7 +32,7 @@
                     </div>
                 </div>
             </template>
-            <template v-else>
+            <template v-else-if="chatsListLoading">
                 <div class="h-8 flex items-center mt-1.5"
                      v-for="n in 4" :key="n"
                 >
@@ -205,6 +205,7 @@ export default {
             userMessage: '',
             loading: false,
             loadingMessage: false,
+            chatsListLoading: false,
             suggestions: [
                 {
                     'id': 1,
@@ -239,12 +240,16 @@ export default {
             }
         },
         getChatsList(){
+            this.chatsListLoading = true;
             axios.get('/chats/list')
                 .then(({data}) => {
                     this.chatsList = data.chats;
                 })
                 .catch(({response}) => {
                     console.log(response.data.message);
+                })
+                .finally(() => {
+                    this.chatsListLoading = false;
                 });
         },
         selectChat(chatId){
