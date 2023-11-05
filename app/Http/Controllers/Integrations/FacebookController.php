@@ -51,8 +51,6 @@ class FacebookController extends BaseController
             'scope' => implode(',', $socialiteUser->approvedScopes)
         ]);
 
-        // TODO add text
-        Session::flash('success-message', 'Connect shopify added/updated');
-        return redirect('integrations');
+        return redirect(route('integrations', ['platform' => 'facebook']));
     }
 }

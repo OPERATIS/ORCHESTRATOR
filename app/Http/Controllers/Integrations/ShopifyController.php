@@ -74,9 +74,7 @@ class ShopifyController extends BaseController
         try {
             $session = OAuth::callback($request->cookies->all(), $request->request->all());
         } catch (\Exception $exception) {
-            // TODO add text
-            Session::flash('success-message', 'Some error please contact us');
-            return redirect('integrations');
+            return abort(500);
         }
 
         Integration::updateOrCreate([
@@ -90,8 +88,6 @@ class ShopifyController extends BaseController
             'scope' => $session->getScope()
         ]);
 
-        // TODO add text
-        Session::flash('success-message', 'Connect shopify added/updated');
-        return redirect('integrations');
+        return redirect(route('integrations', ['platform' => 'shopify']));
     }
 }

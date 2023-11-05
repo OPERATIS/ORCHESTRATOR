@@ -21,4 +21,12 @@ class Integration extends Model
     {
         $query->where('user_id', '!=', User::DEMO_ID);
     }
+
+    /**
+     * @param Builder $query
+     */
+    public function scopeActual(Builder $query)
+    {
+        $query->where('actual', true);
+    }
 }
