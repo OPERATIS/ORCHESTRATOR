@@ -11,9 +11,11 @@
                 >
                 New chat
             </div>
-            <div class="text-sm text-black text-opacity-20 mt-6">
-                Last Opened
-            </div>
+            <template v-if="(chatsList && chatsList.length) || chatsListLoading">
+                <div class="text-sm text-black text-opacity-20 mt-6">
+                    Last Opened
+                </div>
+            </template>
             <template v-if="chatsList && chatsList.length">
                 <div class="flex-col mt-1.5 flex-1 overflow-y-auto -mx-3">
                     <div class="flex items-center h-8 text-sm text-gray_1 px-3 cursor-pointer hover:bg-primary_blue transition duration-200"
