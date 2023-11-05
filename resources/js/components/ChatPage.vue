@@ -436,7 +436,7 @@ export default {
             console.log('log', this.chatMessages, data);
             const lastIndex = this.chatMessages.slice().reverse().findIndex(item => item.id === null);
             if (lastIndex !== -1) {
-                this.chatMessages[this.chatMessages.length - 1 - lastIndex].id = data.send_id;
+                this.chatMessages[this.chatMessages.length - 1 - lastIndex].id = data.send_id || data.id;
             }
 
             console.log(this.chatMessages);
