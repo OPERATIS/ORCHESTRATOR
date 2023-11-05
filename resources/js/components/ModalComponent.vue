@@ -20,13 +20,11 @@ export default {
         maxWidth: {
             type: String,
             default: '635px;'
-        },
-        email: String
+        }
     },
     data() {
         return {
-            show: false,
-            email: ''
+            show: false
         };
     },
     methods: {

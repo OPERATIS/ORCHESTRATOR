@@ -11,10 +11,13 @@ import DashboardChartBlock from './components/DashboardChartBlock.vue';
 import ChatPage from './components/ChatPage.vue';
 import ModalComponent from './components/ModalComponent.vue';
 import GoogleModal from './components/Modals/GoogleModal.vue';
+import ShopifyModal from './components/Modals/ShopifyModal.vue';
+import FacebookModal from './components/Modals/FacebookModal.vue';
 
 createApp({
     components: {
-        LoginBlocks, ResetPasswordBlock, ProfilePage, DashboardChartBlock, ChatPage, ModalComponent, GoogleModal
+        LoginBlocks, ResetPasswordBlock, ProfilePage, DashboardChartBlock, ChatPage, ModalComponent, GoogleModal,
+        ShopifyModal, FacebookModal
     },
     data() {
         return {

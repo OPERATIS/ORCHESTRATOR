@@ -42,20 +42,19 @@
                             </div>
                         </div>
                         <div class="mt-5">
-                            <button type="submit" class="w-full btn md btn_connect"
-                                    @click="openModal('modal_shopify')"
-                            >
-                                Connect
-                            </button>
-                            {{--                            <form method='POST' action="{{route('integrationsShopifyLogin')}}">--}}
-                            {{--                                {{ csrf_field() }}--}}
-                            {{--                                <label class="hidden">--}}
-                            {{--                                    <input name="shop" value="test-orchestrator.myshopify.com" placeholder="test-orchestrator.myshopify.com">--}}
-                            {{--                                </label>--}}
-                            {{--                                <button type="submit" class="w-full btn md btn_connect">--}}
-                            {{--                                    Connect--}}
-                            {{--                                </button>--}}
-                            {{--                            </form>--}}
+                            @if (@$shopifyFirstConnectedAt ?? null)
+                                <button class="w-full btn md btn_connect"
+                                        @click="openModal('modal_shopify')"
+                                >
+                                    Configure
+                                </button>
+                            @else
+                                <button class="w-full btn md btn_connect"
+                                        @click="openModal('modal_shopify_url')"
+                                >
+                                    Connect
+                                </button>
+                            @endif
                         </div>
                     </div>
 
@@ -88,19 +87,20 @@
                                 @endif
                             </div>
                         </div>
-                        {{--                        <div class="mt-5">--}}
-                        {{--                            <a href="{{route('integrationsGoogleLogin', ['service' => 'analytics'])}}"--}}
-                        {{--                                class="w-full btn md btn_connect"--}}
-                        {{--                            >--}}
-                        {{--                                Connect--}}
-                        {{--                            </a>--}}
-                        {{--                        </div>--}}
                         <div class="mt-5">
-                            <button class="w-full btn md btn_connect"
-                                    @click="openModal('modal_google_analytics')"
-                            >
-                                Configure
-                            </button>
+{{--                            @if($googleAnalyticsFirstConnectedAt)--}}
+                                <button class="w-full btn md btn_connect"
+                                        @click="openModal('modal_google')"
+                                >
+                                    Configure
+                                </button>
+{{--                            @else--}}
+{{--                                <a href="{{route('integrationsGoogleLogin', ['service' => 'analytics'])}}"--}}
+{{--                                   class="w-full btn md btn_connect"--}}
+{{--                                >--}}
+{{--                                    Connect--}}
+{{--                                </a>--}}
+{{--                            @endif--}}
                         </div>
                     </div>
                     {{--Google Ads--}}
@@ -133,11 +133,19 @@
                             </div>
                         </div>
                         <div class="mt-5">
-                            <a href="{{route('integrationsGoogleLogin', ['service' => 'adwords'])}}"
-                               class="w-full btn md btn_connect"
-                            >
-                                Connect
-                            </a>
+                            @if($googleAdwordsFirstConnectedAt)
+                                <button class="w-full btn md btn_connect"
+                                        @click="openModal('modal_google')"
+                                >
+                                    Configure
+                                </button>
+                            @else
+                                <a href="{{route('integrationsGoogleLogin', ['service' => 'adwords'])}}"
+                                   class="w-full btn md btn_connect"
+                                >
+                                    Connect
+                                </a>
+                            @endif
                         </div>
                     </div>
                     {{--Facebook Ads--}}
@@ -170,11 +178,19 @@
                             </div>
                         </div>
                         <div class="mt-5">
-                            <a href="{{route('integrationsFacebookLogin')}}"
-                               class="w-full btn md btn_connect"
-                            >
-                                Connect
-                            </a>
+                            @if($facebookFirstConnectedAt)
+                                <button class="w-full btn md btn_connect"
+                                        @click="openModal('modal_facebook')"
+                                >
+                                    Configure
+                                </button>
+                            @else
+                                <a href="{{route('integrationsFacebookLogin')}}"
+                                   class="w-full btn md btn_connect"
+                                >
+                                    Connect
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -182,51 +198,59 @@
         </div>
     </div>
 
-    <modal-component ref="modal_shopify" :max-width="'635px'">
-        <div class="modal-slot">
-            <div class="flex flex-col">
-                <div class="text-black_5 text-2xl">Connect your Shopify Account</div>
-                <div class="text-green_2 mt-3 font-semibold">Important</div>
-                <div class="text-sm text-black_5">
-                    Copy and paste the URL you see in your <a class="text-green_2 underline" href="https://admin.shopify.com/" target="_blank">Shopify Admin</a> under <br/>
-                    "Online Store" › "Domains". <br/>
-                    You can also find the name of your store directly in the shopify admin URL. <br/>
-                    Extract "mystorename" from <span class="text-green_2 underline">https://admin.shopify.com/store / mystorename </span>.
-                </div>
-                <div class="mt-10">
-                    <form method='POST' action="{{route('integrationsShopifyLogin')}}">
-                        {{ csrf_field() }}
-                        <div class="input-block">
-                            <label for="shopify_url" class="label">MyShopify URL</label>
-                            <input id="shopify_url"
-                                   placeholder="Link"
-                                   class="input !pr-40"
-                                   type="text"
-                                   name="shop"
-                            >
-                            <button type="submit" class="absolute w-max top-1.5 right-1.5 w-full btn md btn_connect2">
-                                Connect
-                            </button>
-                        </div>
-                    </form>
+    @if(@$shopifyFirstConnectedAt)
+        <modal-component ref="modal_shopify" :max-width="'460px'">
+            <div class="modal-slot">
+                <shopify-modal :accounts="{{@$shopifyAccounts}}"></shopify-modal>
+            </div>
+        </modal-component>
+    @else
+        <modal-component ref="modal_shopify_url" :max-width="'635px'">
+            <div class="modal-slot">
+                <div class="flex flex-col">
+                    <div class="text-black_5 text-2xl">Connect your Shopify Account</div>
+                    <div class="text-green_2 mt-3 font-semibold">Important</div>
+                    <div class="text-sm text-black_5">
+                        Copy and paste the URL you see in your <a class="text-green_2 underline" href="https://admin.shopify.com/" target="_blank">Shopify Admin</a> under <br/>
+                        "Online Store" › "Domains". <br/>
+                        You can also find the name of your store directly in the shopify admin URL. <br/>
+                        Extract "mystorename" from <span class="text-green_2 underline">https://admin.shopify.com/store / mystorename </span>.
+                    </div>
+                    <div class="mt-10">
+                        <form method='POST' action="{{route('integrationsShopifyLogin')}}">
+                            {{ csrf_field() }}
+                            <div class="input-block">
+                                <label for="shopify_url" class="label">MyShopify URL</label>
+                                <input id="shopify_url"
+                                       placeholder="Link"
+                                       class="input !pr-40"
+                                       type="text"
+                                       name="shop"
+                                >
+                                <button type="submit" class="absolute w-max top-1.5 right-1.5 w-full btn md btn_connect2">
+                                    Connect
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    </modal-component>
+        </modal-component>
+    @endif
 
-    <modal-component ref="modal_google_analytics" :max-width="'460px'">
+    {{-- toDo general component if modals will have the same view --}}
+
+    <modal-component ref="modal_google" :max-width="'460px'">
         <div class="modal-slot">
-            <google-modal :profiles="{{$gaProfiles}}"></google-modal>
+            <google-modal :accounts="{{@$googleAccounts}}"></google-modal>
         </div>
     </modal-component>
 
-    accounts
-    - id
-    - delete
-    - actual
-    - profiles
-    - id
-    - actual
+    <modal-component ref="modal_facebook" :max-width="'460px'">
+        <div class="modal-slot">
+            <facebook-modal :accounts="{{@$facebookAccounts}}"></facebook-modal>
+        </div>
+    </modal-component>
 
 @endsection
 
