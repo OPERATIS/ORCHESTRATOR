@@ -12,7 +12,8 @@
                     </div>
                     <ul
                         v-if="isOpenMenuDropdown"
-                        class="absolute mt-3 py-2 px-3 bg-white whitespace-nowrap z-10"
+                        class="absolute mt-3 py-2 px-3 bg-white whitespace-nowrap z-10 hidden"
+                        :class="{'!block': isOpenMenuDropdown}"
                         style="box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.15); border-radius: 10px; transform: translateX(-30%);"
 
                     >
