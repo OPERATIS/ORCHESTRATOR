@@ -499,7 +499,17 @@ class ChatsController extends Controller
                 if (!is_array($metric->{$subMetric})) {
                     $template[] = 'Hourly change: ' . round(($metric->{$subMetric} / $metricPrevious->{$subMetric} - 1) * 100, 2) . '%';
                 } elseif (in_array($subMetric, ['c_pmd', 'car_pmu'])) {
-                    $template[] = 'Popular payments systems:' . implode(',', $metric->{$subMetric});
+                    $sum = 0;
+                    foreach ($metric->{$subMetric} as $paymentSystem => $count) {
+                        $sum += $count;
+                    }
+
+                    $prepared = [];
+                    foreach ($metric->{$subMetric} as $paymentSystem => $count) {
+                        $prepared[] = $paymentSystem . ' is ' . ($count / $sum * 100) . '%';
+                    }
+
+                    $template[] = 'Popular payments systems: ' . implode(',', $prepared);
                 } elseif ($subMetric == 'l_map') {
                     $template[] = 'List of Most Abandoned Products: ' . implode(',', $metric->{$subMetric});
                 }
