@@ -26,4 +26,7 @@
     &.btn_connect{
         @apply text-white font-bold bg-green_1;
     }
+    &.btn_connect2{
+        @apply text-xl h-11 text-white font-normal bg-green_2 rounded-xl min-w-[9.125rem];
+    }
 }

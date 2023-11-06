@@ -20,7 +20,8 @@ class IntegrationsController extends Controller
         $user = Auth::user();
 
         $integrations = Integration::where('user_id', $user->id)->get();
-        $shopifyAccounts = $this->prepareAccounts($integrations->where('platform', 'shopify'));
+        $shopifyIntegrations = $integrations->where('platform', 'shopify');
+        $shopifyAccounts = $this->prepareAccounts($shopifyIntegrations);
         $shopifyFirstConnectedAt = null;
         foreach ($shopifyAccounts as $shopifyAccount) {
             if (empty($shopifyFirstConnectedAt) || Carbon::parse($shopifyFirstConnectedAt) < Carbon::parse($shopifyAccount->created_at)) {
@@ -28,7 +29,8 @@ class IntegrationsController extends Controller
             }
         }
 
-        $facebookAccounts = $this->prepareAccounts($integrations->where('platform', 'facebook'));
+        $facebookIntegrations = $integrations->where('platform', 'facebook');
+        $facebookAccounts = $this->prepareAccounts($facebookIntegrations);
         $facebookFirstConnectedAt = null;
         foreach ($facebookAccounts as $facebookAccount) {
             if (empty($facebookFirstConnectedAt) || Carbon::parse($facebookFirstConnectedAt) < Carbon::parse($facebookAccount->created_at)) {
@@ -36,19 +38,20 @@ class IntegrationsController extends Controller
             }
         }
 
-        $googleAccounts = $this->prepareAccounts($integrations->where('platform', 'google'));
+        $googleIntegrations = $integrations->where('platform', 'google');
+        $googleAccounts = $this->prepareAccounts($googleIntegrations);
         $googleAnalyticsFirstConnectedAt = null;
         $googleAdwordsFirstConnectedAt = null;
-        foreach ($googleAccounts as &$googleAccount) {
-            if (isset($googleAccount->analytics)) {
-                if (empty($googleAnalyticsFirstConnectedAt) || Carbon::parse($googleAnalyticsFirstConnectedAt) < Carbon::parse($googleAccount->created_at)) {
-                    $googleAnalyticsFirstConnectedAt = $googleAccount->created_at;
+        foreach ($googleIntegrations as $googleIntegration) {
+            if (isset($googleIntegration->analytics)) {
+                if (empty($googleAnalyticsFirstConnectedAt) || Carbon::parse($googleAnalyticsFirstConnectedAt) < Carbon::parse($googleIntegration->created_at)) {
+                    $googleAnalyticsFirstConnectedAt = $googleIntegration->created_at;
                 }
             }
 
-            if (isset($googleAccount->adwords)) {
-                if (empty($googleAdwordsFirstConnectedAt) || Carbon::parse($googleAdwordsFirstConnectedAt) < Carbon::parse($googleAccount->created_at)) {
-                    $googleAdwordsFirstConnectedAt = $googleAccount->created_at;
+            if (isset($integration->adwords)) {
+                if (empty($googleAdwordsFirstConnectedAt) || Carbon::parse($googleAdwordsFirstConnectedAt) < Carbon::parse($googleIntegration->created_at)) {
+                    $googleAdwordsFirstConnectedAt = $googleIntegration->created_at;
                 }
             }
         }
@@ -68,7 +71,7 @@ class IntegrationsController extends Controller
      * @param $integrations
      * @return mixed
      */
-    protected function prepareAccounts($integrations)
+    protected function prepareAccounts(&$integrations)
     {
         foreach ($integrations as &$integration) {
             // Return platforms for google
@@ -82,7 +85,7 @@ class IntegrationsController extends Controller
                     $integration->adwords = true;
                 }
 
-                $gaProfiles = GaProfile::where('integration_id', $integration->id)->get();
+                $gaProfiles = GaProfile::where('integration_id', $integration->id)->orderBy('id')->get();
                 $integration->profiles = $gaProfiles;
             }
             unset($integration->access_token);

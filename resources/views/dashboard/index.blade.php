@@ -49,19 +49,23 @@
                                     Recommendations
                                 </div>
                                 <div class="w-full bg-black h-px bg-opacity-20 mb-6 mt-5"></div>
-                                @if (@$lastUpdateRecommendations || @$priorityRecommendation)
+                                @if (@$lastUpdateRecommendations)
                                     @if ($lastUpdateRecommendations)
                                         <div class="text-sm text-black text-opacity-40">
                                             Last Update {{$lastUpdateRecommendations->format('d.m.y H:i')}}
                                         </div>
                                     @endif
                                     <div class="flex items-center text-sm text-dark mt-4">
-                                        @if ($priorityRecommendation)
-                                            {{$priorityRecommendation}}
-                                            <a href="{{route('chatsCreate', ['alert' => $lastAlertIdForRecommendation])}}">
-                                                Learn more.
-                                            </a>
-                                        @endif
+                                        @foreach ($recommendations as $alertId => $list)
+                                            @foreach ($list as $item)
+                                                @if ($loop->index === 0)
+                                                    {{$item}}
+                                                    <a href="{{route('chatsCreate', ['alert' => $alertId])}}">
+                                                        Learn more.
+                                                    </a>
+                                                @endif
+                                            @endforeach
+                                        @endforeach
                                     </div>
                                 @else
                                     <div class="flex flex-col items-center mt-12">

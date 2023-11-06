@@ -75,12 +75,12 @@ class Demo
             $fbStat = null;
         }
 
-        $uniqueClicks = ($fbStat->unique_clicks ?? 0) + rand(0, 1000);
+        $uniqueClicks = ($fbStat->unique_clicks ?? 0) + rand(0, 100);
         FbStat::create([
             'integration_id' => FbStat::DEMO_INTEGRATION_ID,
-            'clicks' => ($fbStat->clicks ?? 0) + rand(0, 3000) + $uniqueClicks,
-            'impressions' => ($fbStat->impressions ?? 0) + rand(0, 5000),
-            'spend' => ($fbStat->spend ?? 0) + rand(0, 500),
+            'clicks' => ($fbStat->clicks ?? 0) + rand(0, 300) + $uniqueClicks,
+            'impressions' => ($fbStat->impressions ?? 0) + rand(0, 500),
+            'spend' => ($fbStat->spend ?? 0) + rand(0, 50),
             'unique_clicks' => $uniqueClicks,
             'ad_id' => FbStat::DEMO_AD_ID,
             'start_period' => $startPeriod,
@@ -107,14 +107,14 @@ class Demo
             $gaStat = null;
         }
 
-        $uniquePageviews = ($gaStat->unique_pageviews ?? 0) + rand(0, 1000);
+        $uniquePageviews = ($gaStat->unique_pageviews ?? 0) + rand(0, 100);
         GaStat::create([
             'integration_id' => GaStat::DEMO_INTEGRATION_ID,
-            'impressions' => ($gaStat->impressions ?? 0) + rand(0, 5000),
-            'pageviews' => ($gaStat->pageviews ?? 0) + rand(0, 3000) + $uniquePageviews,
+            'impressions' => ($gaStat->impressions ?? 0) + rand(0, 500),
+            'pageviews' => ($gaStat->pageviews ?? 0) + rand(0, 300) + $uniquePageviews,
             'unique_pageviews' => $uniquePageviews,
-            'ad_clicks' => ($gaStat->ad_clicks ?? 0) + rand(0, 3000),
-            'ad_cost' => ($gaStat->ad_cost ?? 0) + rand(0, 100),
+            'ad_clicks' => ($gaStat->ad_clicks ?? 0) + rand(0, 300),
+            'ad_cost' => ($gaStat->ad_cost ?? 0) + rand(0, 10),
             'unique_table_id' => GaStat::DEMO_UNIQUE_TABLE_ID,
             'start_period' => $startPeriod,
             'end_period' => $endPeriod,
@@ -142,7 +142,7 @@ class Demo
             ->where('order_created_at', '<=', $endPeriod)
             ->delete();
 
-        $count = rand(0, 100);
+        $count = rand(0, 25);
         for ($i = 0; $i < $count; $i++) {
             $orderId = time() + $i;
             $price = rand(100, 500);
@@ -173,7 +173,7 @@ class Demo
                 'created_at' => $endPeriod,
                 'updated_at' => $endPeriod,
                 'total_line_items_price' => $price - rand(5, 100),
-                'count_line_items' => rand(1, 100),
+                'count_line_items' => rand(1, 10),
                 'count_refund_line_items' => rand(0, 10),
                 'total_refund_line_items_price' => $price * ((rand(0, 100) / 100) / 100),
                 'reference' => null,
@@ -223,7 +223,7 @@ class Demo
             ->where('checkout_created_at', '<=', $endPeriod)
             ->delete();
 
-        $count = rand(0, 300);
+        $count = rand(0, 50);
         for ($i = 0; $i < $count; $i++) {
             $price = rand(100, 500);
 
@@ -237,7 +237,7 @@ class Demo
                 'token' => uniqid(),
                 'order_id' => $checkout->order_id ?? null,
                 'checkout_created_at' => Carbon::parse($startPeriod)->addSeconds(rand(0, 300)),
-                'checkout_completed_at' =>  rand(0, 10) > 3 ? null : Carbon::parse($startPeriod)->addSeconds(rand(300, 900)),
+                'checkout_completed_at' => rand(0, 10) > 3 ? null : Carbon::parse($startPeriod)->addSeconds(rand(300, 900)),
                 'customer_id' => rand(0, 10) > 3 ? rand(0, 100000) : null,
                 'total_price' => $price,
                 'gift_cards' => $giftCards

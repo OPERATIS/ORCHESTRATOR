@@ -49,6 +49,7 @@ class ChatsController extends Controller
             ->first();
 
         if ($chat) {
+            ChatMessage::where('chat_id', $chat->id)->delete();
             $chat->delete();
             return response()->json([
                 'status' => true,
@@ -139,7 +140,7 @@ class ChatsController extends Controller
                 'status' => true,
                 'chat' => $chat,
                 'messages' => $messages,
-                'showMoreDetails' => count($messages) > 3
+                'showMoreDetails' => count($messages) <= 3
             ]);
         } else {
             return view('chats.index')
@@ -223,7 +224,7 @@ class ChatsController extends Controller
             $chatMessage = $this->sendToAi($messages, $chat);
         } catch (\Exception $exception) {
             return response()->json([
-                'status' => true,
+                'status' => false,
                 'errors' => ['The service is experiencing some problems']
             ]);
         }
@@ -264,13 +265,15 @@ class ChatsController extends Controller
     }
 
     /**
-     * @param int $chatId
-     * @param int $messageId
+     * @param $chatId
+     * @param $messageId
      * @param Request $request
      * @return JsonResponse
      */
-    public function editMessage(int $chatId, int $messageId, Request $request): JsonResponse
+    public function editMessage($chatId, $messageId, Request $request): JsonResponse
     {
+        $chatId = (int)$chatId;
+        $messageId = (int)$messageId;
         $request->merge(['messageId' => $messageId]);
         return $this->sendMessage($chatId, $request);
     }
@@ -296,7 +299,7 @@ class ChatsController extends Controller
             $chatMessage = $this->sendToAi($messages, $chat);
         } catch (\Exception $exception) {
             return response()->json([
-                'status' => true,
+                'status' => false,
                 'errors' => ['The service is experiencing some problems']
             ]);
         }
@@ -482,7 +485,7 @@ class ChatsController extends Controller
             ->first();
 
         $metricPrevious = Metric::where('user_id', $chatAlert->user_id)
-            ->where('start_period', Carbon::parse($chatAlert->start_period)->subHour())
+            ->where('start_period', Carbon::parse($chatAlert->end_period)->subHours(2))
             ->where('end_period', Carbon::parse($chatAlert->end_period)->subHour())
             ->first();
 
@@ -498,7 +501,17 @@ class ChatsController extends Controller
                 if (!is_array($metric->{$subMetric})) {
                     $template[] = 'Hourly change: ' . round(($metric->{$subMetric} / $metricPrevious->{$subMetric} - 1) * 100, 2) . '%';
                 } elseif (in_array($subMetric, ['c_pmd', 'car_pmu'])) {
-                    $template[] = 'Popular payments systems:' . implode(',', $metric->{$subMetric});
+                    $sum = 0;
+                    foreach ($metric->{$subMetric} as $paymentSystem => $count) {
+                        $sum += $count;
+                    }
+
+                    $prepared = [];
+                    foreach ($metric->{$subMetric} as $paymentSystem => $count) {
+                        $prepared[] = $paymentSystem . ' is ' . round(($count / $sum * 100), 2) . '%';
+                    }
+
+                    $template[] = 'Popular payments systems: ' . implode(', ', $prepared);
                 } elseif ($subMetric == 'l_map') {
                     $template[] = 'List of Most Abandoned Products: ' . implode(',', $metric->{$subMetric});
                 }

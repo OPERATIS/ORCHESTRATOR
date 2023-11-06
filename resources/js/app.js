@@ -9,10 +9,15 @@ import ResetPasswordBlock from './components/ResetPasswordBlock.vue';
 import ProfilePage from './components/ProfilePage.vue';
 import DashboardChartBlock from './components/DashboardChartBlock.vue';
 import ChatPage from './components/ChatPage.vue';
+import ModalComponent from './components/ModalComponent.vue';
+import GoogleModal from './components/Modals/GoogleModal.vue';
+import ShopifyModal from './components/Modals/ShopifyModal.vue';
+import FacebookModal from './components/Modals/FacebookModal.vue';
 
 createApp({
     components: {
-        LoginBlocks, ResetPasswordBlock, ProfilePage, DashboardChartBlock, ChatPage
+        LoginBlocks, ResetPasswordBlock, ProfilePage, DashboardChartBlock, ChatPage, ModalComponent, GoogleModal,
+        ShopifyModal, FacebookModal
     },
     data() {
         return {
@@ -22,6 +27,26 @@ createApp({
     methods: {
         closeMenuDropdown(){
             this.isOpenMenuDropdown = false;
+        },
+        openModal(refName) {
+            this.$refs[refName].openModal();
+            setTimeout(() => {
+                this.handleCheckboxChange();
+            }, 1)
+
+        },
+        handleCheckboxChange(){
+            const checkboxes = document.querySelectorAll('.checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const parent = this.parentNode;
+                    if (this.checked) {
+                        parent.style.borderColor = '#99E5B9';
+                    } else {
+                        parent.style.borderColor = 'rgba(28, 28, 28, 0.10)';
+                    }
+                });
+            });
         }
     }
 }).use(vueClickOutsideElement)
