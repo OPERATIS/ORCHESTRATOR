@@ -55,15 +55,17 @@
                                             Last Update {{$lastUpdateRecommendations->format('d.m.y H:i')}}
                                         </div>
                                     @endif
-                                    <div class="flex items-center text-sm text-dark mt-4">
+                                    <div class="flex flex-col text-sm text-dark mt-4">
                                         @foreach ($recommendations as $alertId => $list)
                                             @foreach ($list as $item)
-                                                @if ($loop->index === 0)
-                                                    {{$item}}
-                                                    <a href="{{route('chatsCreate', ['alert' => $alertId])}}">
-                                                        Learn more.
-                                                    </a>
-                                                @endif
+                                                <div class="flex items-center mb-2">
+                                                    @if ($loop->index === 0)
+                                                        {{$item}}
+                                                        <a class="text-green_2 font-bold underline" href="{{route('chatsCreate', ['alert' => $alertId])}}">
+                                                            Learn more
+                                                        </a>.
+                                                    @endif
+                                                </div>
                                             @endforeach
                                         @endforeach
                                     </div>
