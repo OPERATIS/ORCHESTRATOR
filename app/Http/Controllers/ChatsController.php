@@ -494,9 +494,13 @@ class ChatsController extends Controller
         $template[] = 'Metric explanation: ' . Metric::DESCRIPTIONS[$chatAlert->metric]['definition'];
 
         $subMetrics = Metric::DESCRIPTIONS[$chatAlert->metric]['sub_metrics']['default'];
+        $counter = 0;
         foreach ($subMetrics as $subMetric) {
             if (is_array($metric->{$subMetric}) && !empty($metric->{$subMetric}) || !empty($metric->{$subMetric})) {
                 $template[] = '';
+                if ($counter === 0) {
+                    $template[] = 'Factors which attributed:';
+                }
                 $template[] = Metric::DESCRIPTIONS[$subMetric]['description'] . '(' . Metric::DESCRIPTIONS[$subMetric]['name'] . ')';
                 if (!is_array($metric->{$subMetric})) {
                     $template[] = 'Hourly change: ' . round(($metric->{$subMetric} / $metricPrevious->{$subMetric} - 1) * 100, 2) . '%';
@@ -516,6 +520,7 @@ class ChatsController extends Controller
                     $template[] = 'List of Most Abandoned Products: ' . implode(',', $metric->{$subMetric});
                 }
                 $template[] = 'Metric explanation: ' . Metric::DESCRIPTIONS[$subMetric]['definition'];
+                $counter++;
             }
         }
 

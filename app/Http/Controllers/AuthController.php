@@ -6,6 +6,7 @@ use App\Mail\RecoverPassword;
 use App\Mail\Registration;
 use App\Models\UserSocial;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -143,12 +144,17 @@ class AuthController extends Controller
                     return response()->json([
                         'status' => true
                     ]);
-                } else {
+                } elseif ($status === PasswordBroker::INVALID_USER) {
                     return response()->json([
                         'status' => false,
                         'errors' => [
                             'email' => ['Invalid credentials']
                         ]
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'errors' => ['The service is experiencing some problems']
                     ]);
                 }
             }
@@ -173,10 +179,15 @@ class AuthController extends Controller
                     'errors' => $validator->errors()
                 ]);
             } else {
-                $token = hash_hmac('sha256', request()->get('token'), config('app.key'));
-                $passwordReset = \App\Models\PasswordReset::where('token', $token)->first();
+                $passwordResets = \App\Models\PasswordReset::get();
+                foreach ($passwordResets as $passwordReset) {
+                    if (Hash::check(request()->get('token'), $passwordReset->token)) {
+                        $email = $passwordReset->email;
+                        break;
+                    }
+                }
                 $request->merge([
-                    'email' => $passwordReset->email
+                    'email' => $email ?? null
                 ]);
 
                 $status = Password::reset(
@@ -193,7 +204,8 @@ class AuthController extends Controller
 
                 if ($status === Password::PASSWORD_RESET) {
                     return response()->json([
-                        'status' => true
+                        'status' => true,
+                        'redirect' => url('login')
                     ]);
                 } else {
                     return response()->json([
