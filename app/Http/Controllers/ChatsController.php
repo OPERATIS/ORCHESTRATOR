@@ -224,7 +224,7 @@ class ChatsController extends Controller
             $chatMessage = $this->sendToAi($messages, $chat);
         } catch (\Exception $exception) {
             return response()->json([
-                'status' => true,
+                'status' => false,
                 'errors' => ['The service is experiencing some problems']
             ]);
         }
@@ -299,7 +299,7 @@ class ChatsController extends Controller
             $chatMessage = $this->sendToAi($messages, $chat);
         } catch (\Exception $exception) {
             return response()->json([
-                'status' => true,
+                'status' => false,
                 'errors' => ['The service is experiencing some problems']
             ]);
         }
