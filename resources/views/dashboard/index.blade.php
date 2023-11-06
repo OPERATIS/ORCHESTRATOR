@@ -58,12 +58,12 @@
                                     <div class="flex flex-col text-sm text-dark mt-4">
                                         @foreach ($recommendations as $alertId => $list)
                                             @foreach ($list as $item)
-                                                <div class="mb-2">
+                                                <div class="mb-2.5">
                                                     @if ($loop->index === 0)
                                                         {{$item}}
                                                         <a class="text-green_2 font-bold underline"
                                                            href="{{route('chatsCreate', ['alert' => $alertId])}}">
-                                                            Learn more.
+                                                            Learn more
                                                         </a>
                                                     @endif
                                                 </div>
