@@ -350,7 +350,7 @@ export default {
                                 const customEvent = new CustomEvent('flash-message', {
                                     detail: {
                                         title: 'Something went wrong!',
-                                        subtitle: data['errors'] && data['errors']['email'] ? data['errors']['email'][0] : 'Try it again later!',
+                                        subtitle: data['errors'] ? data['errors'][0] : 'Try it again later!',
                                         type: 'warning',
                                         time: 3000,
                                     }
