@@ -260,9 +260,12 @@
 
 <script>
 export default {
+    props: {
+        view_auth: String
+    },
     data() {
         return {
-            view: 'login',
+            view: '',
             email: null,
             password: null,
             password_confirmation: null,
@@ -278,6 +281,7 @@ export default {
             this.view = view;
             if (view !== 'forgot_password_sent') {
                 this.email = null;
+                this.generateUrl(view);
             }
             this.password = null;
             this.password_confirmation = null;
@@ -348,7 +352,16 @@ export default {
                         console.log(response.data.message);
                     });
             }
+        },
+        generateUrl(view){
+            let prepareView = view.replace('_', '-');
+            const baseUrl = new URL(window.location.href);
+            baseUrl.pathname = `/${prepareView}`;
+            window.history.pushState({ path: baseUrl.href }, '', baseUrl.href);
         }
+    },
+    mounted(){
+        this.view = this.view_auth ?? 'login';
     }
 }
 </script>

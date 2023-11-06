@@ -53,7 +53,9 @@ class AuthController extends Controller
             if (Auth::user()) {
                 return redirect('dashboard');
             }
-            return view('auth.login');
+            return view('auth.login', [
+                'view' => 'login'
+            ]);
         }
     }
 
@@ -95,8 +97,9 @@ class AuthController extends Controller
                 'redirect' => url('dashboard')
             ]);
         } else {
-            // TODO change tab
-            return view('auth.login');
+            return view('auth.login', [
+                'view' => 'registration'
+            ]);
         }
     }
 
@@ -150,8 +153,9 @@ class AuthController extends Controller
                 }
             }
         } else {
-            // TODO change tab
-            return view('auth.login');
+            return view('auth.login', [
+                'view' => 'forgot_password'
+            ]);
         }
     }
 

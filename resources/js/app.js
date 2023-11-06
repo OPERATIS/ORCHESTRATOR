@@ -21,7 +21,10 @@ createApp({
     },
     data() {
         return {
-            isOpenMenuDropdown: false
+            isOpenMenuDropdown: false,
+            // for shopify modal only
+            shopifyUrl: '',
+            showShopifyErrorMessage: false
         }
     },
     methods: {
@@ -47,6 +50,23 @@ createApp({
                     }
                 });
             });
+        },
+        // for shopify modal only
+        submitShopifyForm() {
+            if (this.shopifyUrl.endsWith('.myshopify.com')) {
+                const formElement = document.getElementById('shopifyForm');
+                formElement.submit();
+            } else {
+                this.showShopifyErrorMessage = true;
+            }
+        }
+    },
+    mounted(){
+        const urlParams = new URLSearchParams(window.location.search);
+        const modalName = urlParams.get('m');
+        const modals = ['modal_shopify', 'modal_facebook', 'modal_google'];
+        if (modalName && modals.includes(modalName)) {
+            this.openModal(modalName);
         }
     }
 }).use(vueClickOutsideElement)
