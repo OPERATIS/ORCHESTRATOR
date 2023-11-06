@@ -32,7 +32,6 @@ createApp({
             this.isOpenMenuDropdown = false;
         },
         openModal(refName) {
-            console.log(this.$refs);
             this.$refs[refName].openModal();
             setTimeout(() => {
                 this.handleCheckboxChange();
