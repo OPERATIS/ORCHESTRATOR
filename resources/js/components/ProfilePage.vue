@@ -65,7 +65,7 @@
                            }"
                                placeholder="Enter current password"
                                class="input"
-                               autocomplete="off"
+                               autocomplete="new-password"
                                type="password"
                                v-model="password"
                                @input="error.password = null"
