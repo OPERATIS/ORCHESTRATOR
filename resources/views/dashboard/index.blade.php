@@ -55,10 +55,10 @@
                                             Last Update {{$lastUpdateRecommendations->format('d.m.y H:i')}}
                                         </div>
                                     @endif
-                                    <div class="flex flex-col text-sm text-dark mt-4">
+                                    <ul class="flex flex-col text-sm text-dark mt-4 list-disc" style="margin-left: 18px;">
                                         @foreach ($recommendations as $alertId => $list)
                                             @foreach ($list as $item)
-                                                <div class="mb-2.5">
+                                                <li class="mb-2.5">
                                                     @if ($loop->index === 0)
                                                         {{$item}}
                                                         <a class="text-green_2 font-bold underline"
@@ -66,10 +66,10 @@
                                                             Learn more
                                                         </a>
                                                     @endif
-                                                </div>
+                                                </li>
                                             @endforeach
                                         @endforeach
-                                    </div>
+                                    </ul>
                                 @else
                                     <div class="flex flex-col items-center mt-12">
                                         <div class="flex items-center justify-center w-12 h-12 rounded-[0.625rem]" style="background: rgba(229, 236, 244, 0.75);">
