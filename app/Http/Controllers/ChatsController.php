@@ -265,13 +265,15 @@ class ChatsController extends Controller
     }
 
     /**
-     * @param int $chatId
-     * @param int $messageId
+     * @param $chatId
+     * @param $messageId
      * @param Request $request
      * @return JsonResponse
      */
-    public function editMessage(int $chatId, int $messageId, Request $request): JsonResponse
+    public function editMessage($chatId, $messageId, Request $request): JsonResponse
     {
+        $chatId = (int)$chatId;
+        $messageId = (int)$messageId;
         $request->merge(['messageId' => $messageId]);
         return $this->sendMessage($chatId, $request);
     }
