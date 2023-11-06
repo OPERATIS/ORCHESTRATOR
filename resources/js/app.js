@@ -125,7 +125,6 @@ function showFlash(data) {
             </button>
         </div>
     `;
-    console.log(html);
     document.querySelector('#flash_messages').insertAdjacentHTML( 'beforeend', html );
     const message = document.querySelector('.flash_message:last-child');
     setTimeout(() => {
