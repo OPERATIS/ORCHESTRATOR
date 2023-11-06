@@ -224,7 +224,7 @@ class ChatsController extends Controller
             $chatMessage = $this->sendToAi($messages, $chat);
         } catch (\Exception $exception) {
             return response()->json([
-                'status' => true,
+                'status' => false,
                 'errors' => ['The service is experiencing some problems']
             ]);
         }
@@ -299,7 +299,7 @@ class ChatsController extends Controller
             $chatMessage = $this->sendToAi($messages, $chat);
         } catch (\Exception $exception) {
             return response()->json([
-                'status' => true,
+                'status' => false,
                 'errors' => ['The service is experiencing some problems']
             ]);
         }
@@ -485,7 +485,7 @@ class ChatsController extends Controller
             ->first();
 
         $metricPrevious = Metric::where('user_id', $chatAlert->user_id)
-            ->where('start_period', Carbon::parse($chatAlert->start_period)->subHour())
+            ->where('start_period', Carbon::parse($chatAlert->end_period)->subHours(2))
             ->where('end_period', Carbon::parse($chatAlert->end_period)->subHour())
             ->first();
 

@@ -7,10 +7,10 @@ use App\Models\Alert;
 class Recommendations
 {
     /**
-     * @param $alertsForRecommendations
+     * @param $alertForRecommendations
      * @return array
      */
-    public static function getListAdvice($alertsForRecommendations): array
+    public static function getListAdvice($alertForRecommendations): array
     {
         $rules = [
             'c' => [
@@ -83,12 +83,9 @@ class Recommendations
         ];
 
         $listAdvice = [];
-        foreach ($alertsForRecommendations as $alertForRecommendations) {
-            $array = array_reverse($rules[$alertForRecommendations->metric][$alertForRecommendations->result]);
-            if ($alertForRecommendations->result === Alert::UNCHANGED) {
-                $listAdvice[Alert::UNCHANGED][] = array_pop($array);
-            } else {
-                $listAdvice[Alert::INCREASED_DECREASED][] = array_pop($array);
+        foreach ($rules[$alertForRecommendations->metric][$alertForRecommendations->result] as $item) {
+            if (!str_contains($item, 'Go to')) {
+                $listAdvice[] = $item;
             }
         }
 
