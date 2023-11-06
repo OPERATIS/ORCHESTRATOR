@@ -243,6 +243,7 @@
                     >
                         Sign In
                     </button>
+                    <div v-if="error && error.email" class="error text-xs text-dangers mt-1">{{ error.email }}</div>
                     <div class="mt-4 text-xs flex justify-center text-dark">
                         I didn’t received an email
                         <span @click="forgotPassword()"
