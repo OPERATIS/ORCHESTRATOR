@@ -364,6 +364,7 @@ export default {
                         }
                     })
                     .catch(({response}) => {
+                        console.log('2', response);
                         console.log(response.data.message);
                         const customEvent = new CustomEvent('flash-message', {
                             detail: {
