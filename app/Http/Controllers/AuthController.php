@@ -146,6 +146,7 @@ class AuthController extends Controller
                 } else {
                     return response()->json([
                         'status' => false,
+                        // TODO incorrect
                         'errors' => [
                             'email' => ['Invalid credentials']
                         ]
@@ -173,10 +174,15 @@ class AuthController extends Controller
                     'errors' => $validator->errors()
                 ]);
             } else {
-                $token = hash_hmac('sha256', request()->get('token'), config('app.key'));
-                $passwordReset = \App\Models\PasswordReset::where('token', $token)->first();
+                $passwordResets = \App\Models\PasswordReset::get();
+                foreach ($passwordResets as $passwordReset) {
+                    if (Hash::check(request()->get('token'), $passwordReset->token)) {
+                        $email = $passwordReset->email;
+                        break;
+                    }
+                }
                 $request->merge([
-                    'email' => $passwordReset->email
+                    'email' => $email ?? null
                 ]);
 
                 $status = Password::reset(
@@ -193,7 +199,8 @@ class AuthController extends Controller
 
                 if ($status === Password::PASSWORD_RESET) {
                     return response()->json([
-                        'status' => true
+                        'status' => true,
+                        'redirect' => url('login')
                     ]);
                 } else {
                     return response()->json([
