@@ -356,6 +356,7 @@ export default {
                                     }
                                 });
                                 window.dispatchEvent(customEvent);
+                                console.log(data['errors']['email'][0]);
                             } else {
                                 this.error.email = data['errors'] && data['errors']['email'] ? data['errors']['email'][0] : null;
                             }
