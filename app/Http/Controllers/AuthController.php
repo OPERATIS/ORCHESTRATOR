@@ -6,6 +6,7 @@ use App\Mail\RecoverPassword;
 use App\Mail\Registration;
 use App\Models\UserSocial;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -143,13 +144,17 @@ class AuthController extends Controller
                     return response()->json([
                         'status' => true
                     ]);
-                } else {
+                } elseif ($status === PasswordBroker::INVALID_USER) {
                     return response()->json([
                         'status' => false,
-                        // TODO incorrect
                         'errors' => [
                             'email' => ['Invalid credentials']
                         ]
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'errors' => ['The service is experiencing some problems']
                     ]);
                 }
             }
