@@ -337,11 +337,13 @@ export default {
         },
         forgotPassword(resend = false) {
             if (this.email){
+                console.log(this.email);
                 let data = {
                     email: this.email
                 };
                 axios.post('/forgot-password', data)
                     .then(({data}) => {
+                        console.log(data);
                         if(data.status == true){
                             this.changeView('forgot_password_sent');
                             if (resend){
