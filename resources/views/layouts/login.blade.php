@@ -23,6 +23,6 @@
         <div id="app">
             @yield('content')
         </div>
+        @include('components.flash_messages')
     </body>
-
 </html>
