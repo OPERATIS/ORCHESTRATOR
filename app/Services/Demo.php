@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Checkout;
 use App\Models\CheckoutLineItem;
+use App\Models\GaProfile;
 use App\Models\Integration;
 use App\Models\FbStat;
 use App\Models\GaStat;
@@ -11,6 +12,7 @@ use App\Models\Order;
 use App\Models\OrderLineItem;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class Demo
@@ -26,36 +28,77 @@ class Demo
             'brand_name' => 'Demo',
             'password' => Hash::make('demo-password')
         ]);
+
+        DB::select("SELECT setval(pg_get_serial_sequence('users', 'id'), coalesce(max(id)+1, 1), false) FROM users;");
     }
 
     public static function createConnections()
     {
         // Create facebook connect
-        Integration::updateOrCreate([
-            'id' => FbStat::DEMO_INTEGRATION_ID,
-            'user_id' => User::DEMO_ID,
-            'platform' => 'facebook',
-        ], [
-            'access_token' => uniqid()
-        ]);
+        Integration::withTrashed()
+            ->updateOrCreate([
+                'id' => FbStat::DEMO_INTEGRATION_ID,
+                'user_id' => User::DEMO_ID,
+                'platform' => 'facebook',
+            ], [
+                'actual' => true,
+                'deleted_at' => null,
+                'access_token' => uniqid()
+            ]);
+
+
+        // Create facebook connect
+        Integration::withTrashed()
+            ->updateOrCreate([
+                'id' => FbStat::DEMO_INTEGRATION_ID,
+                'user_id' => User::DEMO_ID,
+                'platform' => 'facebook',
+            ], [
+                'actual' => true,
+                'deleted_at' => null,
+                'app_user_slug' => 'demo-facebook',
+                'access_token' => uniqid()
+            ]);
+
 
         // Create google connect
-        Integration::updateOrCreate([
+        Integration::withTrashed()->updateOrCreate([
             'id' => GaStat::DEMO_INTEGRATION_ID,
             'user_id' => User::DEMO_ID,
             'platform' => 'google',
         ], [
-            'access_token' => uniqid()
+            'actual' => true,
+            'deleted_at' => null,
+            'app_user_slug' => 'demo-google',
+            'access_token' => uniqid(),
+            'scope' => 'https://www.googleapis.com/auth/analytics'
         ]);
 
+        for ($i = 0; $i < 3; $i++) {
+            GaProfile::updateOrCreate([
+                'integration_id' => GaStat::DEMO_INTEGRATION_ID,
+                'name' => 'demo-profile-' . $i
+            ], [
+                'actual' => true,
+                'currency' => 'USD',
+                'timezone' => 'UTC',
+                'profile_id' => time() . $i
+            ]);
+        }
+
         // Create shopify connect
-        Integration::updateOrCreate([
+        Integration::withTrashed()->updateOrCreate([
             'id' => Order::DEMO_INTEGRATION_ID,
             'user_id' => User::DEMO_ID,
             'platform' => 'shopify',
         ], [
+            'actual' => true,
+            'deleted_at' => null,
+            'app_user_slug' => 'demo-shopify.myshopify.com',
             'access_token' => uniqid()
         ]);
+
+        DB::select("SELECT setval(pg_get_serial_sequence('integrations', 'id'), coalesce(max(id)+1, 1), false) FROM integrations;");
     }
 
     public static function createFbStats($startPeriod, $endPeriod)

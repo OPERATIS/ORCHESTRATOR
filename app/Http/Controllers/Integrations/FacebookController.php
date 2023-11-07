@@ -46,6 +46,8 @@ class FacebookController extends BaseController
             'app_user_id' => $socialiteUser->getId(),
             'platform' => 'facebook'
         ], [
+            'actual' => true,
+            'deleted_at' => null,
             'access_token' => $socialiteUser->token,
             'expires_in' => $socialiteUser->expiresIn,
             'scope' => implode(',', $socialiteUser->approvedScopes)

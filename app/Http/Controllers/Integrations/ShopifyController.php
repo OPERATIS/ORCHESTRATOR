@@ -83,6 +83,8 @@ class ShopifyController extends BaseController
             'app_user_id' => $session->getId(),
             'platform' => 'shopify'
         ], [
+            'actual' => true,
+            'deleted_at' => null,
             'access_token' => $session->getAccessToken(),
             'expires_in' => $session->getExpires(),
             'scope' => $session->getScope()
