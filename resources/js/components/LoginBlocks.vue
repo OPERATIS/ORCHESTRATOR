@@ -344,8 +344,18 @@ export default {
                     .then(({data}) => {
                         if(data.status == true){
                             this.changeView('forgot_password_sent');
+                            if (resend){
+                                const customEvent = new CustomEvent('flash-message', {
+                                    detail: {
+                                        title: 'Letter has been sent again!',
+                                        subtitle: 'Password instructions sent successfully!',
+                                        type: 'success',
+                                        time: 3000,
+                                    }
+                                });
+                                window.dispatchEvent(customEvent);
+                            }
                         } else {
-                            console.log(resend);
                             if (resend){
                                 const customEvent = new CustomEvent('flash-message', {
                                     detail: {
@@ -356,15 +366,12 @@ export default {
                                     }
                                 });
                                 window.dispatchEvent(customEvent);
-                                console.log(data);
                             } else {
-                                console.log(data);
                                 this.error.email = data['errors'] && data['errors']['email'] ? data['errors']['email'][0] : null;
                             }
                         }
                     })
                     .catch(({response}) => {
-                        console.log('2', response);
                         console.log(response.data.message);
                         const customEvent = new CustomEvent('flash-message', {
                             detail: {
