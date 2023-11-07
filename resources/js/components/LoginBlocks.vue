@@ -369,7 +369,7 @@ export default {
                                 });
                                 window.dispatchEvent(customEvent);
                             } else {
-                                this.error.email = data['errors'] && data['errors']['email'] ? data['errors']['email'][0] : null;
+                                this.error.email = data['errors'] ? (data['errors']['email'] ? data['errors']['email'][0] : data['errors'][0]) : null;
                             }
                         }
                     })
