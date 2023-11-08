@@ -107,7 +107,8 @@ class GetCheckouts implements ShouldQueue
                             'price' => $lineItem->price,
                             'line_price' => $lineItem->line_price,
                             'quantity' => $lineItem->quantity,
-                            'gift_card' => $lineItem->gift_card
+                            'gift_card' => $lineItem->gift_card,
+                            'title' => $lineItem->title
                         ]);
                     }
                 }
