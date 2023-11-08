@@ -246,7 +246,7 @@ class ChatsController extends Controller
         $client = OpenAI::client(config('integrations.openai.apiKey'));
 
         $chatResponse = $client->chat()->create([
-            'model' => 'gpt-3.5-turbo',
+            'model' => 'gpt-4',
             'messages' => $messages,
         ]);
 
@@ -454,8 +454,7 @@ class ChatsController extends Controller
         $template[] = '2. For each submetric:';
         $template[] = 'a) What happened and what does it mean in terms of influence on the main metric.';
         $template[] = 'b) What actions to take to improve the situation.';
-        $template[] = 'Like a thesis about the main metric and action to take, same for each metric of influence and don\'t forget that you must use metrics of influence as references for causes of some effect on metric of interest. If there is something complex in your recommendation - recommend to hire a specialist with expertise with concrete matter. Also, don\'t use email jargon, you are speaking with your best friend with respect and sincere will to help. Finish with something like "if you need more help, feel free to ask", don\'t finish your message as it is an email.';
-
+        $template[] = 'Like a thesis about the main metric and action to take, same for each metric of influence and don\'t forget that you must use metrics of influence as references for causes of some effect on metric of interest. If there is something complex in your recommendation - recommend to hire a specialist with expertise with concrete matter. Also, don\'t use email jargon, you are speaking with your best friend with respect and sincere will to help. Finish with something like "if you need more help, feel free to ask", don\'t finish your message as it is an email - you are not writing an email, it’s just casual conversation.';
         return implode("\n", $template);
     }
 
@@ -476,12 +475,13 @@ class ChatsController extends Controller
         if ($chat->alert->period === Metric::PERIOD_HOUR) {
             $template[] = Notifications::getMessageFromAlert($chatAlert);
             $template[] = '';
+            $template[] = 'Metric of interest performance during last hour:';
         } elseif ($chat->alert->period === Metric::PERIOD_DAY) {
             $template[] = 'Your ' . Metric::DESCRIPTIONS[$chatAlert->metric]['symbol'] . '(' . Metric::DESCRIPTIONS[$chatAlert->metric]['description'] . ') was just fine during the last 24 hours. Learn how to improve further.';
             $template[] = '';
+            $template[] = 'Metric of interest performance during last 24 hours:';
         }
 
-        $template[] = 'Metric of interest performance during last hour:';
         $template[] = '';
 
         $metric = Metric::where('user_id', $chatAlert->user_id)
@@ -505,6 +505,7 @@ class ChatsController extends Controller
                 $template[] = '';
                 if ($counter === 0) {
                     $template[] = 'Factors which attributed:';
+                    $template[] = '';
                 }
                 $template[] = Metric::DESCRIPTIONS[$subMetric]['description'] . '(' . Metric::DESCRIPTIONS[$subMetric]['name'] . ')';
                 if (!is_array($metric->{$subMetric})) {
