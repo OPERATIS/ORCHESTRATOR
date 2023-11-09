@@ -348,7 +348,7 @@ class SaveMetrics extends Command
                 if (!$trySearch || ($trySearch->countproducts !== $checkoutLineItem->countproducts)) {
                     $products[$userId][$checkoutLineItem->product_id] = $checkoutLineItem->countproducts - ($trySearch->countproducts ?? 0);
                     $products[$userId][$checkoutLineItem->product_id] = $products[$userId][$checkoutLineItem->product_id] > 0 ? $products[$userId][$checkoutLineItem->product_id] : 0;
-                    $productsName[$userId][$checkoutLineItem->product_id] = $checkoutLineItem->title ?? $trySearch->countproducts;
+                    $productsName[$userId][$checkoutLineItem->product_id] = $checkoutLineItem->title ?? $trySearch->title;
                 }
             }
         }
