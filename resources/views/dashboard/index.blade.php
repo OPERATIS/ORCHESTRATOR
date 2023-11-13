@@ -8,28 +8,43 @@
         </div>
         <div class="max-w-[84rem] mx-auto">
             <div class="px-7 py-8">
-                <div class="flex items-center w-full items-center gap-3">
-                    @foreach($metricsActualData as $metricKey => $metricActualData)
-                        <div class="h-[7rem] w-full text-black p-6 rounded-2xl" style="@if($metricActualData['percent'] > 0) background: #E3FFE4; @else background: #F6E5E5; @endif">
-                            <div class="text-sm font-semibold uppercase mb-2">
-                                {{$metricKey}}
+                <div class="relative flex items-center w-full items-center gap-3">
+                    @if($metricsActualData)
+                        @foreach($metricsActualData as $metricKey => $metricActualData)
+                            <div class="h-[7rem] w-full text-black p-6 rounded-2xl" style="@if($metricActualData['percent'] > 0) background: #E3FFE4; @else background: #F6E5E5; @endif">
+                                <div class="text-sm font-semibold uppercase mb-2">
+                                    {{$metricKey}}
+                                </div>
+                                <div class="w-full flex items-center">
+                                    <div class="text-2xl font-semibold mr-2" style="line-height: 36px;">
+                                        {{\App\Helpers\Shorts::formatNumber($metricActualData['last'], null, 1)}}
+                                        {{--                                    {{$metricActualData['previous']}}--}}
+                                    </div>
+                                    <div class="flex items-center text-xs ml-auto" style="line-height: 18px;">
+                                        <span>{{$metricActualData['percent']}}%</span>
+                                        @if($metricActualData['percent'] > 0)
+                                            <x-icon name="arrow-rise-icon" class="w-4 h-4 ml-1"/>
+                                        @else
+                                            <x-icon name="arrow-rise-down-icon" class="w-4 h-4 ml-1"/>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
-                            <div class="w-full flex items-center">
-                                <div class="text-2xl font-semibold mr-2" style="line-height: 36px;">
-                                    {{\App\Helpers\Shorts::formatNumber($metricActualData['last'], null, 1)}}
-                                    {{--                                    {{$metricActualData['previous']}}--}}
-                                </div>
-                                <div class="flex items-center text-xs ml-auto" style="line-height: 18px;">
-                                    <span>{{$metricActualData['percent']}}%</span>
-                                    @if($metricActualData['percent'] > 0)
-                                        <x-icon name="arrow-rise-icon" class="w-4 h-4 ml-1"/>
-                                    @else
-                                        <x-icon name="arrow-rise-down-icon" class="w-4 h-4 ml-1"/>
-                                    @endif
-                                </div>
+                        @endforeach
+                    @else
+                        @for($i = 0; $i < 5; $i++)
+                            <div class="h-[7rem] w-full text-black p-6 rounded-2xl bg-primary_light">
+                            </div>
+                        @endfor
+                        <div class="w-full absolute flex flex-col items-center">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-[0.625rem]" style="background: rgba(229, 236, 244, 0.75);">
+                                <x-icon name="circle-wavy-warning" class="w-4 h-4"/>
+                            </div>
+                            <div class="text-sm text-black mt-3">
+                                You have no metrics data yet
                             </div>
                         </div>
-                    @endforeach
+                    @endif
                 </div>
                 <div class="flex justify-center items-center w-full min-h-[18rem] mt-8 bg-primary_light rounded-2xl pt-0 pb-4 px-4">
                     <dashboard-chart-block></dashboard-chart-block>
