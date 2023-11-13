@@ -56,7 +56,7 @@
             </div>
         </div>
         <div class="w-full">
-            <template v-if="chartData.length || loading">
+            <template v-if="Object.keys(chartData).length || loading">
                 <highcharts ref="chart" id="dashboard-chart" :options="chartOptions"></highcharts>
             </template>
             <template v-else>
@@ -100,7 +100,7 @@ export default {
                 current: true,
                 previous: true
             },
-            chartData: [],
+            chartData: {},
             loading: false
         }
     },
