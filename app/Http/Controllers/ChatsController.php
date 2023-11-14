@@ -495,7 +495,9 @@ class ChatsController extends Controller
             ->first();
 
         $template[] = Metric::DESCRIPTIONS[$chatAlert->metric]['description'] . '(' . Metric::DESCRIPTIONS[$chatAlert->metric]['name'] . ')';
-        $template[] = 'Hourly change: ' . round(($metric->{$chatAlert->metric} / $metricPrevious->{$chatAlert->metric} - 1) * 100, 2) . '%';
+        if (isset($metricPrevious->{$chatAlert->metric}) && $metricPrevious->{$chatAlert->metric}) {
+            $template[] = 'Hourly change: ' . round(($metric->{$chatAlert->metric} / $metricPrevious->{$chatAlert->metric} - 1) * 100, 2) . '%';
+        }
         $template[] = 'Metric explanation: ' . Metric::DESCRIPTIONS[$chatAlert->metric]['definition'];
 
         $subMetrics = Metric::DESCRIPTIONS[$chatAlert->metric]['sub_metrics']['default'];
@@ -508,7 +510,7 @@ class ChatsController extends Controller
                     $template[] = '';
                 }
                 $template[] = Metric::DESCRIPTIONS[$subMetric]['description'] . '(' . Metric::DESCRIPTIONS[$subMetric]['name'] . ')';
-                if (!is_array($metric->{$subMetric})) {
+                if (!is_array($metric->{$subMetric}) && $metricPrevious->{$subMetric}) {
                     $template[] = 'Hourly change: ' . round(($metric->{$subMetric} / $metricPrevious->{$subMetric} - 1) * 100, 2) . '%';
                 } elseif (in_array($subMetric, ['c_pmd', 'car_pmu'])) {
                     $sum = 0;
