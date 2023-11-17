@@ -7,12 +7,12 @@
             >
                 Profile Details
             </div>
-            <div class="h-10 w-[20rem] flex justify-center items-center text-black_2 cursor-pointer border-b-4 border-transparent"
-                 :class="{ '!border-primary text-black_5': tab === 'plans' }"
-                 @click="tab = 'plans'"
-            >
-                Plans and billing
-            </div>
+<!--            <div class="h-10 w-[20rem] flex justify-center items-center text-black_2 cursor-pointer border-b-4 border-transparent"-->
+<!--                 :class="{ '!border-primary text-black_5': tab === 'plans' }"-->
+<!--                 @click="tab = 'plans'"-->
+<!--            >-->
+<!--                Plans and billing-->
+<!--            </div>-->
         </div>
         <template v-if="tab === 'profile'">
             <div class="bg-primary_light rounded-2xl p-7 mt-16 space-y-6">

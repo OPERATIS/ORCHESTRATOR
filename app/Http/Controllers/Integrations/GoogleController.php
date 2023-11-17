@@ -87,6 +87,8 @@ class GoogleController extends BaseController
                 'app_user_id' => $client->getClientId(),
                 'platform' => 'google'
             ], [
+                'actual' => true,
+                'deleted_at' => null,
                 'access_token' => $token['access_token'],
                 'expires_in' => $token['expires_in'],
                 'refresh_token' => $token['refresh_token'],

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Checkout;
 use App\Models\CheckoutLineItem;
+use App\Models\GaProfile;
 use App\Models\Integration;
 use App\Models\FbStat;
 use App\Models\GaStat;
@@ -11,6 +12,7 @@ use App\Models\Order;
 use App\Models\OrderLineItem;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class Demo
@@ -26,36 +28,77 @@ class Demo
             'brand_name' => 'Demo',
             'password' => Hash::make('demo-password')
         ]);
+
+        DB::select("SELECT setval(pg_get_serial_sequence('users', 'id'), coalesce(max(id)+1, 1), false) FROM users;");
     }
 
     public static function createConnections()
     {
         // Create facebook connect
-        Integration::updateOrCreate([
-            'id' => FbStat::DEMO_INTEGRATION_ID,
-            'user_id' => User::DEMO_ID,
-            'platform' => 'facebook',
-        ], [
-            'access_token' => uniqid()
-        ]);
+        Integration::withTrashed()
+            ->updateOrCreate([
+                'id' => FbStat::DEMO_INTEGRATION_ID,
+                'user_id' => User::DEMO_ID,
+                'platform' => 'facebook',
+            ], [
+                'actual' => true,
+                'deleted_at' => null,
+                'access_token' => uniqid()
+            ]);
+
+
+        // Create facebook connect
+        Integration::withTrashed()
+            ->updateOrCreate([
+                'id' => FbStat::DEMO_INTEGRATION_ID,
+                'user_id' => User::DEMO_ID,
+                'platform' => 'facebook',
+            ], [
+                'actual' => true,
+                'deleted_at' => null,
+                'app_user_slug' => 'demo-facebook',
+                'access_token' => uniqid()
+            ]);
+
 
         // Create google connect
-        Integration::updateOrCreate([
+        Integration::withTrashed()->updateOrCreate([
             'id' => GaStat::DEMO_INTEGRATION_ID,
             'user_id' => User::DEMO_ID,
             'platform' => 'google',
         ], [
-            'access_token' => uniqid()
+            'actual' => true,
+            'deleted_at' => null,
+            'app_user_slug' => 'demo-google',
+            'access_token' => uniqid(),
+            'scope' => 'https://www.googleapis.com/auth/analytics'
         ]);
 
+        for ($i = 0; $i < 3; $i++) {
+            GaProfile::updateOrCreate([
+                'integration_id' => GaStat::DEMO_INTEGRATION_ID,
+                'name' => 'demo-profile-' . $i
+            ], [
+                'actual' => true,
+                'currency' => 'USD',
+                'timezone' => 'UTC',
+                'profile_id' => time() . $i
+            ]);
+        }
+
         // Create shopify connect
-        Integration::updateOrCreate([
+        Integration::withTrashed()->updateOrCreate([
             'id' => Order::DEMO_INTEGRATION_ID,
             'user_id' => User::DEMO_ID,
             'platform' => 'shopify',
         ], [
+            'actual' => true,
+            'deleted_at' => null,
+            'app_user_slug' => 'demo-shopify.myshopify.com',
             'access_token' => uniqid()
         ]);
+
+        DB::select("SELECT setval(pg_get_serial_sequence('integrations', 'id'), coalesce(max(id)+1, 1), false) FROM integrations;");
     }
 
     public static function createFbStats($startPeriod, $endPeriod)
@@ -197,7 +240,8 @@ class Demo
                     'variant_id' => $productId,
                     'price' => $price,
                     'quantity' => rand(1, 10),
-                    'gift_card' => rand(0, 1)
+                    'gift_card' => rand(0, 1),
+                    'title' => self::getProduct($productId),
                 ]);
             }
         }
@@ -256,9 +300,123 @@ class Demo
                     'price' => $price,
                     'line_price' => $price,
                     'quantity' => rand(1, 10),
-                    'gift_card' => rand(0, 1)
+                    'gift_card' => rand(0, 1),
+                    'title' => self::getProduct($productId),
                 ]);
             }
         }
+    }
+
+    /**
+     * @param $id
+     * @return string
+     */
+    public static function getProduct($id): string
+    {
+        $products = [
+            0 => 'Blackcurrant',
+            1 => 'Apple',
+            2 => 'Apricot',
+            3 => 'Avocado',
+            4 => 'Banana',
+            5 => 'Blackberry',
+            6 => 'Blueberry',
+            7 => 'Boysenberry',
+            8 => 'Breadfruit',
+            9 => 'Cactus fruit',
+            10 => 'Cantaloupe',
+            11 => 'Cherry',
+            12 => 'Clementine',
+            13 => 'Coconut',
+            14 => 'Cranberry',
+            15 => 'Currant',
+            16 => 'Date',
+            17 => 'Dragonfruit',
+            18 => 'Durian',
+            19 => 'Elderberry',
+            20 => 'Fig',
+            21 => 'Grape',
+            22 => 'Grapefruit',
+            23 => 'Ground cherry',
+            24 => 'Guava',
+            25 => 'Honeydew melon',
+            26 => 'Jackfruit',
+            27 => 'Kiwi',
+            28 => 'Kumquat',
+            29 => 'Lemon',
+            30 => 'Lime',
+            31 => 'Lychee',
+            32 => 'Mango',
+            33 => 'Mandarin',
+            34 => 'Maracuja',
+            35 => 'Mulberry',
+            36 => 'Nectarine',
+            37 => 'Orange',
+            38 => 'Papaya',
+            39 => 'Passionfruit',
+            40 => 'Peach',
+            41 => 'Pear',
+            42 => 'Persimmon',
+            43 => 'Pineapple',
+            44 => 'Plum',
+            45 => 'Pomegranate',
+            46 => 'Raspberry',
+            47 => 'Red currant',
+            48 => 'Star fruit',
+            49 => 'Strawberry',
+            50 => 'Tangerine',
+            51 => 'Watermelon',
+            52 => 'Artichoke',
+            53 => 'Asparagus',
+            54 => 'Aubergine',
+            55 => 'Beetroot',
+            56 => 'Bell pepper',
+            57 => 'Broccoli',
+            58 => 'Brussels sprout',
+            59 => 'Cabbage',
+            60 => 'Carrot',
+            61 => 'Cauliflower',
+            62 => 'Celery',
+            63 => 'Chard',
+            64 => 'Chicory',
+            65 => 'Cucumber',
+            66 => 'Daikon radish',
+            67 => 'Eggplant',
+            68 => 'Endive',
+            69 => 'Fennel',
+            70 => 'Garlic',
+            71 => 'Ginger',
+            72 => 'Green bean',
+            73 => 'Kale',
+            74 => 'Leek',
+            75 => 'Lettuce',
+            76 => 'Mushroom',
+            77 => 'Okra',
+            78 => 'Onion',
+            79 => 'Parsnip',
+            80 => 'Pea',
+            81 => 'Pepper',
+            82 => 'Potato',
+            83 => 'Pumpkin',
+            84 => 'Radish',
+            85 => 'Red cabbage',
+            86 => 'Rhubarb',
+            87 => 'Spinach',
+            88 => 'Sweet corn',
+            89 => 'Sweet potato',
+            90 => 'Tomato',
+            91 => 'Turnip',
+            92 => 'Zucchini',
+            93 => 'Corn',
+            94 => 'White radish',
+            95 => 'Green onion',
+            96 => 'Kohlrabi',
+            97 => 'Arugula',
+            98 => 'Jalapeno pepper',
+            99 => 'Green chili',
+            100 => 'Swiss chard',
+        ];
+
+        return $products[$id];
     }
 }

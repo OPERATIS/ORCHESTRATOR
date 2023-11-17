@@ -64,7 +64,7 @@ createApp({
     mounted(){
         const urlParams = new URLSearchParams(window.location.search);
         const modalName = urlParams.get('m');
-        const modals = ['modal_shopify', 'modal_facebook', 'modal_google'];
+        const modals = ['modal_shopify', 'modal_facebook', 'modal_google', 'modal_google_ads'];
         if (modalName && modals.includes(modalName)) {
             this.openModal(modalName);
         }
@@ -124,7 +124,7 @@ function showFlash(data) {
                 </svg>
             </button>
         </div>
-    `
+    `;
     document.querySelector('#flash_messages').insertAdjacentHTML( 'beforeend', html );
     const message = document.querySelector('.flash_message:last-child');
     setTimeout(() => {

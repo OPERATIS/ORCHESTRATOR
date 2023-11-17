@@ -138,7 +138,8 @@ class GetOrders implements ShouldQueue
                             'variant_id' => $lineItem->variant_id,
                             'price' => $lineItem->price,
                             'quantity' => $lineItem->quantity,
-                            'gift_card' => $lineItem->gift_card
+                            'gift_card' => $lineItem->gift_card,
+                            'title' => $lineItem->title,
                         ]);
                     }
                 }

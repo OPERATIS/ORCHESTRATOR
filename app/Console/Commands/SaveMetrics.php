@@ -306,11 +306,12 @@ class SaveMetrics extends Command
 
         $orderLineItems = OrderLineItem::selectRaw("
             product_id,
+            title,
             count(*) as countProducts,
             integration_id
         ")
             ->whereIn('order_id', $orderIds)
-            ->groupBy(['product_id', 'integration_id'])
+            ->groupBy(['product_id', 'integration_id', 'title'])
             ->get();
 
         // Checkout and line items
@@ -325,16 +326,18 @@ class SaveMetrics extends Command
 
         $checkoutLineItems = CheckoutLineItem::selectRaw("
             product_id,
+            title,
             count(*) as countProducts,
             integration_id
         ")
             ->whereIn('checkout_id', $checkoutIds)
-            ->groupBy(['product_id', 'integration_id'])
+            ->groupBy(['product_id', 'integration_id', 'title'])
             ->get();
 
         $collectOrderLineItems = collect($orderLineItems);
 
         $products = [];
+        $productsName = [];
         foreach ($checkoutLineItems as $checkoutLineItem) {
             $userId = $integrationIds[$checkoutLineItem->integration_id] ?? null;
             if ($userId) {
@@ -345,6 +348,7 @@ class SaveMetrics extends Command
                 if (!$trySearch || ($trySearch->countproducts !== $checkoutLineItem->countproducts)) {
                     $products[$userId][$checkoutLineItem->product_id] = $checkoutLineItem->countproducts - ($trySearch->countproducts ?? 0);
                     $products[$userId][$checkoutLineItem->product_id] = $products[$userId][$checkoutLineItem->product_id] > 0 ? $products[$userId][$checkoutLineItem->product_id] : 0;
+                    $productsName[$userId][$checkoutLineItem->product_id] = $checkoutLineItem->title ?? $trySearch->title ?? 'Empty';
                 }
             }
         }
@@ -357,7 +361,7 @@ class SaveMetrics extends Command
                 $count = 0;
                 foreach ($productsUser as $productId => $value) {
                     if ($count < 5) {
-                        $prepared[] = $productId;
+                        $prepared[] = $productsName[$userId][$productId] . '#' . $productId;
                     }
                     $count++;
                 }

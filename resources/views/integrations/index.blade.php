@@ -135,7 +135,7 @@
                         <div class="mt-5">
                             @if($googleAdwordsFirstConnectedAt)
                                 <button class="w-full btn md btn_connect"
-                                        @click="openModal('modal_google')"
+                                        @click="openModal('modal_google_ads')"
                                 >
                                     Configure
                                 </button>
@@ -198,57 +198,72 @@
         </div>
     </div>
 
-    @if(@$shopifyFirstConnectedAt)
-        <modal-component ref="modal_shopify" :max-width="'460px'">
-            <div class="modal-slot">
-                <shopify-modal :accounts="{{@$shopifyAccounts}}"></shopify-modal>
-            </div>
-        </modal-component>
-    @else
-        <modal-component ref="modal_shopify_url" :max-width="'635px'">
-            <div class="modal-slot">
-                <div class="flex flex-col">
-                    <div class="text-black_5 text-2xl">Connect your Shopify Account</div>
-                    <div class="text-green_2 mt-3 font-semibold">Important</div>
-                    <div class="text-sm text-black_5">
-                        Copy and paste the URL you see in your <a class="text-green_2 underline" href="https://admin.shopify.com/" target="_blank">Shopify Admin</a> under <br/>
-                        "Online Store" › "Domains". <br/>
-                        You can also find the name of your store directly in the shopify admin URL. <br/>
-                        Extract "mystorename" from <span class="text-green_2 underline">https://admin.shopify.com/store / mystorename </span>.
-                    </div>
-                    <div class="mt-10">
-                        <form id="shopifyForm" @submit.prevent="submitShopifyForm" method='POST' action="{{route('integrationsShopifyLogin')}}">
-                            {{ csrf_field() }}
-                            <div class="input-block">
-                                <label for="shopify_url" class="label">MyShopify URL</label>
-                                <input id="shopify_url"
-                                       placeholder="Link"
-                                       class="input !pr-40"
-                                       type="text"
-                                       name="shop"
-                                       v-model="shopifyUrl"
-                                >
-                                <div v-if="showShopifyErrorMessage" class="error">URL should end with '.myshopify.com'</div>
-                                <button type="submit" class="absolute w-max top-1.5 right-1.5 w-full btn md btn_connect2">
-                                    Connect
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+    <modal-component ref="modal_shopify" :max-width="'726px'">
+        <div class="modal-slot">
+            <shopify-modal :accounts="{{@$shopifyAccounts}}"></shopify-modal>
+        </div>
+    </modal-component>
+    <modal-component ref="modal_shopify_url" :max-width="'635px'">
+        <div class="modal-slot">
+            <div class="flex flex-col">
+                <div class="text-black_5 text-2xl">Connect your Shopify Account</div>
+                <div class="text-green_2 mt-3 font-semibold">Important</div>
+                <div class="text-sm text-black_5">
+                    Copy and paste the URL you see in your <a class="text-green_2 underline" href="https://admin.shopify.com/" target="_blank">Shopify Admin</a> under <br/>
+                    "Online Store" › "Domains". <br/>
+                    You can also find the name of your store directly in the shopify admin URL. <br/>
+                    Extract "mystorename" from <span class="text-green_2 underline">https://admin.shopify.com/store / mystorename </span>.
+                </div>
+                <div class="mt-10">
+                    <form id="shopifyForm" @submit.prevent="submitShopifyForm" method='POST' action="{{route('integrationsShopifyLogin')}}">
+                        {{ csrf_field() }}
+                        <div class="input-block">
+                            <label for="shopify_url" class="label">MyShopify URL</label>
+                            <input id="shopify_url"
+                                   placeholder="Link"
+                                   class="input !pr-40"
+                                   type="text"
+                                   name="shop"
+                                   v-model="shopifyUrl"
+                            >
+                            <div v-if="showShopifyErrorMessage" class="error">URL should end with '.myshopify.com'</div>
+                            <button type="submit" class="absolute w-max top-1.5 right-1.5 w-full btn md btn_connect2">
+                                Connect
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </modal-component>
-    @endif
-
-    <modal-component ref="modal_google" :max-width="'460px'">
-        <div class="modal-slot">
-            <google-modal :accounts="{{@$googleAccounts}}"></google-modal>
         </div>
     </modal-component>
 
-    <modal-component ref="modal_facebook" :max-width="'460px'">
+    <modal-component ref="modal_google" :max-width="'726px'">
         <div class="modal-slot">
-            <facebook-modal :accounts="{{@$facebookAccounts}}"></facebook-modal>
+            <google-modal :accounts="{{@$googleAccounts}}"
+                          :title="'Connect your Google Analytics accounts'"
+                          :ads="false"
+                          :link="'{{route('integrationsGoogleLogin', ['service' => 'analytics'])}}'"
+                          :add_text="'Add Google Analytics Account'"
+            >
+
+            </google-modal>
+        </div>
+    </modal-component>
+
+    <modal-component ref="modal_google_ads" :max-width="'726px'">
+        <div class="modal-slot">
+            <google-modal :accounts="{{@$googleAccounts}}"
+                          :title="'Connect your Google Ads accounts'"
+                          :ads="true"
+                          :link="'{{route('integrationsGoogleLogin', ['service' => 'adwords'])}}'"
+                          :add_text="'Add Google Ads Account'"
+            ></google-modal>
+        </div>
+    </modal-component>
+
+    <modal-component ref="modal_facebook" :max-width="'726px'">
+        <div class="modal-slot">
+            <facebook-modal :accounts="{{@$facebookAccounts}}" :link="'{{route('integrationsFacebookLogin')}}'"></facebook-modal>
         </div>
     </modal-component>
 

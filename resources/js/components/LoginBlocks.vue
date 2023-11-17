@@ -245,7 +245,7 @@
                     </button>
                     <div class="mt-4 text-xs flex justify-center text-dark">
                         I didn’t received an email
-                        <span @click="forgotPassword()"
+                        <span @click="forgotPassword(true)"
                               class="font-bold ml-3 text-green_2 hover:opacity-75 cursor-pointer"
                         >
                             Resend
@@ -335,7 +335,7 @@ export default {
                     });
             }
         },
-        forgotPassword() {
+        forgotPassword(resend = false) {
             if (this.email){
                 let data = {
                     email: this.email
@@ -344,12 +344,44 @@ export default {
                     .then(({data}) => {
                         if(data.status == true){
                             this.changeView('forgot_password_sent');
+                            if (resend){
+                                const customEvent = new CustomEvent('flash-message', {
+                                    detail: {
+                                        title: 'Letter has been sent again!',
+                                        subtitle: 'Password instructions sent successfully!',
+                                        type: 'success',
+                                        time: 3000,
+                                    }
+                                });
+                                window.dispatchEvent(customEvent);
+                            }
                         } else {
-                            this.error.email = data['errors'] && data['errors']['email'] ? data['errors']['email'][0] : null;
+                            if (resend){
+                                const customEvent = new CustomEvent('flash-message', {
+                                    detail: {
+                                        title: 'Something went wrong!',
+                                        subtitle: data['errors'] ? data['errors'][0] : 'Try it again later!',
+                                        type: 'warning',
+                                        time: 3000,
+                                    }
+                                });
+                                window.dispatchEvent(customEvent);
+                            } else {
+                                this.error.email = data['errors'] ? (data['errors']['email'] ? data['errors']['email'][0] : data['errors'][0]) : null;
+                            }
                         }
                     })
                     .catch(({response}) => {
                         console.log(response.data.message);
+                        const customEvent = new CustomEvent('flash-message', {
+                            detail: {
+                                title: 'Something went wrong!',
+                                subtitle: 'Try it again later!',
+                                type: 'warning',
+                                time: 3000,
+                            }
+                        });
+                        window.dispatchEvent(customEvent);
                     });
             }
         },
