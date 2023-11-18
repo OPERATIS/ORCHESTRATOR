@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Integrations;
 use App\Models\Integration;
 use App\Models\User;
 use App\Services\Shopify;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
@@ -91,5 +92,38 @@ class ShopifyController extends BaseController
         ]);
 
         return redirect(route('integrations', ['platform' => 'shopify']));
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function customersDataRequest(): JsonResponse
+    {
+        $status = Shopify::verify() ? 200 : 403;
+        return response()->json([
+            'status' => true,
+        ], $status);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function customersRedact(): JsonResponse
+    {
+        $status = Shopify::verify() ? 200 : 403;
+        return response()->json([
+            'status' => true,
+        ], $status);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function shopRedact(): JsonResponse
+    {
+        $status = Shopify::verify() ? 200 : 403;
+        return response()->json([
+            'status' => true,
+        ], $status);
     }
 }
