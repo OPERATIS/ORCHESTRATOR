@@ -15,6 +15,9 @@ class VerifyCsrfToken extends Middleware
         'webhooks/whatsapp',
         'webhooks/messenger',
         'webhooks/telegram',
-        'webhooks/stripe'
+        'webhooks/stripe',
+        'integrations/shopify/customers-data-request',
+        'integrations/shopify/customers-redact',
+        'integrations/shopify/shop-redact'
     ];
 }
