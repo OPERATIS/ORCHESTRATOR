@@ -35,10 +35,14 @@ Route::get('thank-you', [PagesController::class, 'thankYou'])->name('thankYou');
 Route::get('404', [PagesController::class, 'error404'])->name('error404');
 Route::get('500', [PagesController::class, 'error500'])->name('error500');
 
-Route::middleware([Authenticate::class])->group(function () {
-    Route::post('integrations/shopify/login', [ShopifyController::class, 'login'])->name('integrationsShopifyLogin');
-    Route::get('integrations/shopify/callback', [ShopifyController::class, 'callback'])->name('integrationsShopifyCallback');
+Route::post('integrations/shopify/customers-data-request', [ShopifyController::class, 'customersDataRequest'])->name('integrationsShopifyCustomersDataRequest');
+Route::post('integrations/shopify/customers-redact', [ShopifyController::class, 'customersRedact'])->name('integrationsCustomersRedact');
+Route::post('integrations/shopify/shop-redact', [ShopifyController::class, 'shopRedact'])->name('integrationsShopRedact');
+Route::get('integrations/shopify/guest', [ShopifyController::class, 'guest'])->name('integrationsShopifyGuest');
+Route::post('integrations/shopify/login', [ShopifyController::class, 'login'])->name('integrationsShopifyLogin');
+Route::get('integrations/shopify/callback', [ShopifyController::class, 'callback'])->name('integrationsShopifyCallback');
 
+Route::middleware([Authenticate::class])->group(function () {
     Route::get('integrations/google/login', [GoogleController::class, 'login'])->name('integrationsGoogleLogin');
     Route::get('integrations/google/callback', [GoogleController::class, 'callback'])->name('integrationsGoogleCallback');
 
