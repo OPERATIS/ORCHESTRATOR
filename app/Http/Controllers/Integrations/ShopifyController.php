@@ -38,10 +38,8 @@ class ShopifyController extends BaseController
      */
     public function guest(Request $request)
     {
-        if (Shopify::verify()) {
-            $parameters = $request->request->all();
-            unset($parameters['hmac']);
-            $shop = $parameters['shop'];
+        if (Shopify::verify($request)) {
+            $shop = $request->get('shop');
 
             // Search shop in records
             $integration = Integration::where('app_user_slug', $shop)
@@ -169,7 +167,7 @@ class ShopifyController extends BaseController
      */
     public function customersDataRequest(): JsonResponse
     {
-        $status = Shopify::verify() ? 200 : 403;
+        $status = Shopify::verifyWebhooks() ? 200 : 403;
         return response()->json([
             'status' => true,
         ], $status);
@@ -180,7 +178,7 @@ class ShopifyController extends BaseController
      */
     public function customersRedact(): JsonResponse
     {
-        $status = Shopify::verify() ? 200 : 403;
+        $status = Shopify::verifyWebhooks() ? 200 : 403;
         return response()->json([
             'status' => true,
         ], $status);
@@ -191,7 +189,7 @@ class ShopifyController extends BaseController
      */
     public function shopRedact(): JsonResponse
     {
-        $status = Shopify::verify() ? 200 : 403;
+        $status = Shopify::verifyWebhooks() ? 200 : 403;
         return response()->json([
             'status' => true,
         ], $status);
