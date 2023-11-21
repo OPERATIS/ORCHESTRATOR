@@ -14,6 +14,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Shopify\Auth\OAuth;
 use Shopify\Auth\OAuthCookie;
@@ -26,6 +27,37 @@ use Shopify\Exception\UninitializedContextException;
 class ShopifyController extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    /**
+     * @param Request $request
+     * @return RedirectResponse|void
+     * @throws CookieSetException
+     * @throws PrivateAppException
+     * @throws SessionStorageException
+     * @throws UninitializedContextException
+     */
+    public function guest(Request $request)
+    {
+        if (Shopify::verify($request)) {
+            $shop = $request->get('shop');
+
+            // Search shop in records
+            $integration = Integration::where('app_user_slug', $shop)
+                ->whereHas('user')
+                ->where('platform', 'shopify')
+                ->first();
+
+            // Check correct record
+            if ($integration && !empty($integration->access_token) && $integration->scope !== config('integrations.shopify.appScopes')) {
+                Auth::login($integration->user);
+                return redirect()->route('dashboard');
+            } else {
+                return $this->baseLogin($shop);
+            }
+        } else {
+            abort(403);
+        }
+    }
 
     /**
      * @param Request $request
@@ -42,6 +74,19 @@ class ShopifyController extends BaseController
             abort(404);
         }
 
+        return $this->baseLogin($shop);
+    }
+
+    /**
+     * @param string $shop
+     * @return RedirectResponse
+     * @throws CookieSetException
+     * @throws PrivateAppException
+     * @throws SessionStorageException
+     * @throws UninitializedContextException
+     */
+    protected function baseLogin(string $shop): RedirectResponse
+    {
         Shopify::setContext($shop);
         $url = OAuth::begin($shop, route('integrationsShopifyCallback'), false,
             function (OAuthCookie $cookie) use ($shop) {
@@ -78,12 +123,35 @@ class ShopifyController extends BaseController
             return abort(500);
         }
 
-        Integration::updateOrCreate([
-            'user_id' => $user->id,
+        $data = [
             'app_user_slug' => $session->getShop(),
             'app_user_id' => $session->getId(),
             'platform' => 'shopify'
-        ], [
+        ];
+
+        if ($user) {
+            $data['user_id'] = $user->id;
+        } else {
+            // Search shop in records
+            $integration = Integration::where('app_user_slug', $shop)
+                ->whereHas('user')
+                ->where('platform', 'shopify')
+                ->first();
+
+            if ($integration) {
+                $user = $integration->user;
+            } else {
+                $user = User::create([
+                    'email' => $shop,
+                    'password' => Hash::make(str_replace('.myshopify.com', '', $shop)),
+                    'brand_name' => str_replace('.myshopify.com', '', $shop)
+                ]);
+            }
+            $data['user_id'] = $user->id;
+            Auth::login($user);
+        }
+
+        Integration::updateOrCreate($data, [
             'actual' => true,
             'deleted_at' => null,
             'access_token' => $session->getAccessToken(),
@@ -99,7 +167,7 @@ class ShopifyController extends BaseController
      */
     public function customersDataRequest(): JsonResponse
     {
-        $status = Shopify::verify() ? 200 : 403;
+        $status = Shopify::verifyWebhooks() ? 200 : 403;
         return response()->json([
             'status' => true,
         ], $status);
@@ -110,7 +178,7 @@ class ShopifyController extends BaseController
      */
     public function customersRedact(): JsonResponse
     {
-        $status = Shopify::verify() ? 200 : 403;
+        $status = Shopify::verifyWebhooks() ? 200 : 403;
         return response()->json([
             'status' => true,
         ], $status);
@@ -121,7 +189,7 @@ class ShopifyController extends BaseController
      */
     public function shopRedact(): JsonResponse
     {
-        $status = Shopify::verify() ? 200 : 403;
+        $status = Shopify::verifyWebhooks() ? 200 : 403;
         return response()->json([
             'status' => true,
         ], $status);
