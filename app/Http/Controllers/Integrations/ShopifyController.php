@@ -141,8 +141,9 @@ class ShopifyController extends BaseController
             if ($integration) {
                 $user = $integration->user;
             } else {
-                $user = User::create([
-                    'email' => $shop,
+                $user = User::updateOrCreate([
+                    'email' => $shop
+                ], [
                     'password' => Hash::make(str_replace('.myshopify.com', '', $shop)),
                     'brand_name' => str_replace('.myshopify.com', '', $shop)
                 ]);
@@ -190,6 +191,15 @@ class ShopifyController extends BaseController
     public function shopRedact(): JsonResponse
     {
         $status = Shopify::verifyWebhooks() ? 200 : 403;
+
+        // Remove shop
+        $shopDomain = request()->post('shop_domain');
+        if ($status === 200 && $shopDomain) {
+            Integration::where('platform', 'shopify')
+                ->where('app_user_slug', $shopDomain)
+                ->forceDelete();
+        }
+
         return response()->json([
             'status' => true,
         ], $status);
