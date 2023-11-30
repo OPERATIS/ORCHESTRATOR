@@ -21,6 +21,9 @@ class DashboardController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
+        if (!$user) {
+            return redirect('login');
+        }
 
         $metricsActualData = Metrics::getActualData($user->id);
 
