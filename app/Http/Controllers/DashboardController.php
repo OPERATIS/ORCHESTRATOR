@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Shorts;
 use App\Models\Alert;
+use App\Models\Integration;
 use App\Models\Metric;
 use App\Models\User;
 use App\Services\Metrics;
@@ -41,6 +42,12 @@ class DashboardController extends Controller
         $warningWhenShopifyIntegrationNotFound = $warnings->getStatusShopifyIntegrationNotFound($user);
         $warningWhenShopifyIntegratedLess24Hours = $warnings->getStatusShopifyIntegratedLess24Hours($user);
         $warningWhenShopifyIntegratedLess1Hour = $warnings->getStatusShopifyIntegratedLess1Hour($user);
+
+        $actualIntegrations = Integration::select('platform')
+            ->where('user_id', $user->id)
+            ->get()
+            ->pluck('platform')
+            ->toArray();
 
         return view('dashboard.index')
             ->with('user', $user)
