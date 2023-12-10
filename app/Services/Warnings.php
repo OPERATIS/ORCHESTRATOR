@@ -53,8 +53,19 @@ class Warnings
         return Carbon::parse($this->getIntegrationShopifyCreatedAt($user)) < Carbon::now()->subHours(24);
     }
 
+    public function getStatusShopifyIntegratedLess1Hour(User $user): bool
+    {
+        return Carbon::parse($this->getIntegrationShopifyCreatedAt($user)) < Carbon::now()->subHour();
+    }
+
     public function getStatusShopifyHasLittleInformation(User $user): bool
     {
         return $this->getCountShopifyRecords($user) > 12;
+    }
+
+    public function getStatusShopifyIntegrationNotFound(User $user): bool
+    {
+        $integration = $this->getLastIntegrationShopify($user);
+        return empty($integration);
     }
 }

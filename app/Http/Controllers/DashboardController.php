@@ -38,8 +38,9 @@ class DashboardController extends Controller
 
         /** @var Warnings $warnings */
         $warnings = app()->make(Warnings::class);
+        $warningWhenShopifyIntegrationNotFound = $warnings->getStatusShopifyIntegrationNotFound($user);
         $warningWhenShopifyIntegratedLess24Hours = $warnings->getStatusShopifyIntegratedLess24Hours($user);
-        $warningWhenShopifyHasLittleInformation = $warnings->getStatusShopifyHasLittleInformation($user);
+        $warningWhenShopifyIntegratedLess1Hour = $warnings->getStatusShopifyIntegratedLess1Hour($user);
 
         return view('dashboard.index')
             ->with('user', $user)
