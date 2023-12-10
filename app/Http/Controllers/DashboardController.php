@@ -8,6 +8,7 @@ use App\Models\Metric;
 use App\Models\User;
 use App\Services\Metrics;
 use App\Services\Recommendations;
+use App\Services\Warnings;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -34,6 +35,11 @@ class DashboardController extends Controller
         $this->getRevenueAttributionFactors($user->id, $revenueAttributionFactors, $lastUpdateRevenueAttributionFactors);
 
         SEOTools::setTitle('Dashboard - ORCHESTRATOR');
+
+        /** @var Warnings $warnings */
+        $warnings = app()->make(Warnings::class);
+        $warningWhenShopifyIntegratedLess24Hours = $warnings->getStatusShopifyIntegratedLess24Hours($user);
+        $warningWhenShopifyHasLittleInformation = $warnings->getStatusShopifyHasLittleInformation($user);
 
         return view('dashboard.index')
             ->with('user', $user)
