@@ -50,12 +50,12 @@ class Warnings
 
     public function getStatusShopifyIntegratedLess24Hours(User $user): bool
     {
-        return Carbon::parse($this->getIntegrationShopifyCreatedAt($user)) < Carbon::now()->subHours(24);
+        return Carbon::parse($this->getIntegrationShopifyCreatedAt($user)) > Carbon::now()->subHours(24);
     }
 
     public function getStatusShopifyIntegratedLess1Hour(User $user): bool
     {
-        return Carbon::parse($this->getIntegrationShopifyCreatedAt($user)) < Carbon::now()->subHour();
+        return Carbon::parse($this->getIntegrationShopifyCreatedAt($user)) > Carbon::now()->subHour();
     }
 
     public function getStatusShopifyHasLittleInformation(User $user): bool
