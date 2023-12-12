@@ -9,7 +9,7 @@
         <div class="max-w-[84rem] mx-auto">
             <div class="px-7 py-8">
                 <div class="relative flex items-center w-full items-center gap-3">
-                    @if($metricsActualData)
+                    @if($metricsActualData && count($actualIntegrations))
                         @foreach($metricsActualData as $metricKey => $metricActualData)
                             <div class="h-[7rem] w-full text-black p-6 rounded-2xl" style="@if($metricActualData['percent'] > 0) background: #E3FFE4; @else background: #F6E5E5; @endif">
                                 <div class="text-sm font-semibold uppercase mb-2">
@@ -40,14 +40,20 @@
                             <div class="flex items-center justify-center w-10 h-10 rounded-[0.625rem]" style="background: rgba(229, 236, 244, 0.75);">
                                 <x-icon name="circle-wavy-warning" class="w-4 h-4"/>
                             </div>
-                            <div class="text-sm text-black mt-3">
-                                You have no metrics data yet
+                            <div class="text-sm text-black text-center mt-3" style="max-width: 500px;">
+                                @if(@$warningWhenShopifyIntegratedLess1Hour)
+                                    We need 1 hour after connecting your data to populate metrics, you will see 0s if there will be no orders in curren hour
+                                @elseif(@$warningWhenShopifyIntegrationNotFound || !count(@$actualIntegrations))
+                                    Please connect data for your Shopify store (optionally for other data sources) in the Integrations tab
+                                @else
+                                    You have no metrics data yet
+                                @endif
                             </div>
                         </div>
                     @endif
                 </div>
                 <div class="flex justify-center items-center w-full min-h-[18rem] mt-8 bg-primary_light rounded-2xl pt-0 pb-4 px-4">
-                    <dashboard-chart-block></dashboard-chart-block>
+                    <dashboard-chart-block :integrations-count="{{count($actualIntegrations)}}"></dashboard-chart-block>
                 </div>
                 <div class="mt-8">
                     <div class="flex items-center text-black text-2xl font-semibold">
@@ -90,8 +96,16 @@
                                         <div class="flex items-center justify-center w-12 h-12 rounded-[0.625rem]" style="background: rgba(229, 236, 244, 0.75);">
                                             <x-icon name="circle-wavy-warning" class="w-6 h-6"/>
                                         </div>
-                                        <div class="text-sm text-black mt-4">
-                                            You have no recommendations yet
+                                        <div class="text-sm text-black text-center mt-4" style="max-width: 400px;">
+                                            @if(count($actualIntegrations))
+                                                @if(@$warningWhenShopifyIntegratedLess24Hours)
+                                                    We need 24 hours to obtain enough data for relevant recommendations
+                                                @else
+                                                    You have no recommendations yet
+                                                @endif
+                                            @else
+                                                Please connect data for your Shopify store (optionally for other data sources) in the Integrations tab
+                                            @endif
                                         </div>
                                     </div>
                                 @endif
@@ -145,8 +159,16 @@
                                         <div class="flex items-center justify-center w-12 h-12 rounded-[0.625rem]" style="background: rgba(229, 236, 244, 0.75);">
                                             <x-icon name="circle-wavy-warning" class="w-6 h-6"/>
                                         </div>
-                                        <div class="text-sm text-black mt-4">
-                                            You have no attributions factors yet
+                                        <div class="text-sm text-black text-center mt-4" style="max-width: 400px;">
+                                            @if(count($actualIntegrations))
+                                                @if(@$warningWhenShopifyIntegratedLess1Hour)
+                                                    We need 1 hour after connecting your data to populate attributions
+                                                @else
+                                                    You have no attributions factors yet
+                                                @endif
+                                            @else
+                                                Please connect data for your Shopify store (optionally for other data sources) in the Integrations tab
+                                            @endif
                                         </div>
                                     </div>
                                 @endif

@@ -55,7 +55,11 @@ class DashboardController extends Controller
             ->with('recommendations', $recommendations)
             ->with('revenueAttributionFactors', $revenueAttributionFactors)
             ->with('lastUpdateRevenueAttributionFactors', $lastUpdateRevenueAttributionFactors)
-            ->with('metricsActualData', $metricsActualData);
+            ->with('metricsActualData', $metricsActualData)
+            ->with('warningWhenShopifyIntegrationNotFound', $warningWhenShopifyIntegrationNotFound)
+            ->with('warningWhenShopifyIntegratedLess24Hours', $warningWhenShopifyIntegratedLess24Hours)
+            ->with('warningWhenShopifyIntegratedLess1Hour', $warningWhenShopifyIntegratedLess1Hour)
+            ->with('actualIntegrations', $actualIntegrations);
     }
 
     /**
