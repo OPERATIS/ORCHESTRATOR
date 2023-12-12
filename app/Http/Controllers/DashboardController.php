@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Shorts;
 use App\Models\Alert;
+use App\Models\Integration;
 use App\Models\Metric;
 use App\Models\User;
 use App\Services\Metrics;
 use App\Services\Recommendations;
+use App\Services\Warnings;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,6 +23,9 @@ class DashboardController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
+        if (!$user) {
+            return redirect('login');
+        }
 
         $metricsActualData = Metrics::getActualData($user->id);
 
@@ -32,13 +37,29 @@ class DashboardController extends Controller
 
         SEOTools::setTitle('Dashboard - ORCHESTRATOR');
 
+        /** @var Warnings $warnings */
+        $warnings = app()->make(Warnings::class);
+        $warningWhenShopifyIntegrationNotFound = $warnings->getStatusShopifyIntegrationNotFound($user);
+        $warningWhenShopifyIntegratedLess24Hours = $warnings->getStatusShopifyIntegratedLess24Hours($user);
+        $warningWhenShopifyIntegratedLess1Hour = $warnings->getStatusShopifyIntegratedLess1Hour($user);
+
+        $actualIntegrations = Integration::select('platform')
+            ->where('user_id', $user->id)
+            ->get()
+            ->pluck('platform')
+            ->toArray();
+
         return view('dashboard.index')
             ->with('user', $user)
             ->with('lastUpdateRecommendations', $lastUpdateRecommendations)
             ->with('recommendations', $recommendations)
             ->with('revenueAttributionFactors', $revenueAttributionFactors)
             ->with('lastUpdateRevenueAttributionFactors', $lastUpdateRevenueAttributionFactors)
-            ->with('metricsActualData', $metricsActualData);
+            ->with('metricsActualData', $metricsActualData)
+            ->with('warningWhenShopifyIntegrationNotFound', $warningWhenShopifyIntegrationNotFound)
+            ->with('warningWhenShopifyIntegratedLess24Hours', $warningWhenShopifyIntegratedLess24Hours)
+            ->with('warningWhenShopifyIntegratedLess1Hour', $warningWhenShopifyIntegratedLess1Hour)
+            ->with('actualIntegrations', $actualIntegrations);
     }
 
     /**

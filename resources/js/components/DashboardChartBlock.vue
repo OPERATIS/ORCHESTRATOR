@@ -68,8 +68,8 @@
                             <path d="M33.3125 40.3125C33.3125 41.8658 32.0532 43.125 30.5 43.125C28.9468 43.125 27.6875 41.8658 27.6875 40.3125C27.6875 38.7592 28.9468 37.5 30.5 37.5C32.0532 37.5 33.3125 38.7592 33.3125 40.3125Z" />
                         </svg>
                     </div>
-                    <div class="text-sm text-black mt-4">
-                        You have no chart data yet
+                    <div class="text-sm text-black text-center mt-4" style="max-width: 500px;">
+                        {{ actualIntegrationsText }}
                     </div>
                 </div>
             </template>
@@ -85,6 +85,12 @@ import { Chart } from 'highcharts-vue'
 export default {
     components: {
         highcharts: Chart
+    },
+    props: {
+        integrationsCount: {
+            type: Number,
+            default: false
+        }
     },
     data(){
         return {
@@ -103,6 +109,11 @@ export default {
             chartData: {},
             loading: false
         }
+    },
+    computed: {
+      actualIntegrationsText(){
+        return this.integrationsCount && this.integrationsCount > 0 ? 'You have no chart data yet' : 'Please connect data for your Shopify store (optionally for other data sources) in the Integrations tab';
+      }
     },
     methods: {
         toggleDropdown() {
